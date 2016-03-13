@@ -1,15 +1,15 @@
 program test_subspace
 
 use subspace
+use signals,only: signoise
+
 Implicit none
 
 integer :: Ns = 1024 !default value
-real(dp) :: fs=48000_dp
-integer :: i,M
+real(dp) :: fs=48000_dp, fb=12345.6_dp,snr=60
+integer :: M
 integer :: Ntone=1
 
-complex(dp),parameter :: J=(0._dp,1._dp)
-complex(dp) :: t
 complex(dp),allocatable :: x(:)
 real(dp),allocatable :: tones(:),sigma(:)
 !-----------------------------
@@ -36,17 +36,16 @@ endif
 allocate(x(Ns),tones(Ntone),sigma(Ntone))
 
 
+call signoise(fs,fb,snr,Ns,&
+              x)
 
-do i=1,size(x)
-t = (i-1)/fs
-x(i) = exp(J*2*pi*12345.5_dp*t)
-enddo
 
 call esprit(x,size(x),Ntone,M,fs,&
             tones,sigma)
 
 write(stdout,*) ' ESPRIT found tone(s) [Hz]: ',tones
 write(stdout,*) ' with sigma: ',sigma
-
-
 end program test_subspace
+
+
+
