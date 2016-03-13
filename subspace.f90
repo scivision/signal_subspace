@@ -19,31 +19,36 @@ real(dp) :: S(M,M),RWORK(5*M),ang(L),f(L)
 integer :: luinfo=0
 integer :: svdinfo
 
-complex(dp) :: W1(M-1,L), IPIV(M-1), Phi(L,L)
+complex(dp) :: W1(L,L), IPIV(M-1), Phi(L,L)
 
 Lwork = 4*M
 
+!write(stdout,*) 'autocov'
 call corrmtx(x,size(x),M,R)
 
-call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
 
+call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
+write(stdout,*) 'SVD return code',svdinfo
 S1 = U(1:M-1,1:L)
 S2 = U(2:M,1:L)
 
-!write(stdout,*) 'start inversion'
 W1=matmul(conjg(transpose(S1)),S1)
-call zgetrf(M-1,L,W1,M-1,ipiv,luinfo) !LU decomp
-call zgetri(M-1,W1,M-1,ipiv,work,Lwork,luinfo) !LU inversion
+!write(stdout,*) 'LU decomp'
+call zgetrf(L,L,W1,L,ipiv,luinfo) !LU decomp
+!write(stdout,*) 'LU inverse'
+call zgetri(L,W1,L,ipiv,work,Lwork,luinfo) !LU inversion
+write(stdout,*) 'LU inverse output code',luinfo
+
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 
 !write(stdout,*) 'find eigenvalues'
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,work,lwork,rwork,luinfo)
+write(stdout,*) 'eig output code',luinfo
 
 !write(stdout,*) 'eig -> angle'
 ang = atan2(aimag(eig),real(eig))
 !write(stdout,*) 'angle -> tone'
 tones = fs*ang/(2*pi)
-write(stdout,*) ' ESPRIT complete',tones
 
 end subroutine esprit
 !----------------------------------------------------------------------
@@ -51,7 +56,7 @@ subroutine corrmtx(x,N,M,C)
 
 ! input:
 ! x is a 1-D vector
-! sx is length of x
+! N is length of x
 ! M is the size of signal block (integer)
 ! output:
 ! C is the 2-D result
@@ -69,7 +74,7 @@ R = matmul(yn,conjg(transpose(yn)))
 !call zgemm('N','C',M,M,M,1_dp,yn,M,yn,M,0_dp,R,M) !half speed of matmul, Gfortran 5.2.1
 
 do i = 1,N-M-1
-    yn(:,1) = x(M+i:i:-1)
+    yn(:,1) = x(M-1+i:i:-1)
     R = R + matmul(yn,conjg(transpose(yn)))
 enddo
 

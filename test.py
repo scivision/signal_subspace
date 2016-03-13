@@ -22,8 +22,10 @@ def test_autocov():
     np.testing.assert_allclose(C,Cf)
 
 def test_esprit():
-    x = np.arange(1,11)
+    tic = time()
+    t = np.arange(0,0.01,1/48e3)
+    x = np.exp(1j*2*np.pi*12345.5*t)
     fb,sigma=esprit(x,4,fs=48e3)
-    print(fb,sigma)
+    print(fb,sigma,time()-tic)
 
 test_esprit()

@@ -3,7 +3,7 @@ program test_subspace
 use subspace
 Implicit none
 
-integer,parameter :: Ns = 128
+integer,parameter :: Ns = 2048
 integer :: i
 complex(dp),parameter :: J=(0_dp,1_dp)
 complex(dp) :: t,x(Ns)
@@ -21,6 +21,7 @@ enddo
 
 call esprit(x,size(x),Ntone,M,fs,tones)
 
-write(stdout,*) tones
+write(stdout,*) ' ESPRIT complete',tones
+
 
 end program test_subspace
