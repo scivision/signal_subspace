@@ -1,54 +1,65 @@
-!
 module subspace
-use, intrinsic :: iso_fortran_env, only : dp=>real64, stdout=>output_unit
-Implicit none
-real(dp),parameter :: pi = 4_dp*datan(1._dp)
+    use, intrinsic :: iso_fortran_env, only : dp=>real64, i64=>int64, stdout=>output_unit
+    use perf, only : init_random_seed,sysclock2ms
+    Implicit none
+    real(dp),parameter :: pi = 4_dp*datan(1._dp)
 contains
 
-subroutine esprit(x,N,L,M,fs,tones)
+subroutine esprit(x,N,L,M,fs,tones,sigma)
 
-integer, intent(in) :: L,M,N
-double complex,intent(in) :: x(N)
-real(dp),intent(in) :: fs
-real(dp),intent(out) :: tones(L)
+    integer, intent(in) :: L,M,N
+    complex(dp),intent(in) :: x(N)
+    real(dp),intent(in) :: fs
+    real(dp),intent(out) :: tones(L),sigma(L)
 
-integer :: Lwork
-complex(dp) :: R(M,M),U(M,M),VT(M,M), WORK(4*M), S1(M-1,L), S2(M-1,L), &
-    eig(L),junk(L,L)
-real(dp) :: S(M,M),RWORK(5*M),ang(L),f(L)
-integer :: luinfo=0
-integer :: svdinfo
+    integer :: Lwork,i
+    complex(dp) :: R(M,M),U(M,M),VT(M,M), WORK(4*M), S1(M-1,L), S2(M-1,L), &
+        eig(L),junk(L,L)
+    real(dp) :: S(M,M),RWORK(5*M),ang(L)
+    integer :: luinfo=0
+    integer :: svdinfo
+    complex(dp) :: W1(L,L), IPIV(M-1), Phi(L,L)
 
-complex(dp) :: W1(L,L), IPIV(M-1), Phi(L,L)
+    integer(i64) :: tic,toc
 
 Lwork = 4*M
 
 !write(stdout,*) 'autocov'
 call corrmtx(x,size(x),M,R)
 
-
+call system_clock(tic)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
-write(stdout,*) 'SVD return code',svdinfo
+if (svdinfo.ne.0) write(stdout,*) 'SVD return code',svdinfo
+call system_clock(toc)
+if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
+
 S1 = U(1:M-1,1:L)
 S2 = U(2:M,1:L)
 
+call system_clock(tic)
 W1=matmul(conjg(transpose(S1)),S1)
-!write(stdout,*) 'LU decomp'
 call zgetrf(L,L,W1,L,ipiv,luinfo) !LU decomp
-!write(stdout,*) 'LU inverse'
 call zgetri(L,W1,L,ipiv,work,Lwork,luinfo) !LU inversion
-write(stdout,*) 'LU inverse output code',luinfo
+if (luinfo.ne.0) write(stdout,*) 'LU inverse output code',luinfo
 
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
+call system_clock(toc)
+if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
 
-!write(stdout,*) 'find eigenvalues'
+call system_clock(tic)
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,work,lwork,rwork,luinfo)
-write(stdout,*) 'eig output code',luinfo
+if (luinfo.ne.0) write(stdout,*) 'eig output code',luinfo
+call system_clock(toc)
+if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 
-!write(stdout,*) 'eig -> angle'
+
 ang = atan2(aimag(eig),real(eig))
-!write(stdout,*) 'angle -> tone'
-tones = fs*ang/(2*pi)
+
+tones = abs(fs*ang/(2*pi))
+!eigenvalues
+do i=1,L
+    sigma(i) = S(i,i)
+enddo
 
 end subroutine esprit
 !----------------------------------------------------------------------
@@ -62,11 +73,11 @@ subroutine corrmtx(x,N,M,C)
 ! C is the 2-D result
 
 integer, intent(in) :: M,N
-double complex,intent(in) :: x(N)
-double complex,intent(out):: C(M,M)
+complex(dp),intent(in) :: x(N)
+complex(dp),intent(out):: C(M,M)
 
 integer :: i
-double complex :: yn(M,1), R(M,M)
+complex(dp) :: yn(M,1), R(M,M)
 
 yn(:,1) = x(M:1:-1)
 

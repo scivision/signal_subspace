@@ -25,7 +25,7 @@ def test_esprit():
     tic = time()
     t = np.arange(0,0.01,1/48e3)
     x = np.exp(1j*2*np.pi*12345.5*t)
-    fb,sigma=esprit(x,4,fs=48e3)
+    fb,sigma=esprit(x,1,fs=48e3)
     print(fb,sigma,time()-tic)
 
 test_esprit()
