@@ -1,10 +1,8 @@
 !
 module subspace
 use, intrinsic :: iso_fortran_env, only : dp=>real64, stdout=>output_unit
-
 Implicit none
-
-!integer,parameter :: dp = selected_real_kind(15)
+real(dp),parameter :: pi = 4_dp*datan(1._dp)
 contains
 
 subroutine esprit(x,N,L,M,fs,tones)
@@ -13,8 +11,6 @@ integer, intent(in) :: L,M,N
 double complex,intent(in) :: x(N)
 real(dp),intent(in) :: fs
 real(dp),intent(out) :: tones(L)
-
-real(dp),parameter :: pi = 4_dp*datan(1._dp)
 
 integer :: Lwork
 complex(dp) :: R(M,M),U(M,M),VT(M,M), WORK(4*M), S1(M-1,L), S2(M-1,L), &
@@ -34,17 +30,20 @@ call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
 S1 = U(1:M-1,1:L)
 S2 = U(2:M,1:L)
 
+!write(stdout,*) 'start inversion'
 W1=matmul(conjg(transpose(S1)),S1)
 call zgetrf(M-1,L,W1,M-1,ipiv,luinfo) !LU decomp
 call zgetri(M-1,W1,M-1,ipiv,work,Lwork,luinfo) !LU inversion
-
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 
+!write(stdout,*) 'find eigenvalues'
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,work,lwork,rwork,luinfo)
 
+!write(stdout,*) 'eig -> angle'
 ang = atan2(aimag(eig),real(eig))
-
+!write(stdout,*) 'angle -> tone'
 tones = fs*ang/(2*pi)
+write(stdout,*) ' ESPRIT complete',tones
 
 end subroutine esprit
 !----------------------------------------------------------------------

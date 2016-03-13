@@ -1,18 +1,26 @@
 program test_subspace
 
- use subspace
- Implicit none
+use subspace
+Implicit none
 
+integer,parameter :: Ns = 128
+integer :: i
+complex(dp),parameter :: J=(0_dp,1_dp)
+complex(dp) :: t,x(Ns)
+integer,parameter :: M=Ns/2, Ntone=1
+!complex(dp) :: C(M,M)
+real(dp) :: tones(Ntone)
+real(dp),parameter :: fs=48000_dp
 
- complex(dp),parameter :: x(10)=[1,2,3,4,5,6,7,8,9,10]
- integer,parameter :: M=10/2, N=4
- !complex(dp) :: C(M,M)
- real(dp) :: tones(N)
- real(dp),parameter :: fs=48000_dp
+do i=1,Ns
+t = (i-1)/fs
+x(i) = exp(J*2*pi*12345.5_dp*t)
+enddo
 
- !call corrmtx(x,size(x),M,C)
- call esprit(x,size(x),N,M,fs,tones)
+!write(stdout,*) x
 
-    write(stdout,*) tones
+call esprit(x,size(x),Ntone,M,fs,tones)
+
+write(stdout,*) tones
 
 end program test_subspace
