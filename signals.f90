@@ -21,11 +21,11 @@ subroutine signoise(fs,fb,snr,Ns,x)
     x(i) = sqrt(2._dp) * exp(J*2._dp*pi*fb*t)
     enddo
 !--- add noise
-    nvar = 10._dp**(-snr/10._dp)
     call randn(Ns,noise)
-    noise = sqrt(nvar)* noise
 
-    x = x + noise
+    nvar = 10._dp**(-snr/10._dp)
+
+    x = x + sqrt(nvar)*noise
 
 
 end subroutine signoise

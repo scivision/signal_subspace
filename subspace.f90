@@ -24,8 +24,11 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
 
 Lwork = 4*M
 
-!write(stdout,*) 'autocov'
+call system_clock(tic)
 call corrmtx(x,size(x),M,R)
+call system_clock(toc)
+if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute autocovariance estimate:',sysclock2ms(toc-tic)
+
 
 call system_clock(tic)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
