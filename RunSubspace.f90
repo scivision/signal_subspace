@@ -28,7 +28,7 @@ if (narg.GT.2) then
  call get_command_argument(3,arg); read(arg,*) Ntone
 endif
 if (narg.GT.3) then
-    call get_command_argument(3,arg); read(arg,*) M
+    call get_command_argument(4,arg); read(arg,*) M
  else
     M=Ns/2
 endif
