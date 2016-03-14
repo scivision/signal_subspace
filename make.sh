@@ -5,9 +5,11 @@
 
 rm -f *.mod *.o
 
-gfortran -O0 -c comm.f90
-gfortran -O0 -c subspace.f90
+OPTS="-O3 -Wall -pedantic"
 
-gcc -O0 -c RunSubspace.c -o main.o
+gfortran $OPTS -c comm.f90
+gfortran $OPTS -c subspace.f90
 
-gcc -O0 -g subspace.o main.o -lgfortran -lm -llapack -lblas -o cesprit
+gcc $OPTS -c RunSubspace.c -o main.o
+
+gcc $OPTS -g subspace.o main.o -lgfortran -lm -llapack -lblas -o cesprit
