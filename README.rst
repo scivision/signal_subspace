@@ -11,6 +11,8 @@ To be able to access the Fortran Esprit from Python::
 
    f2py3 --quiet -m fortsubspace -c subspace.f90
 
+If you get ImportError complaining about gfortran 1_4, see notes at bottom of this section.
+
 Then in the Python script::
 
    import numpy as np
@@ -22,6 +24,20 @@ Then in the Python script::
    fest,sigma=esprit(x,1,fs)
 
 Fest will be very close to 1000 Hz.
+
+Notes if ImportError
+--------------------
+If you're using Gfortran 5.x, you may get errors with regard to Fortran library version,
+since at the moment Numpy uses Gfortran 4.x.
+
+Try compiling with::
+
+    f2py3 --f90exec=gfortran-4.9 --quiet -m fortsubspace -c subspace.f90
+
+If it still complains about library version, try::
+
+    ln -s /usr/lib/gcc/x86_64-linux-gnu/4.9/libgfortran.so libgfortran.so.3
+
 
 Compile ESPRIT example with noisy sinusoid
 ==========================================
