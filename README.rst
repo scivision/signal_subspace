@@ -3,6 +3,8 @@ spectral_analysis
 =================
 1-D and ensemble signal analysis
 
+based in part upon the `public domain code <https://github.com/vincentchoqueuse/spectral_analysis_project>`_
+
 Compile ESPRIT example with noisy sinusoid
 ==========================================
 ::
