@@ -22,20 +22,18 @@ Note, don't use -Ofast to avoid seg faults.::
 
 C
 =
-Here is a simple example of calling Fortran code from C.
-This program passes an integer from C to Fortran. Fortran converts the integer to float. Finally Fortan passes the float back to C for printing. 
+Here is a simple example of calling Fortran Esprit from C. This should be done with make or cmake, but I made the make.sh script instead.
 
 1. Create .o Object files from each of C and Fortran
 2. Link the object files with gcc
 
 ::
 
-   gfortran -c cfort.f90 -o cfort.o
-   gcc -c cfort.c -o main.o
-   
-   gcc main.o cfort.o -lgfortran
+  ./make.sh
 
-And you will observe 12345.00000 a float from 12345 the original integer.
+  ./cesprit
+
+And you will observe the frequency estimate printed.
 
 
 Python
