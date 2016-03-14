@@ -1,5 +1,6 @@
 program test_subspace
 
+use perf
 use subspace
 use signals,only: signoise
 
