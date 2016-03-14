@@ -1,14 +1,12 @@
 module signals
-    use, intrinsic :: iso_fortran_env, only : dp=>real64, i64=>int64, stdout=>output_unit
+    use comm
     use perf,only: init_random_seed
     implicit none
-    complex(dp),parameter :: J=(0._dp,1._dp)
-    real(dp),parameter :: pi = 4_dp*datan(1._dp)
 contains
 
-subroutine signoise(fs,fb,snr,Ns,x)
+subroutine signoise(fs,f0,snr,Ns,x)
 
-    real(dp),intent(in) :: fs,fb,snr
+    real(dp),intent(in) :: fs,f0,snr
     integer, intent(in) :: Ns
     complex(dp),intent(out) :: x(Ns)
 
@@ -18,7 +16,7 @@ subroutine signoise(fs,fb,snr,Ns,x)
 
     do i=1,size(x)
     t = (i-1)/fs
-    x(i) = sqrt(2._dp) * exp(J*2._dp*pi*fb*t)
+    x(i) = sqrt(2._dp) * exp(J*2._dp*pi*f0*t)
     enddo
 !--- add noise
     call randn(Ns,noise)

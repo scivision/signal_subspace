@@ -1,8 +1,7 @@
 module subspace
-    use, intrinsic :: iso_fortran_env, only : dp=>real64, i64=>int64, stdout=>output_unit
+    use comm
     !use perf, only : init_random_seed,sysclock2ms
     Implicit none
-    real(dp),parameter :: pi = 4_dp*datan(1._dp)
 contains
 
 subroutine esprit(x,N,L,M,fs,tones,sigma)
