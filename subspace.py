@@ -74,11 +74,11 @@ def compute_autocovariance(x,M):
     # init covariance matrix
     yn = x_vect[M-1::-1]
     #R  = yn @ yn.conj().T
-    R = yn.dot(yn.conj().T)
+    R = yn.dot(yn.conj().T) #zeroth lag
     #about 5-8% of computation time
-    for indice in range(1,N-M):
+    for i in range(1,N-M): #no zero because we just computed it
         #extract the column vector
-        yn = x_vect[M-1+indice:indice-1:-1]
+        yn = x_vect[M-1+i:i-1:-1]
         #R  = R + yn @ yn.conj().T
         R = R + yn.dot(yn.conj().T)
 
@@ -194,7 +194,7 @@ def rootmusic(x,L,M=None,fs=1):
 
     return f,S[:L]
 
-def esprit(x,L,M=None,fs=1):
+def esprit(x,L,M=None,fs=1,verbose=False):
 
     r""" This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
 
@@ -220,15 +220,19 @@ def esprit(x,L,M=None,fs=1):
     assert x.ndim==1
     N=x.size
 
-    if M==None:
+    if M is None:
         M=N//2
 
-    #extract signal subspace  99.9 % of computation time
+#%% extract signal subspace  99.9 % of computation time
+    tic=time()
     R=compute_autocovariance(x,M) #75% of computation time
+    if verbose: print(' autocov time {:.6f} sec.'.format(time()-tic))
     #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
+
+    tic=time()
     U,S,V=lg.svd(R) #25% of computation time
-
-
+    if verbose: print('svd time {:.6f} sec.'.format(time()-tic))
+#%% take eigenvalues and determine sinusoid frequencies
     #Remove last row
     S1=U[:-1,:L]
     #Remove first row

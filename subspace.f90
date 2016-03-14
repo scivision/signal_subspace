@@ -34,7 +34,7 @@ call system_clock(tic)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
 if (svdinfo.ne.0) write(stdout,*) 'SVD return code',svdinfo
 call system_clock(toc)
-if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
+if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
 S1 = U(1:M-1,1:L)
 S2 = U(2:M,1:L)
@@ -47,13 +47,13 @@ if (luinfo.ne.0) write(stdout,*) 'LU inverse output code',luinfo
 
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 call system_clock(toc)
-if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
+if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
 
 call system_clock(tic)
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,work,lwork,rwork,luinfo)
 if (luinfo.ne.0) write(stdout,*) 'eig output code',luinfo
 call system_clock(toc)
-if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
+if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 
 
 ang = atan2(aimag(eig),real(eig))
@@ -75,24 +75,26 @@ subroutine corrmtx(x,N,M,C)
 ! output:
 ! C is the 2-D result
 
-integer, intent(in) :: M,N
-complex(dp),intent(in) :: x(N)
-complex(dp),intent(out):: C(M,M)
+ integer, intent(in) :: M,N
+ complex(dp),intent(in) :: x(N)
+ complex(dp),intent(out):: C(M,M)
 
-integer :: i
-complex(dp) :: yn(M,1), R(M,M)
+ integer :: i
+ complex(dp) :: yn(M,1), R(M,M)!, work(M,M)
 
-yn(:,1) = x(M:1:-1)
+ yn(:,1) = x(M:1:-1)
 
-R = matmul(yn,conjg(transpose(yn)))
-!call zgemm('N','C',M,M,M,1_dp,yn,M,yn,M,0_dp,R,M) !half speed of matmul, Gfortran 5.2.1
+ R = matmul(yn,conjg(transpose(yn)))
+ !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,R,M) !slower, worse accuracy than matmul in Gfortran 5.2.1
 
-do i = 1,N-M-1
-    yn(:,1) = x(M-1+i:i:-1)
+ do i = 1,N-M-1 ! yes, -1
+    yn(:,1) = x(M+i-1:i:-1) !yes, -1
     R = R + matmul(yn,conjg(transpose(yn)))
-enddo
+    !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,work,M)
+    !R = R + work
+ enddo
 
-C = R/real(N,dp)
+ C = R/real(N,dp)
 
 end subroutine corrmtx
 

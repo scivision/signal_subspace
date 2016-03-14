@@ -54,7 +54,7 @@ subroutine randn (N,rout)
 
   integer,intent(in) :: N
   complex(dp),intent(out) :: rout(N)
-  real (dp):: v1(N), v2(N), x_c(N), x_r(N)
+  real (dp):: v1(N), v2(N), x_i(N), x_r(N)
 
  CALL init_random_seed()
 
@@ -64,7 +64,7 @@ subroutine randn (N,rout)
   x_r = sqrt ( - 2._dp * log ( v1 ) ) * cos ( 2._dp * pi * v2 )
   x_i = sqrt ( - 2._dp * log ( v1 ) ) * sin ( 2._dp * pi * v2 )
 
-  rout = complex ( x_r, x_i)
+  rout = cmplx ( x_r, x_i,dp)  !complex() can only handle scalars
 
 end subroutine randn
 
