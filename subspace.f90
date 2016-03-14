@@ -4,6 +4,21 @@ module subspace
     Implicit none
 contains
 
+subroutine esprittone(x,N,L,M,fs,tone)
+
+    integer, intent(in) :: L,M,N
+    complex(dp),intent(in) :: x(N)
+    real(dp),intent(in) :: fs
+    real(dp),intent(out) :: tone
+
+    real(dp) :: tones(L),sigma(L)
+
+    call esprit(x,N,L,M,fs,tones,sigma)
+
+    tone = tones(1) 
+
+end subroutine esprittone
+
 subroutine esprit(x,N,L,M,fs,tones,sigma)
 
     integer, intent(in) :: L,M,N
