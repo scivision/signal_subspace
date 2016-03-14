@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from time import time
 import numpy as np
-from dtclient.specest import compute_autocovariance,esprit
+from subspace import compute_autocovariance,esprit
 
 def test_autocov():
     x = np.random.randn(4096).astype(np.complex128) # 2x extra speedup from casting correct type

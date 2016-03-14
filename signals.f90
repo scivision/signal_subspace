@@ -32,9 +32,8 @@ end subroutine signoise
 
 subroutine randn (N,rout)
 ! https://people.sc.fsu.edu/~jburkardt/f_src/normal/normal.f90
-!*****************************************************************************80
 !
-!! C8_NORMAL_01 returns a unit pseudonormal C8.
+!  returns a unit pseudonormal C8.
 !
 !  Licensing:
 !
@@ -63,9 +62,9 @@ subroutine randn (N,rout)
   call random_number(v2)
 
   x_r = sqrt ( - 2._dp * log ( v1 ) ) * cos ( 2._dp * pi * v2 )
-  x_c = sqrt ( - 2._dp * log ( v1 ) ) * sin ( 2._dp * pi * v2 )
+  x_i = sqrt ( - 2._dp * log ( v1 ) ) * sin ( 2._dp * pi * v2 )
 
-  rout = cmplx ( x_r, x_c, dp)
+  rout = complex ( x_r, x_i)
 
 end subroutine randn
 

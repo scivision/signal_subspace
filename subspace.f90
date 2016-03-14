@@ -23,13 +23,13 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
     integer(i64) :: tic,toc
 
 Lwork = 4*M
-
+!------ estimate autocovariance from single time sample vector (1-D)
 call system_clock(tic)
 call corrmtx(x,size(x),M,R)
 call system_clock(toc)
 if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute autocovariance estimate:',sysclock2ms(toc-tic)
 
-
+!-------- SVD -------------------
 call system_clock(tic)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
 if (svdinfo.ne.0) write(stdout,*) 'SVD return code',svdinfo
