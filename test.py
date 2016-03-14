@@ -11,7 +11,7 @@ def test_autocov():
     C= compute_autocovariance(x,M)
     tocpy = time()-tic
     #%%
-    from .subspace import subspace
+    from .fortsubspace import subspace
     tic = time()
     Cf = subspace.corrmtx(x,M)
     tocfort = time()-tic
