@@ -37,7 +37,7 @@ C
 =
 Here is an example of calling Fortran Esprit from C::
 
-  make Makefile_c
+  make -f Makefile_c
 
   ./cesprit
 
