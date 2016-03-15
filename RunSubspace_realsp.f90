@@ -8,13 +8,13 @@ use signals,only: signoise
 Implicit none
 
 integer :: Ns = 1024 !default value
-real(dp) :: fs=48000, f0=12345.6, &
+real(sp) :: fs=48000, f0=12345.6, &
             snr=60  !dB
 integer :: M
-integer :: Ntone=1
+integer :: Ntone=4
 
-complex(dp),allocatable :: x(:)
-real(dp),allocatable :: tones(:),sigma(:)
+real(sp),allocatable :: x(:)
+real(sp),allocatable :: tones(:),sigma(:)
 
 integer(i64) :: tic,toc
 !----------- parse command line ------------------
@@ -41,10 +41,10 @@ if (narg.GT.4) then
  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 !---------- assign variable size arrays ---------------
-allocate(x(Ns),tones(Ntone),sigma(Ntone))
+allocate(x(Ns),tones(Ntone/2),sigma(Ntone/2))
 !--- checking system numerics --------------
-if (sizeof(fs).ne.8) write(stderr,*) 'expected 8-byte real but you have real bytes: ', sizeof(fs)
-if (sizeof(x(1)).ne.16) write(stderr,*) 'expected 16-byte complex but you have complex bytes: ', sizeof(x(1))
+if (sizeof(fs).ne.4) write(stderr,*) 'expected 4-byte real but you have real bytes: ', sizeof(fs)
+
 
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr,Ns,&

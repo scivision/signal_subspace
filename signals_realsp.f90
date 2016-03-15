@@ -1,27 +1,33 @@
 module signals
-    use comm,only: dp,pi,J
+    use comm,only: sp
     use perf,only: init_random_seed
     implicit none
+
+    real(sp),parameter :: pi = 4_sp*atan(1._sp)
+
+    private
+    public :: signoise,randn
 contains
 
 subroutine signoise(fs,f0,snr,Ns,x)
 
-    real(dp),intent(in) :: fs,f0,snr
+    real(sp),intent(in) :: fs,f0,snr
     integer, intent(in) :: Ns
-    complex(dp),intent(out) :: x(Ns)
+    real(sp),intent(out) :: x(Ns)
 
-    real(dp) :: t,nvar
-    complex(dp) :: noise(Ns)
+
+    real(sp) :: t,nvar
+    real(sp) :: noise(Ns)
     integer :: i
 
     do i=1,size(x)
     t = (i-1)/fs
-    x(i) = sqrt(2._dp) * exp(J*2._dp*pi*f0*t)
+    x(i) = sqrt(2._sp) * cos(2._sp*pi*f0*t)
     enddo
 !--- add noise
     call randn(Ns,noise)
 
-    nvar = 10._dp**(-snr/10._dp)
+    nvar = 10._sp**(-snr/10._sp)
 
     x = x + sqrt(nvar)*noise
 
@@ -50,18 +56,16 @@ subroutine randn (N,rout)
 
 
   integer,intent(in) :: N
-  complex(dp),intent(out) :: rout(N)
-  real (dp):: v1(N), v2(N), x_i(N), x_r(N)
+  real(sp),intent(out) :: rout(N)
+  real (sp):: v1(N), v2(N)
 
  CALL init_random_seed()
 
   call random_number(v1)
   call random_number(v2)
 
-  x_r = sqrt ( - 2._dp * log ( v1 ) ) * cos ( 2._dp * pi * v2 )
-  x_i = sqrt ( - 2._dp * log ( v1 ) ) * sin ( 2._dp * pi * v2 )
+  rout = sqrt ( - 2._sp * log ( v1 ) ) * cos ( 2._sp * pi * v2 )
 
-  rout = cmplx ( x_r, x_i,dp)  !complex() can only handle scalars
 
 end subroutine randn
 
