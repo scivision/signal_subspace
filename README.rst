@@ -17,6 +17,8 @@ Compile ESPRIT example with noisy sinusoid
 -------------------------------------------
 Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program. 
 
+The reason one might use the real version is that it's four times faster than the double complex version.
+
 double complex::
   
    make -f Makefile_f
