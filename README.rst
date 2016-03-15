@@ -1,15 +1,17 @@
 =================
 spectral_analysis
 =================
-1-D and ensemble signal analysis
+1-D and ensemble signal analysis with subspace methods such as Esprit and RootMusic in Fortran, C, and Python
 
 based in part upon the `Spectral Analysis Lib public domain code <https://github.com/vincentchoqueuse/spectral_analysis_project>`_
+
+The core subspace code is written in Fortran and is called from other languages (Python, C).
 
 .. contents::
 
 Fortran
 =======
-
+This is Fortran 2008 code.
 
 Compile ESPRIT example with noisy sinusoid
 -------------------------------------------
@@ -22,16 +24,13 @@ Note, don't use -Ofast to avoid seg faults.::
 
 C
 =
-Here is an example of calling Fortran Esprit from C.
-
-
-::
+Here is an example of calling Fortran Esprit from C::
 
   make
 
   ./cesprit
 
-And you will observe the frequency estimate printed.
+And you will observe the frequency estimates printed along with their corresponding eigenvalues, where a larger eigenvalue may be taken as increased confidence in that particular frequency estimate.
 
 
 Python
