@@ -22,14 +22,12 @@ Note, don't use -Ofast to avoid seg faults.::
 
 C
 =
-Here is a simple example of calling Fortran Esprit from C. This should be done with make or cmake, but I made the make.sh script instead.
+Here is an example of calling Fortran Esprit from C.
 
-1. Create .o Object files from each of C and Fortran
-2. Link the object files with gcc
 
 ::
 
-  ./make.sh
+  make
 
   ./cesprit
 
