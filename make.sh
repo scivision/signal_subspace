@@ -3,7 +3,7 @@
 # example of calling Fortran Esprit from C
 
 
-rm -f *.mod *.o
+#rm -f *.mod *.o
 
 OPTS="-O3 -Wall -pedantic"
 
