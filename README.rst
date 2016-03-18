@@ -11,6 +11,14 @@ The core subspace code is written in Fortran 2008 and is called from other langu
 
 Building
 ========
+
+Prereqs
+-------
+The standard software repos in Ubuntu 14.04 and any other modern operating system should be fine. From a Debian/Ubuntu system, type::
+
+    sudo apt-get install libatlas-base-dev libatleast-dev liblapack-dev libblas-dev g++ gcc gfortran
+
+
 For all languages (Fortran, C, C++, Python) at once, simply type::
 
     make
