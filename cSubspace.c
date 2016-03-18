@@ -6,7 +6,7 @@ extern void __signals_MOD_signoise(float *,float *,float *,int *, float []);
 
 int main () {
  int N=1024;
- int L=2;
+ int L=4;
  int M=50;
  float fs=48000.;
 //------- noisy signal generation ----------------

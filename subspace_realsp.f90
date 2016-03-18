@@ -16,17 +16,18 @@ subroutine esprit(x,N,L,M,fs,tout,sigma)
     real(sp),intent(out) :: tout(L/2),sigma(L)
 
     real(sp) :: tones(L)
-    integer :: Lwork,i
+    integer :: LWORK
     real(sp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(sp) :: S(M,M),RWORK(8*M),ang(L)
+    real(sp) :: S(M,M),RWORK(8*M),ang(L),SWORK(8*M)
     integer :: luinfo=0
-    integer :: svdinfo
+    integer :: svdinfo,i
     real(sp) :: W1(L,L), IPIV(M-1)
-    complex(sp) :: Phi(L,L), CWORK(8*M), work(8*m), junk(L,L), eig(L)
+    complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
+
+LWORK = 8*M  !at least 5M for sgesvd
    ! integer(i64) :: tic,toc
 
-Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
 call corrmtx(x,size(x),M,R)
@@ -35,8 +36,9 @@ call corrmtx(x,size(x),M,R)
 
 !-------- SVD -------------------
 !call system_clock(tic)
-call sgesvd('A','N',M,M,R,M,S,U,M,VT,M,WORK,LWORK,RWORK,svdinfo)
-if (svdinfo.ne.0) write(stderr,*) 'SVD return code',svdinfo
+!http://www.netlib.org/lapack/explore-html/d4/dca/group__real_g_esing.html
+call sgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,svdinfo)
+if (svdinfo.ne.0) write(stderr,*) 'SGESVD return code',svdinfo
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
@@ -46,7 +48,7 @@ S2 = U(2:M,1:L)
 !call system_clock(tic)
 W1=matmul((transpose(S1)),S1)
 call sgetrf(L,L,W1,L,ipiv,luinfo) !LU decomp
-call sgetri(L,W1,L,ipiv,work,Lwork,luinfo) !LU inversion
+call sgetri(L,W1,L,ipiv,Rwork,Lwork,luinfo) !LU inversion
 if (luinfo.ne.0) write(stderr,*) 'LU inverse output code',luinfo
 
 Phi = matmul(matmul(W1, (transpose(S1))), S2)
