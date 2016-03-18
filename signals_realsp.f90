@@ -1,6 +1,5 @@
 module signals
-    use comm,only: sp
-    use perf,only: init_random_seed
+    use comm,only: sp, init_random_seed
     implicit none
     real(sp),parameter :: pi = 4_sp*atan(1._sp)
 

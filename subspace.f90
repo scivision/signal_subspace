@@ -1,6 +1,6 @@
 module subspace
     use comm,only: dp,pi,stdout,stderr
-    !use perf, only : init_random_seed,sysclock2ms
+    !use perf, only : sysclock2ms
     Implicit none
 
     private
@@ -18,9 +18,8 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
     integer :: LWORK
     complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(dp) :: S(M,M),RWORK(8*M),ang(L)
-    integer :: luinfo=0
-    integer :: svdinfo,i
-    complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork~complex
+    integer :: getrfinfo,getriinfo,evinfo, svdinfo,i
+    complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(dp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
    ! integer(i64) :: tic,toc
@@ -44,17 +43,18 @@ S2 = U(2:M,1:L)
 
 !call system_clock(tic)
 W1=matmul(conjg(transpose(S1)),S1)
-call zgetrf(L,L,W1,L,ipiv,luinfo) !LU decomp
-call zgetri(L,W1,L,ipiv,Swork,Lwork,luinfo) !LU inversion, yes Swork~complex
-if (luinfo.ne.0) write(stderr,*) 'LU inverse output code',luinfo
+call zgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
+call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
+if (getrfinfo.ne.0) write(stderr,*) 'ZGETRF inverse output code',getrfinfo
+if (getriinfo.ne.0) write(stderr,*) 'ZGETRI output code',getriinfo
 
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
 
 !call system_clock(tic)
-call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,luinfo)
-if (luinfo.ne.0) write(stderr,*) 'eig output code',luinfo
+call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
+if (evinfo.ne.0) write(stderr,*) 'ZGEEVS output code',evinfo
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 

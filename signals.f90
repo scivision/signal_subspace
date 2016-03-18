@@ -1,6 +1,5 @@
 module signals
-    use comm,only: dp,pi,J
-    use perf,only: init_random_seed
+    use comm,only: dp,pi,J, init_random_seed
     implicit none
 
     private

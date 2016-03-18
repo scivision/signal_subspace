@@ -1,7 +1,7 @@
 program test_subspace
 
 use comm, only: dp, i64,stdout,stderr,sizeof
-use perf, only: sysclock2ms
+use perf, only: sysclock2ms,assert
 use subspace, only: esprit
 use signals,only: signoise
 
@@ -55,10 +55,14 @@ call esprit(x,size(x),Ntone,M,fs,&
             tones,sigma)
 call system_clock(toc)
 
+! -- assert <0.1% error ---------
+call assert(abs(tones(1)-f0).le.0.001*f0)
 
 write(stdout,*) ' ESPRIT found tone(s) [Hz]: ',tones
 write(stdout,*) ' with sigma: ',sigma
 write(stdout,*) ' seconds to compute: ',sysclock2ms(toc-tic)/1000
+
+write(stdout,*) 'OK'
 end program test_subspace
 
 

@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <cstdio>
 
 void __subspace_MOD_esprit(float [], int *, int *, int *, float *, float [], float []);
 

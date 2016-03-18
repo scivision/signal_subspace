@@ -5,19 +5,27 @@ FC = gfortran
 TARGET_CMPL = fesprit
 TARGET_REAL= fesprit_realsp
 TARGET_C = cesprit
+TARGET_CPP = cpp_esprit
+TARGET_PYREAL = fortsubspace_real
+TARGET_PYCMPL = fortsubspace_cmpl
 #----Sources (in order of dependency) ---------------------------------
-FSRC_CMPL = comm.f90 perf.f90 subspace.f90 signals.f90 
-FMAIN_CMPL = RunSubspace.f90
+FSRC_CMPL = comm.f90 subspace.f90 signals.f90
+FMAIN_CMPL = perf.f90 RunSubspace.f90
 
 # yes, we should be using data polymorphism instead
-FSRC_REAL = comm.f90 perf.f90 subspace_realsp.f90 signals_realsp.f90 
-FMAIN_REAL = RunSubspace_realsp.f90
+FSRC_REAL = comm.f90 subspace_realsp.f90 signals_realsp.f90
+FMAIN_REAL = perf.f90  RunSubspace_realsp.f90
 
-CSOURCES = cSubspace.c 
+CSRC = cSubspace.c 
+
+CPPSRC = cppSubspace.c
 #----- libs you need --------------------------------------------------
-FLIBS = -lblas -llapack -lpthread
+FLIBS = -latlas -llapack -lblas -lpthread
 CLIBS = -lm -lgfortran
+CPPLIBS = -lm -lgfortran
 #----- suffix patterns ------------------------------------------------
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 %.o: %.c
 	$(CC) $(CFLAGS) -c  -o $@ $<
 %.o: %.f90
@@ -36,9 +44,12 @@ FOBJMAIN_REAL = $(FMAIN_REAL:.f90=.o)
 MODS = $(wildcard *.mod)
 #------ C ----------------- -------------------------------------------
 CFLAGS = -std=c11 -Wall -Wpedantic -Wextra -mtune=native -ffast-math -O3
-COBJS = $(CSOURCES:.c=.o)
+COBJS = $(CSRC:.c=.o)
+#------- C++ ------------------------------------------------------------
+CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -mtune=native -ffast-math -O3
+CXXOBJS = $(CPPSRC:.cpp=.o)
 #------ targeting a Fortran Program--------------------------------
-all: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C)
+all: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C) $(TARGET_PYREAL) $(TARGET_PYCMPL)
 
 debug: FFLAGS += -g $(DBGFLAGS)
 debug: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C)
@@ -49,7 +60,22 @@ cmpl: $(TARGET_CMPL)
 
 c: $(TARGET_C)
 
+cpp: $(TARGET_CPP)
+
+pythonreal: $(TARGET_PYREAL)
+
+pythoncmpl: $(TARGET_PYCMPL)
+
+$(TARGET_PYREAL): $(FSRC_REAL)
+	f2py3 --quiet -m fortsubspace_real -c $(FSRC_REAL) $(FLIBS) $(LDFLAGS)
+
+$(TARGET_PYCMPL): $(FSRC_CMPL)
+	f2py3 --quiet -m fortsubspace_cmpl -c $(FSRC_CMPL) $(FLIBS) $(LDFLAGS)
+
 $(TARGET_C): $(COBJS) $(FOBJS_REAL)
+	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS) $(LDFLAGS) 
+
+$(TARGET_CPP): $(CPPOBJS) $(FOBJS_REAL)
 	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS) $(LDFLAGS) 
     
 $(TARGET_CMPL): $(FOBJS_CMPL) $(FOBJMAIN_CMPL)
