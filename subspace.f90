@@ -2,6 +2,10 @@ module subspace
     use comm,only: dp,pi,stdout,stderr
     !use perf, only : init_random_seed,sysclock2ms
     Implicit none
+
+    private
+    public::esprit,corrmtx
+
 contains
 
 subroutine esprit(x,N,L,M,fs,tones,sigma)
@@ -13,15 +17,15 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
 
     integer :: Lwork,i
     complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(dp) :: S(M,M),RWORK(6*M),ang(L)
+    real(dp) :: S(M,M),RWORK(8*M),ang(L)
     integer :: luinfo=0
     integer :: svdinfo
     complex(dp) :: W1(L,L), IPIV(M-1)
-    complex(dp) :: Phi(L,L), cWORK(6*M), work(6*m),junk(L,L), eig(L)
+    complex(dp) :: Phi(L,L), CWORK(8*M), work(8*m), junk(L,L), eig(L)
 
    ! integer(i64) :: tic,toc
 
-Lwork = 6*M !at least5M for sgesvd
+Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
 call corrmtx(x,size(x),M,R)

@@ -15,29 +15,24 @@ This is Fortran 2008 code.
 
 Compile ESPRIT example with noisy sinusoid
 -------------------------------------------
-Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program. 
+Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.::
 
-The reason one might use the real version is that it's four times faster than the double complex version.
+    make
 
-double complex::
-  
-   make -f Makefile_f
+Which creates executables for C and Fortran. You can make only for real single precision real Fortran by::
 
-   ./test_esprit
+    make real
 
+or only double precision complex Fortran by::
 
-single real::
-
-   make -f Makefile_f_realsp
-
-   ./test_esprit_realsp
+    make cmpl
 
 
 C
 =
-Here is an example of calling Fortran Esprit from C::
+Here is an example of calling Fortran Esprit from C, which uses real single precision float::
 
-  make -f Makefile_c
+  make c
 
   ./cesprit
 

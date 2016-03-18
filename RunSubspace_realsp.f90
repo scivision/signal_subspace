@@ -1,17 +1,18 @@
 program test_subspace
 
-use comm
+use comm, only: sp, i64,stdout,stderr
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
 
 Implicit none
 
-integer :: Ns = 1024 !default value
+integer :: Ns = 1024, &
+           Ntone=4
 real(sp) :: fs=48000, f0=12345.6, &
             snr=60  !dB
 integer :: M
-integer :: Ntone=4
+ 
 
 real(sp),allocatable :: x(:)
 real(sp),allocatable :: tones(:),sigma(:)

@@ -2,6 +2,9 @@ module signals
     use comm,only: dp,pi,J
     use perf,only: init_random_seed
     implicit none
+
+    private
+    public :: signoise,randn
 contains
 
 subroutine signoise(fs,f0,snr,Ns,x)

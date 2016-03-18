@@ -71,7 +71,8 @@ def test_esprit():
 
     return py,fort
 
-py,fort=test_esprit()
-#test_autocov()
-print(py)
-print(fort)
+if __name__ == '__main__':
+    py,fort=test_esprit()
+    #test_autocov()
+    print(py)
+    print(fort)
