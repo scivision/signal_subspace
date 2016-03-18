@@ -67,8 +67,8 @@ Compile Fortran ESPRIT to use from Python via f2py
 --------------------------------------------------
 To be able to access the Fortran Esprit from Python::
 
-   make python
-
+   make pythonreal pythoncmpl
+  
    ./test.py
 
 See ``basic.py`` for a basic example.
