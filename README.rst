@@ -16,7 +16,7 @@ Prereqs
 -------
 The standard software repos in Ubuntu 14.04 and any other modern operating system should be fine. From a Debian/Ubuntu system, type::
 
-    sudo apt-get install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran
+    sudo apt-get install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make
 
 
 For all languages (Fortran, C, C++, Python) at once, simply type::
