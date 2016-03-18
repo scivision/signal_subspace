@@ -23,7 +23,7 @@ CLIBS = -lm -lgfortran
 %.o: %.f90
 	$(FC) $(FFLAGS) -c  -o $@ $<
 #------------- FORTRAN ------------------------------------------------
-FFLAGS = -Wall -Wpedantic -Wextra -mtune=native -fexternal-blas -ffast-math -O3
+FFLAGS = -std=f2008 -Wall -Wpedantic -Wextra -mtune=native -fexternal-blas -ffast-math -O3
 
 DBGFLAGS = -O0  -fbacktrace -fbounds-check
 
@@ -35,7 +35,7 @@ FOBJMAIN_REAL = $(FMAIN_REAL:.f90=.o)
 
 MODS = $(wildcard *.mod)
 #------ C ----------------- -------------------------------------------
-CFLAGS = -Wall -Wpedantic -Wextra -mtune=native -ffast-math -O3
+CFLAGS = -std=c11 -Wall -Wpedantic -Wextra -mtune=native -ffast-math -O3
 COBJS = $(CSOURCES:.c=.o)
 #------ targeting a Fortran Program--------------------------------
 all: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C)

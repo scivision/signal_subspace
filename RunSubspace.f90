@@ -1,6 +1,6 @@
 program test_subspace
 
-use comm, only: dp, i64,stdout,stderr
+use comm, only: dp, i64,stdout,stderr,sizeof
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
