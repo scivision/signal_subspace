@@ -67,10 +67,10 @@ pythonreal: $(TARGET_PYREAL)
 pythoncmpl: $(TARGET_PYCMPL)
 
 $(TARGET_PYREAL): $(FSRC_REAL)
-	f2py3 --quiet -m fortsubspace_real -c $(FSRC_REAL) $(FLIBS) $(LDFLAGS)
+	f2py3 --quiet -m fortsubspace_real -c $(FSRC_REAL)  $(LDFLAGS)
 
 $(TARGET_PYCMPL): $(FSRC_CMPL)
-	f2py3 --quiet -m fortsubspace_cmpl -c $(FSRC_CMPL) $(FLIBS) $(LDFLAGS)
+	f2py3 --quiet -m fortsubspace_cmpl -c $(FSRC_CMPL)  $(LDFLAGS)
 
 $(TARGET_C): $(COBJS) $(FOBJS_REAL)
 	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS) $(LDFLAGS) 
