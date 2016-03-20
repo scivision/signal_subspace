@@ -13,8 +13,10 @@ git:
 
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r/test
     packages:
-      - gfortran
+    - gfortran-4.9
 
 before_install:
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
