@@ -11,6 +11,9 @@ notifications:
 git:
   depth: 1
 
+env:
+    -gfortran=gfortran-4.9
+
 addons:
   apt:
     sources:
