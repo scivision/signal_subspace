@@ -21,11 +21,40 @@ except ImportError as e:
     print('not able to import Fortran Esprit real {}'.format(e))
     Sr=None
 
+def plot_noisehist():
+    """
+    not part of standard selftest
+    """
+    N = 10000
+
+    from matplotlib.pyplot import figure,subplots,show
+    fg,axs = subplots(3,1)
+
+    noiser = Sr.signals.randn(N)
+    noisec = Sc.signals.randn(N)
+    noisepy = np.random.randn(N)
+
+    ax = axs[0]
+    ax.hist(noiser,bins=64)
+    ax.set_title('real noise')
+
+    ax = axs[1]
+    ax.hist(noisec.real,bins=64)
+    ax.set_title('complex noise')
+
+    ax = axs[2]
+    ax.hist(noisepy,bins=64)
+    ax.set_title('python randn')
+    show()
+
+
 def test_signoise():
     noiser = Sr.signals.randn(10)
     assert isinstance(noiser[0],np.float32)
     noisec = Sc.signals.randn(10)
     assert isinstance(noisec[0],np.complex128)
+
+
 
 def test_autocov():
     x = np.random.randn(4096).astype(np.complex128) # 2x extra speedup from casting correct type
@@ -106,6 +135,7 @@ def test_esprit():
     return py,fortcmpl,fortreal
 
 if __name__ == '__main__':
+    plot_noisehist()
     test_signoise()
 
 #%%
