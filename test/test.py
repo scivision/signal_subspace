@@ -4,57 +4,14 @@ import numpy as np
 from pandas import DataFrame
 #
 from spectral_analysis.subspace import compute_autocovariance,esprit
-
-try:
-    import fortsubspace_cmpl as Sc
-    assert Sc.comm.pi.dtype=='float64' #0d array
-    np.testing.assert_allclose(Sc.comm.pi,np.pi)
-except (ImportError,AssertionError) as e:
-    print('problem importing Fortran Esprit complex {}'.format(e))
-    Sc=None
-
-try:
-    import fortsubspace_real as Sr
-    assert Sr.subspace.pi.dtype=='float32' #0d array
-    np.testing.assert_allclose(Sr.subspace.pi,np.pi)
-except ImportError as e:
-    print('not able to import Fortran Esprit real {}'.format(e))
-    Sr=None
-
-def plot_noisehist():
-    """
-    not part of standard selftest
-    """
-    N = 10000
-
-    from matplotlib.pyplot import figure,subplots,show
-    fg,axs = subplots(3,1)
-
-    noiser = Sr.signals.randn(N)
-    noisec = Sc.signals.randn(N)
-    noisepy = np.random.randn(N)
-
-    ax = axs[0]
-    ax.hist(noiser,bins=64)
-    ax.set_title('real noise')
-
-    ax = axs[1]
-    ax.hist(noisec.real,bins=64)
-    ax.set_title('complex noise')
-
-    ax = axs[2]
-    ax.hist(noisepy,bins=64)
-    ax.set_title('python randn')
-    show()
-
+from spectral_analysis.importfort import fort
+Sc,Sr = fort()
 
 def test_signoise():
     noiser = Sr.signals.randn(10)
     assert isinstance(noiser[0],np.float32)
     noisec = Sc.signals.randn(10)
     assert isinstance(noisec[0],np.complex128)
-
-
 
 def test_autocov():
     x = np.random.randn(4096).astype(np.complex128) # 2x extra speedup from casting correct type
@@ -74,7 +31,7 @@ def test_autocov():
         tocfortreal = time() - tic
     except Exception as e:
         print('problem loading Fortran module {}'.format(e))
-        tocfortcmpl=tocfortreal=Cf=np.nan
+        tocfortcmpl=tocfortreal=Cc=Cr=np.nan
 
     #print('autocovariance: python {:.6f} sec  fortran {:.6f} sec'.format(tocpy,tocfortcmpl))
     print('autocovariance: Fortran is {:.3f} times faster than Python \n'.format(tocpy/tocfortcmpl))
@@ -95,7 +52,7 @@ def test_esprit():
     f0 = 12345.6
     fs = 48e3
     snr=60.
-    Ntarg = 2
+    Ntone = 2
     Ns = 1024
 #%% create signal
     #t = np.arange(0,0.01,1/fs)
@@ -114,32 +71,24 @@ def test_esprit():
     for m in M:
 #%% python
         tic = time()
-        fest,sigma = esprit(xc,Ntarg//2,M=m,fs=fs,verbose=False)
+        fest,sigma = esprit(xc,Ntone//2,M=m,fs=fs,verbose=False)
         toc = time()-tic
         py.loc[m,:] = [fest-f0,sigma,toc]
        # print('PYTHON time signal N= {} M={} freq error {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest-fb,sigma,toc))
 #%% fortran
         if Sc is not None:
             tic = time()
-            fest,sigma = Sc.subspace.esprit(xc, Ntarg, m, fs)
+            fest,sigma = Sc.subspace.esprit(xc, Ntone, m, fs)
             np.testing.assert_allclose(fest[0],f0,rtol=0.1)
             fortcmpl.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         if Sr is not None:
-            fest,sigma = Sr.subspace.esprit(xr,Ntarg,m, fs)
+            fest,sigma = Sr.subspace.esprit(xr,Ntone,m, fs)
             np.testing.assert_allclose(fest[0],f0,rtol=0.1)
             fortreal.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         #print('FORTRAN time signal N= {} M={} freq error {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest-fb,sigma,toc))
 
-    return py,fortcmpl,fortreal
-
-if __name__ == '__main__':
-    plot_noisehist()
-    test_signoise()
-
-#%%
-    py,fortcmpl,fortreal=test_esprit()
     print('python complex: time {:.4f} sec.'.format(py['time'].values[0]))
 
     print('Fortran complex: time {:.4f} sec.'.format(fortcmpl['time'].values[0]))
@@ -147,5 +96,6 @@ if __name__ == '__main__':
     print('Fortran real: time {:.4f} sec.'.format(fortreal['time'].values[0]))
 
     print('ESPRIT: Fortran is {:.4f} times faster than Python'.format(py['time'].values[0] / fortcmpl['time'].values[0]))
-#%%
-    test_autocov()
+
+if __name__ == '__main__':
+    np.testing.run_module_suite()

@@ -1,0 +1,36 @@
+language: python
+
+python:
+    - 3.5
+
+sudo: false
+
+notifications:
+  email: false
+
+git:
+  depth: 1
+
+addons:
+  apt:
+    packages:
+      - gfortran
+
+before_install:
+    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    - chmod +x miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH=$HOME/miniconda/bin:$PATH
+
+install:
+    - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+    - source activate test
+    - pip -q install coveralls
+    - conda install --yes --quiet numpy
+    - python setup.py develop
+
+script:
+    - coverage run test/test.py
+
+after_success:
+    - coveralls

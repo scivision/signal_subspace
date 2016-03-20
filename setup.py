@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
-from setuptools import setup
+import setuptools #enables develop
+from numpy.distutils.core import setup,Extension
 import subprocess
 
 with open('README.rst','r') as f:
@@ -16,6 +16,12 @@ setup(name='spectral_analysis',
 	  install_requires=[],
       extras_require={},
       packages=['spectral_analysis'],
+      ext_modules=[Extension(name='fortsubspace_cmpl',
+                    sources=['comm.f90','signals.f90','subspace.f90'],
+                    f2py_options=['--quiet']),
+                   Extension(name='fortsubspace_real',
+                    sources=['comm.f90','signals_realsp.f90','subspace_realsp.f90'],
+                    f2py_options=['--quiet'])]
 	  )
 
 #%%
