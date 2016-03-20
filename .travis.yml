@@ -14,7 +14,7 @@ git:
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r/test
+    - ubuntu-toolchain-r-test
     packages:
     - gfortran-4.9
 
