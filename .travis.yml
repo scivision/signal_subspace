@@ -24,7 +24,6 @@ addons:
 before_install:
     - mkdir -p "$HOME/.local/bin"
     - ln -fs /usr/bin/gfortran-4.9 "$HOME/.local/bin/gfortran" && gfortran --version
-    - ln -fs /usr/lib/gcc/x86_64-linux-gnu/4.9/libgfortran.so $HOME/miniconda/lib/libgfortran.so.3
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
     - chmod +x miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
@@ -36,6 +35,7 @@ install:
     - pip -q install coveralls
     - conda install --yes --quiet numpy
     - python setup.py develop
+    - ln -fs /usr/lib/gcc/x86_64-linux-gnu/4.9/libgfortran.so $HOME/miniconda/lib/libgfortran.so.3
 
 script:
     - coverage run test/test.py
