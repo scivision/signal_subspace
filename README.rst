@@ -84,17 +84,3 @@ To be able to access the Fortran Esprit from Python::
 
 See ``basic.py`` for a basic example.
 
-If you get an ``ImportError`` complaining about gfortran 1_4, see notes at bottom of this section.
-
-
-If you get ``ImportError``
----------------------------
-If you're using Gfortran 5.x, you may get errors with regard to Fortran library version,
-since at the moment Numpy uses Gfortran 4.x.
-
-Try adding ``--f90exec=gfortran-4.9`` to the ``f2py3`` line in ``Makefile``.
-
-If it still complains about library version, try::
-
-    ln -s /usr/lib/gcc/x86_64-linux-gnu/4.9/libgfortran.so libgfortran.so.3
-
