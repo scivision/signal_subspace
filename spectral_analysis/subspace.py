@@ -214,9 +214,9 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         >>> f=sa.Esprit(x,1,None,Fe)
         >>> print(f)
         """
-
     # length of the vector x
     x = asarray(x)
+
     assert x.ndim==1
     N=x.size
 

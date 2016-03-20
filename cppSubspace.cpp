@@ -1,8 +1,8 @@
 #include <cstdio>
 
-void __subspace_MOD_esprit(float [], int *, int *, int *, float *, float [], float []);
+extern void __subspace_MOD_esprit(float [], int *, int *, int *, float *, float [], float []);
 
-void __signals_MOD_signoise(float *,float *,float *,int *, float []);
+extern void __signals_MOD_signoise(float *,float *,float *,int *, float []);
 
 int main () {
  int N=1024;
