@@ -19,6 +19,7 @@ addons:
     - gfortran-5
 
 before_install:
+    - mkdir -p $HOME/.local/bin
     - ln -fs /usr/bin/gfortran-5 "$HOME/.local/bin/gfortran" && gfortran --version
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
     - chmod +x miniconda.sh
