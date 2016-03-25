@@ -32,7 +32,6 @@ install:
     - pip -q install coveralls
     - conda install --yes --quiet numpy
     - python setup.py develop
-#    - strings $HOME/miniconda/lib/libgfortran.so.3 | grep "GFORTRAN_1"
 
 script:
     - coverage run test/test.py

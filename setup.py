@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 import setuptools #enables develop
-from numpy.distutils.core import setup,Extension
 import subprocess
 
 with open('README.rst','r') as f:
 	long_description = f.read()
+
+try:
+    subprocess.run(['conda','install','--yes','--quiet','--file','requirements.txt'])
+except Exception as e:
+    print('you will need to install packages in requirements.txt  {}'.format(e))
+
+from numpy.distutils.core import setup,Extension
 
 setup(name='spectral_analysis',
       version='0.1',
@@ -24,8 +30,3 @@ setup(name='spectral_analysis',
                     f2py_options=['--quiet'])]
 	  )
 
-#%%
-try:
-    subprocess.run(['conda','install','--yes','--quiet','--file','requirements.txt'])
-except Exception as e:
-    pass
