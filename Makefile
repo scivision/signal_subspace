@@ -31,6 +31,7 @@ CPPLIBS = -lm -lgfortran
 %.o: %.f90
 	$(FC) $(FFLAGS) -c  -o $@ $<
 #------------- FORTRAN ------------------------------------------------
+F2PY = f2py3
 FFLAGS = -std=f2008 -Wall -Wpedantic -Wextra -mtune=native -fexternal-blas -ffast-math -O3
 
 DBGFLAGS = -O0  -fbacktrace -fbounds-check
@@ -49,7 +50,7 @@ COBJS = $(CSRC:.c=.o)
 CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -mtune=native -ffast-math -O3
 CXXOBJS = $(CPPSRC:.cpp=.o)
 #------ targeting a Fortran Program--------------------------------
-all: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C) $(TARGET_PYREAL) $(TARGET_PYCMPL)
+all: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C) $(TARGET_CPP) $(TARGET_PYREAL) $(TARGET_PYCMPL)
 
 debug: FFLAGS += -g $(DBGFLAGS)
 debug: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C)
@@ -67,10 +68,10 @@ pythonreal: $(TARGET_PYREAL)
 pythoncmpl: $(TARGET_PYCMPL)
 
 $(TARGET_PYREAL): $(FSRC_REAL)
-	f2py3 --quiet -m $@ -c $(FSRC_REAL)  $(LDFLAGS)
+	$(F2PY) --quiet -m $@ -c $(FSRC_REAL)  $(LDFLAGS)
 
 $(TARGET_PYCMPL): $(FSRC_CMPL)
-	f2py3 --quiet -m $@ -c $(FSRC_CMPL)  $(LDFLAGS)
+	$(F2PY) --quiet -m $@ -c $(FSRC_CMPL)  $(LDFLAGS)
 
 $(TARGET_C): $(COBJS) $(FOBJS_REAL)
 	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS) $(LDFLAGS) 

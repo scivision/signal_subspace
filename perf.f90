@@ -22,7 +22,7 @@ contains
 
         if (.not. cond) then
             write(stderr,*) 'assertion failed, halting test'
-            stop
+            error stop
         end if
 
     end subroutine assert

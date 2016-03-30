@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 extern void __subspace_MOD_esprit(float [], int *, int *, int *, float *, float [], float []);
 
@@ -23,7 +24,16 @@ float tones[L], sigma[L];
 __subspace_MOD_esprit(&x[0], &N, &L, &M, &fs, &tones[0], &sigma[0]);
 
 printf("tones: %f %f\n",tones[0],tones[1]);
-printf("sigma: %f %f",sigma[0],sigma[1]);
+printf("sigma: %f %f\n",sigma[0],sigma[1]);
+
+if (abs(tones[0]-f0)>0.0001*f0){
+    perror("failed to meet tolerance\n");
+    exit(EXIT_FAILURE);
+}
+else{
+    printf("OK\n");
+    exit(EXIT_SUCCESS);
+}
 
 }
 
