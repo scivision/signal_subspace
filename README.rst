@@ -27,7 +27,7 @@ For all languages (Fortran, C, C++, Python) at once, simply type::
     cmake .
     make
 
-If you wish to compile only for a particular language, see the optional individual sections below.
+If you have a need for speed, the `newly no-cost Intel MKL <https://software.intel.com/en-us/articles/free_mkl>`_ is 2-3 times faster than LAPACK.
 
 
 In the examples below, you will observe the frequency estimates printed along with their corresponding eigenvalues, where a larger eigenvalue may be taken as increased confidence in that particular frequency estimate.

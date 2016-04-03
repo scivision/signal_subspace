@@ -50,7 +50,7 @@ COBJS = $(CSRC:.c=.o)
 CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -mtune=native -ffast-math -O3
 CXXOBJS = $(CPPSRC:.cpp=.o)
 #------ targeting a Fortran Program--------------------------------
-all: cmpl real c cpp pythonreal pythoncmpl
+all: cmpl real c cpp # pythonreal pythoncmpl
 
 debug: FFLAGS += -g $(DBGFLAGS)
 debug: $(TARGET_CMPL) $(TARGET_REAL) $(TARGET_C)
