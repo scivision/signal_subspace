@@ -25,5 +25,5 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -mtune=native -O3 -ffast-math
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -mtune=native -O3 -ffast-math -Wall -Wextra -Wpedantic -Warray-bounds=2 -fexceptions") 
 
-SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -std=f2008 -mtune=native -O3 -ffast-math -Wall -Wextra -Wpedantic -Warray-bounds=2 -fcheck=all -fexceptions") 
+SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -std=f2008 -mtune=native -g -O3 -ffast-math -Wall -Wextra -Wpedantic -Warray-bounds=2 -fcheck=all -fexceptions") 
 #-Warray-temporaries -Winteger-division -funroll-loops

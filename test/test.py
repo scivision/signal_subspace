@@ -23,11 +23,11 @@ def test_autocov():
     #%%
     try:
         tic = time()
-        Cc = Sc.subspace.corrmtx(x,M)
+        Cc = Sc.covariance.autocov(x,M)
         tocfortcmpl = time()-tic
 
         tic = time()
-        Cr = Sr.subspace.corrmtx(x.real,M)
+        Cr = Sr.covariance.autocov(x.real,M)
         tocfortreal = time() - tic
     except Exception as e:
         print('problem loading Fortran module {}'.format(e))

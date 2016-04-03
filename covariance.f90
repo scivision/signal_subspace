@@ -2,7 +2,6 @@ module covariance
     use comm,only: dp,stdout
     !use perf, only : sysclock2ms
     Implicit none
-
     private
     public::autocov
 

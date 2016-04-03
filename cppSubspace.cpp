@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <stdlib.h>
 
-
 extern "C" void __subspace_MOD_esprit(float [], const int *, const int *, int *, const float *, float [], float []);
 
 extern "C" void __signals_MOD_signoise(const float *,float *, const float *, const int *, float []);

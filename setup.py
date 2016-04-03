@@ -23,10 +23,13 @@ setup(name='spectral_analysis',
       extras_require={},
       packages=['spectral_analysis'],
       ext_modules=[Extension(name='fortsubspace_cmpl',
-                    sources=['comm.f90','signals.f90','subspace.f90'],
-                    f2py_options=['--quiet']),
+                    sources=['comm.f90','signals.f90','covariance.f90','subspace.f90'],
+                    f2py_options=['--quiet'],
+                    extra_link_args=['-llapack'] ),
+
                    Extension(name='fortsubspace_real',
-                    sources=['comm.f90','signals_realsp.f90','subspace_realsp.f90'],
-                    f2py_options=['--quiet'])]
+                    sources=['comm.f90','signals_realsp.f90','covariance_realsp.f90','subspace_realsp.f90'],
+                    f2py_options=['--quiet'],
+                    extra_link_args=['-llapack'])]
 	  )
 

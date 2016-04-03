@@ -69,6 +69,8 @@ Compile Fortran ESPRIT to use from Python via f2py
 --------------------------------------------------
 Self-test Fortran Esprit from Python::
 
+    python setup.py develop
+
    ./test.py
 
 See ``basic.py`` for a basic example.
