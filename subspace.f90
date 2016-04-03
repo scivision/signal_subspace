@@ -1,10 +1,11 @@
 module subspace
     use comm,only: dp,pi,stdout,stderr
+    use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
 
     private
-    public::esprit,corrmtx
+    public::esprit
 
 contains
 
@@ -27,7 +28,7 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
 Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
-call corrmtx(x,size(x),M,R)
+call autocov(x,size(x),M,R)
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute autocovariance estimate:',sysclock2ms(toc-tic)
 
@@ -63,42 +64,10 @@ ang = atan2(aimag(eig),real(eig))
 
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
-do i=1,L
+do concurrent (i=1:L)
     sigma(i) = S(i,i)
 enddo
 
 end subroutine esprit
-!----------------------------------------------------------------------
-subroutine corrmtx(x,N,M,C)
-
-! input:
-! x is a 1-D vector
-! N is length of x
-! M is the size of signal block (integer)
-! output:
-! C is the 2-D result
-
- integer, intent(in) :: M,N
- complex(dp),intent(in) :: x(N)
- complex(dp),intent(out):: C(M,M)
-
- integer :: i
- complex(dp) :: yn(M,1), R(M,M)!, work(M,M)
-
- yn(:,1) = x(M:1:-1)
-
- R = matmul(yn,conjg(transpose(yn)))
- !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,R,M) !slower, worse accuracy than matmul in Gfortran 5.2.1
-
- do i = 1,N-M-1 ! yes, -1
-    yn(:,1) = x(M+i-1:i:-1) !yes, -1
-    R = R + matmul(yn,conjg(transpose(yn)))
-    !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,work,M)
-    !R = R + work
- enddo
-
- C = R/real(N,dp)
-
-end subroutine corrmtx
 
 end module subspace

@@ -17,7 +17,11 @@ contains
         call random_seed(size=n)
         allocate(seed(n))
         call system_clock(count=clock)
-        seed = clock + 37 * [ (i - 1, i = 1, n) ]
+        
+        do concurrent (i=1:n)
+            seed(i) = clock + 37 * (i-1)
+        enddo
+
         call random_seed(put=seed)
     end subroutine
 

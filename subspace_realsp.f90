@@ -1,9 +1,10 @@
 module subspace
     use comm,only: sp,stdout,stderr
+    use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
     real(sp),parameter :: pi = 4_sp*atan(1._sp)
-    public::esprit,corrmtx
+    public::esprit
 
 contains
 
@@ -28,7 +29,7 @@ LWORK = 8*M  !at least 5M for sgesvd
 
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
-call corrmtx(x,size(x),M,R)
+call autocov(x,size(x),M,R)
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute autocovariance estimate:',sysclock2ms(toc-tic)
 
@@ -73,34 +74,5 @@ do i=1,L/2
 enddo
 
 end subroutine esprit
-!----------------------------------------------------------------------
-subroutine corrmtx(x,N,M,C)
-
-! input:
-! x is a 1-D vector
-! N is length of x
-! M is the size of signal block (integer)
-! output:
-! C is the 2-D result
-
- integer, intent(in) :: M,N
- real(sp),intent(in) :: x(N)
- real(sp),intent(out):: C(M,M)
-
- integer :: i
- real(sp) :: yn(M,1), R(M,M)!, work(M,M)
-
- yn(:,1) = x(M:1:-1)
-
- R = matmul(yn,(transpose(yn)))
- 
- do i = 1,N-M-1 ! yes, -1
-    yn(:,1) = x(M+i-1:i:-1) !yes, -1
-    R = R + matmul(yn,(transpose(yn)))
- enddo
-
- C = R/real(N,sp)
-
-end subroutine corrmtx
 
 end module subspace

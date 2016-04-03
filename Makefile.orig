@@ -2,27 +2,27 @@
 
 FC = gfortran
 #---- What the EXE filename should be ---------------------------------
-TARGET_CMPL = fesprit
-TARGET_REAL= fesprit_realsp
-TARGET_C = cesprit
-TARGET_CPP = cpp_esprit
+TARGET_CMPL = fespritcmpl.out
+TARGET_REAL= fespritreal.out
+TARGET_C = cesprit.out
+TARGET_CPP = cpp_esprit.out
 TARGET_PYREAL = fortsubspace_real
 TARGET_PYCMPL = fortsubspace_cmpl
 #----Sources (in order of dependency) ---------------------------------
-FSRC_CMPL = comm.f90 subspace.f90 signals.f90
+FSRC_CMPL = comm.f90 covariance.f90 subspace.f90 signals.f90
 FMAIN_CMPL = perf.f90 RunSubspace.f90
 
 # yes, we should be using data polymorphism instead
-FSRC_REAL = comm.f90 subspace_realsp.f90 signals_realsp.f90
+FSRC_REAL = comm.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90
 FMAIN_REAL = perf.f90  RunSubspace_realsp.f90
 
 CSRC = cSubspace.c 
 
-CPPSRC = cppSubspace.c
+CPPSRC = cppSubspace.cpp
 #----- libs you need --------------------------------------------------
 FLIBS = -latlas -llapack -lblas -lpthread
 CLIBS = -lm -lgfortran
-CPPLIBS = -lm -lgfortran
+CXXLIBS = -lm -lgfortran
 #----- suffix patterns ------------------------------------------------
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -34,7 +34,7 @@ CPPLIBS = -lm -lgfortran
 F2PY = f2py3
 FFLAGS = -std=f2008 -Wall -Wpedantic -Wextra -mtune=native -fexternal-blas -ffast-math -O3
 
-DBGFLAGS = -O0  -fbacktrace -fbounds-check
+DBGFLAGS = -O0  -fbacktrace -fcheck=all
 
 FOBJS_CMPL =     $(FSRC_CMPL:.f90=.o)
 FOBJMAIN_CMPL = $(FMAIN_CMPL:.f90=.o)
@@ -68,23 +68,23 @@ pythonreal: $(TARGET_PYREAL)
 pythoncmpl: $(TARGET_PYCMPL)
 
 $(TARGET_PYREAL): $(FSRC_REAL)
-	$(F2PY) --quiet -m $@ -c $(FSRC_REAL)  $(LDFLAGS)
+	$(F2PY) --quiet -m $@ -c $(FSRC_REAL)
 
 $(TARGET_PYCMPL): $(FSRC_CMPL)
-	$(F2PY) --quiet -m $@ -c $(FSRC_CMPL)  $(LDFLAGS)
+	$(F2PY) --quiet -m $@ -c $(FSRC_CMPL)
 
 $(TARGET_C): $(COBJS) $(FOBJS_REAL)
-	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS) $(LDFLAGS) 
+	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS)
 
-$(TARGET_CPP): $(CPPOBJS) $(FOBJS_REAL)
-	$(CC) -o $@ $(CFLAGS) $(COBJS) $(FOBJS_REAL) $(FLIBS) $(CLIBS) $(LDFLAGS) 
+$(TARGET_CPP): $(CXXOBJS) $(FOBJS_REAL)
+	$(CXX) -o $@ $(CXXFLAGS) $(CXXOBJS) $(FOBJS_REAL) $(FLIBS) $(CXXLIBS)
     
 $(TARGET_CMPL): $(FOBJS_CMPL) $(FOBJMAIN_CMPL)
-	$(FC) -o $@ $(FFLAGS) $(FOBJS_CMPL) $(FOBJMAIN_CMPL) $(FLIBS) $(LDFLAGS)
+	$(FC) -o $@ $(FFLAGS) $(FOBJS_CMPL) $(FOBJMAIN_CMPL) $(FLIBS)
 
 $(TARGET_REAL): $(FOBJS_REAL) $(FOBJMAIN_REAL)
-	$(FC) -o $@ $(FFLAGS) $(FOBJS_REAL) $(FOBJMAIN_REAL) $(FLIBS) $(LDFLAGS)
+	$(FC) -o $@ $(FFLAGS) $(FOBJS_REAL) $(FOBJMAIN_REAL) $(FLIBS)
 #----------- CLEAN ----------------------------
 clean:
-	$(RM) $(FOBJS_REAL) $(FOBJMAIN_REAL) $(FOBJS_CMPL) $(FOBJMAIN_CMPL) $(COBJS) $(MODS)
+	$(RM) $(FOBJS_REAL) $(FOBJMAIN_REAL) $(FOBJS_CMPL) $(FOBJMAIN_CMPL) $(COBJS) $(MODS) *.out *.so
 

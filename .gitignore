@@ -1,6 +1,8 @@
-cesprit
-cpp_esprit
-fesprit*
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
 *.o
 *.so
 *.mod

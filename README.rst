@@ -19,11 +19,12 @@ Prereqs
 -------
 ::
 
-    sudo apt-get install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make
+    sudo apt-get install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make cmake
 
 
 For all languages (Fortran, C, C++, Python) at once, simply type::
 
+    cmake .
     make
 
 If you wish to compile only for a particular language, see the optional individual sections below.
@@ -36,17 +37,11 @@ Fortran
 
 ESPRIT example with noisy sinusoid
 ----------------------------------
-Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.You can make only for real single precision real Fortran by::
+Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.::
 
-    make real
+    ./fespritcmpl.out
 
-    ./fesprit_realsp
-
-or only double precision complex Fortran by::
-
-    make cmpl
-
-    ./fesprit
+    ./fespritreal.out
 
 
 C
@@ -56,9 +51,7 @@ ESPRIT example with noisy sinusoid
 ----------------------------------
 Here is an example of calling Fortran Esprit from C, which uses real single precision float::
 
-  make c
-
-  ./cesprit
+  ./cesprit.out
 
 C++
 ===
@@ -66,9 +59,7 @@ ESPRIT example with noisy sinusoid
 ----------------------------------
 Here is an example of calling Fortran Esprit from C++, which uses real single precision float::
 
-  make cpp
-
-  ./cpp_esprit
+  ./cppesprit.out
 
 
 Python
@@ -76,10 +67,8 @@ Python
 
 Compile Fortran ESPRIT to use from Python via f2py
 --------------------------------------------------
-To be able to access the Fortran Esprit from Python::
+Self-test Fortran Esprit from Python::
 
-   make pythonreal pythoncmpl
-  
    ./test.py
 
 See ``basic.py`` for a basic example.
