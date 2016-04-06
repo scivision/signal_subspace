@@ -3,7 +3,9 @@ module subspace
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
+
     real(sp),parameter :: pi = 4_sp*atan(1._sp)
+    private
     public::esprit
 
 contains
@@ -19,7 +21,7 @@ subroutine esprit(x,N,L,M,fs,tout,sigma)
     integer :: LWORK
     real(sp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(sp) :: S(M,M),RWORK(8*M),ang(L),SWORK(8*M) !this Swork is real
-    integer :: getrfinfo,getriinfo, evinfo, svdinfo,i
+    integer :: getrfinfo,getriinfo, evinfo, svdinfo
     real(sp) :: W1(L,L), IPIV(M-1)
     complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
@@ -51,7 +53,7 @@ call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
 if (getrfinfo.ne.0) write(stderr,*) 'ZGETRF inverse output code',getrfinfo
 if (getriinfo.ne.0) write(stderr,*) 'ZGETRI output code',getriinfo
 
-Phi = matmul(matmul(W1, (transpose(S1))), S2)
+Phi = matmul(matmul(W1, transpose(S1)), S2)
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
 
@@ -69,9 +71,7 @@ tones = abs(fs*ang/(2*pi))
 tout = tones(1:L:2)
 
 !eigenvalues
-do i=1,L/2
-    sigma(i) = S(i,i)
-enddo
+sigma = reshape(S(1:L/2, 1:L/2), [L/2]) !reshape=>squeeze
 
 end subroutine esprit
 

@@ -2,6 +2,7 @@ module subspace
     use comm,only: dp,pi,stdout,stderr
     use covariance,only: autocov
     !use perf, only : sysclock2ms
+
     Implicit none
 
     private
@@ -19,7 +20,7 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
     integer :: LWORK
     complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(dp) :: S(M,M),RWORK(8*M),ang(L)
-    integer :: getrfinfo,getriinfo,evinfo, svdinfo,i
+    integer :: getrfinfo,getriinfo,evinfo, svdinfo
     complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(dp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
@@ -64,9 +65,8 @@ ang = atan2(aimag(eig),real(eig))
 
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
-do concurrent (i=1:L)
-    sigma(i) = S(i,i)
-enddo
+sigma = reshape(S(1:L/2, 1:L/2), [L/2]) !reshape=>squeeze
+
 
 end subroutine esprit
 
