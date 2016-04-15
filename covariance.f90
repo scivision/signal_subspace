@@ -8,7 +8,7 @@ module covariance
 contains
 
 subroutine autocov(x,N,M,C)
-
+! autocovariance estimate of 1-D vector (e.g. noisy sinusoid)
 ! input:
 ! x is a 1-D vector
 ! N is length of x

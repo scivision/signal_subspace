@@ -5,8 +5,7 @@ module subspace
     Implicit none
 
     real(sp),parameter :: pi = 4_sp*atan(1._sp)
-    private
-    public::esprit
+    public::esprit,pi
 
 contains
 
@@ -18,7 +17,7 @@ subroutine esprit(x,N,L,M,fs,tout,sigma)
     real(sp),intent(out) :: tout(L/2),sigma(L)
 
     real(sp) :: tones(L)
-    integer :: LWORK
+    integer :: LWORK,i
     real(sp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(sp) :: S(M,M),RWORK(8*M),ang(L),SWORK(8*M) !this Swork is real
     integer :: getrfinfo,getriinfo, evinfo, svdinfo
@@ -69,9 +68,13 @@ ang = atan2(aimag(eig),real(eig))
 tones = abs(fs*ang/(2*pi))
 
 tout = tones(1:L:2)
+!write(stdout,*) 'tones ',tones
+!write(stdout,*) 'tout ',tout
 
 !eigenvalues
-sigma = reshape(S(1:L/2, 1:L/2), [L/2]) !reshape=>squeeze
+do concurrent (i=1:L/2)
+sigma(i) = S(i,i)
+enddo
 
 end subroutine esprit
 

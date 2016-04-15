@@ -17,7 +17,7 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
     real(dp),intent(in) :: fs
     real(dp),intent(out) :: tones(L),sigma(L)
 
-    integer :: LWORK
+    integer :: LWORK,i
     complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(dp) :: S(M,M),RWORK(8*M),ang(L)
     integer :: getrfinfo,getriinfo,evinfo, svdinfo
@@ -65,8 +65,9 @@ ang = atan2(aimag(eig),real(eig))
 
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
-sigma = reshape(S(1:L/2, 1:L/2), [L/2]) !reshape=>squeeze
-
+do concurrent (i=1:L/2)
+sigma(i) = S(i,i)
+enddo
 
 end subroutine esprit
 

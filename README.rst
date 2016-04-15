@@ -24,7 +24,8 @@ Prereqs
 
 For all languages (Fortran, C, C++, Python) at once, simply type::
 
-    cmake .
+    cd bin
+    cmake ..
     make
 
 If you have a need for speed, the `newly no-cost Intel MKL <https://software.intel.com/en-us/articles/free_mkl>`_ is 2-3 times faster than LAPACK.
@@ -39,9 +40,9 @@ ESPRIT example with noisy sinusoid
 ----------------------------------
 Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.::
 
-    ./fespritcmpl.out
+    ./fespritcmpl
 
-    ./fespritreal.out
+    ./fespritreal
 
 
 C
@@ -51,7 +52,7 @@ ESPRIT example with noisy sinusoid
 ----------------------------------
 Here is an example of calling Fortran Esprit from C, which uses real single precision float::
 
-  ./cesprit.out
+  ./cesprit
 
 C++
 ===
@@ -59,7 +60,7 @@ ESPRIT example with noisy sinusoid
 ----------------------------------
 Here is an example of calling Fortran Esprit from C++, which uses real single precision float::
 
-  ./cppesprit.out
+  ./cppesprit
 
 
 Python

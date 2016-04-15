@@ -20,3 +20,6 @@ def fort():
         Sr=None
 
     return Sc,Sr
+
+if __name__ == '__main__':
+    Sc,Sr = fort()

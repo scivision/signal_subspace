@@ -1,25 +1,29 @@
 program test_subspace
 
-use comm, only: sp, i64,stdout,stderr,sizeof
+use comm, only: sp, i64,stdout,stderr,sizeof,c_int
 use perf, only: sysclock2ms,assert
 use subspace, only: esprit
 use signals,only: signoise
+use filters,only: fircircfilter
 
-Implicit none
+implicit none
 
-integer :: Ns = 1024, &
-           Ntone=4
-real(sp) :: fs=48000, f0=12345.6, &
+integer(c_int) :: Ns = 1024, &
+                  Ntone = 2
+real(sp) :: fs=48000, &
+            f0=12345.6, &
             snr=60  !dB
-integer :: M
+character(len=*),parameter :: bfn='bfilt.txt'
+
+integer(c_int) :: M,Nb,fstat
  
 
-real(sp),allocatable :: x(:)
+real(sp),allocatable :: x(:),b(:),y(:)
 real(sp),allocatable :: tones(:),sigma(:)
 
 integer(i64) :: tic,toc
 !----------- parse command line ------------------
-integer :: narg
+integer(c_int) :: narg
 character(len=16) :: arg
 
 narg = command_argument_count()
@@ -42,24 +46,41 @@ if (narg.GT.4) then
  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 !---------- assign variable size arrays ---------------
-allocate(x(Ns),tones(Ntone/2),sigma(Ntone/2))
+allocate(x(Ns),y(Ns),tones(Ntone/2),sigma(Ntone/2))
 !--- checking system numerics --------------
 if (sizeof(fs).ne.4) write(stderr,*) 'expected 4-byte real but you have real bytes: ', sizeof(fs)
-
 
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr,Ns,&
               x)
+!------ filter noisy signal --------------
+! read coefficients 'b'
+open (unit=99, file=bfn, status='old',iostat=fstat)
+if (fstat.eq.0) then
+    read(99,*) Nb !first line of file: number of coeff
+    allocate(b(Nb))
+    read(99,*) b ! second line all coeff
+    close(99)
+    !write(stdout,*) b
+
+    call system_clock(tic)
+    call fircircfilter(x,Ns,b,size(b),y)
+    call system_clock(toc)
+    write(stdout,*) 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
+else ! filter coeff file not found
+    write(stderr,*) 'ERROR: FIR Filter coefficient file not found, proceeding without filter ',bfn
+    y=x
+endif
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(x,size(x),Ntone,M,fs,&
+call esprit(y,Ns,Ntone,M,fs,&
             tones,sigma)
 call system_clock(toc)
 
 
-write(stdout,*) ' ESPRIT found tone(s) [Hz]: ',tones
-write(stdout,*) ' with sigma: ',sigma
-write(stdout,*) ' seconds to compute: ',sysclock2ms(toc-tic)/1000
+write(stdout,*) 'Fortran ESPRIT found tone(s) [Hz]: ',tones
+write(stdout,*) 'with sigma: ',sigma
+write(stdout,*) 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
 
 ! -- assert <0.1% error ---------
 call assert(abs(tones(1)-f0).le.0.001*f0)
