@@ -28,7 +28,7 @@ elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL PGI)
     list(APPEND fortran_flags -traceback)
 endif()
 
-add_compile_options(
+add_compile_options( # Cmake >=3.3 for COMPILE_LANGUAGE
     "$<$<COMPILE_LANGUAGE:C>:${ccxx_flags}>"
     "$<$<COMPILE_LANGUAGE:CXX>:${ccxx_flags}>"
     "$<$<COMPILE_LANGUAGE:Fortran>:${fortran_flags}>"
