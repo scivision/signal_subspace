@@ -39,7 +39,7 @@ def main():
         tscipy = time()-tic
 
         tic = time()
-        yrfort = Sr.filters.fircircfilter(xr.astype(np.float32),b)
+        yrfort = Sr.filters.fircircfilter(xr.astype(np.float32),b)[0]
         tfort = time()-tic
         np.testing.assert_allclose(yrfort,yrpy,rtol=1e-4) #single prec vs double prec
 
