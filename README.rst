@@ -28,6 +28,10 @@ For all languages (Fortran, C, C++, Python) at once, simply type::
     cmake ..
     make
 
+Then you can test all languages at once from the bin/ directory by::
+
+    ../test/test.py
+
 If you have a need for speed, the `newly no-cost Intel MKL <https://software.intel.com/en-us/articles/free_mkl>`_ is 2-3 times faster than LAPACK.
 
 
