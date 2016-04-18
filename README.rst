@@ -42,7 +42,8 @@ Fortran
 
 ESPRIT example with noisy sinusoid
 ----------------------------------
-Note, don't use -Ofast to avoid seg faults. There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.::
+There are two versions of this program, one a full accuracy using ``double complex`` numbers, and the other using ``single real`` numbers as input. 
+The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.::
 
     ./fespritcmpl
 
@@ -72,11 +73,19 @@ Python
 
 Compile Fortran ESPRIT to use from Python via f2py
 --------------------------------------------------
-Self-test Fortran Esprit from Python::
+::
 
     python setup.py develop
 
+Selftest Fortran/C/C++/Python Esprit from Python
+------------------------------------------------
+::
+
    ./test.py
 
-See ``basic.py`` for a basic example.
+Plots comparing Fortran to Python
+---------------------------------
+::
+
+    ./BasicEspritExample.py
 

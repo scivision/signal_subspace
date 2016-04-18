@@ -1,4 +1,4 @@
-#this is a template, loaded with include(compiler.cmake) from your main CMakeLists.txt
+#this is a Cmake>=3.3 template, loaded with include(compiler.cmake) from your main CMakeLists.txt
 add_compile_options(-mtune=native -Wall -Wextra -Wpedantic -fexceptions)
 
 add_compile_options("$<$<CONFIG:RELEASE>: -ffast-math >")
