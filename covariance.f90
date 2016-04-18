@@ -1,5 +1,5 @@
 module covariance
-    use comm,only: dp,stdout
+    use comm,only: dp,c_int,stdout
     !use perf, only : sysclock2ms
     Implicit none
     private
@@ -16,11 +16,11 @@ subroutine autocov(x,N,M,C)
 ! output:
 ! C is the 2-D result
 
- integer, intent(in) :: M,N
+ integer(c_int), intent(in) :: M,N
  complex(dp),intent(in) :: x(N)
  complex(dp),intent(out):: C(M,M)
 
- integer :: i
+ integer(c_int) :: i
  complex(dp) :: yn(M,1), R(M,M)!, work(M,M)
 
  yn(:,1) = x(M:1:-1)

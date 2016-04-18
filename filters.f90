@@ -1,21 +1,41 @@
 module filters
     
-    use comm, only: sp,c_int
+    use comm, only: sp,c_int, stderr,stdout
 
     implicit none
-    
+
+    private    
     public:: fircircfilter
 
 contains
 
-pure subroutine fircircfilter(x,N,b,L,y)
+subroutine fircircfilter(x,N,b,L,y,stat)
 ! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
     integer(c_int), intent(in) :: N,L
     real(sp),intent(in) :: x(N),b(L) 
     real(sp),intent(out) :: y(N)
+    integer(c_int),intent(out) :: stat ! 0 => OK
 
     integer(c_int) :: k,p,i,j
     real(sp) :: z(L), acc
+    logical,parameter :: verbose=.false.
+
+
+    if (N.lt.1) then
+        write(stderr,*) "E: expected input array length>0, you passed in len(x)=",N
+        stat=-1
+        return
+    elseif (verbose) then
+        write(stdout,*) "input signal len(x)=",N
+    endif
+
+    if (L.lt.1) then
+        write(stderr,*) "E: expected more than zero filter coefficients, len(B)=",L
+        stat=-1
+        return
+    elseif (verbose) then
+        write(stdout,*) "filter coefficients len(B)=",L
+    endif
     
     p = 0
     z = 0. !fill array with zeros
@@ -33,6 +53,8 @@ pure subroutine fircircfilter(x,N,b,L,y)
         enddo !j
         y(i) = acc
     enddo !i
+
+stat=0
 
 end subroutine fircircfilter
 

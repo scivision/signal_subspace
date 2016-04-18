@@ -1,5 +1,5 @@
 module signals
-    use comm,only: sp, init_random_seed
+    use comm,only: sp, c_int, init_random_seed
     implicit none
     real(sp),parameter :: pi = 4_sp*atan(1._sp)
 
@@ -10,13 +10,13 @@ contains
 subroutine signoise(fs,f0,snr,Ns,x)
 
     real(sp),intent(in) :: fs,f0,snr
-    integer, intent(in) :: Ns
+    integer(c_int), intent(in) :: Ns
     real(sp),intent(out) :: x(Ns)
 
 
     real(sp) :: t,nvar
     real(sp) :: noise(Ns)
-    integer :: i
+    integer(c_int) :: i
 
     do i=1,size(x)
     t = (i-1)/fs
@@ -53,7 +53,7 @@ subroutine randn (N,rout)
 !    Output, complex (dp ) rout, 1-D vector drawn from gaussian PDF.
 
 
-  integer,intent(in) :: N
+  integer(c_int),intent(in) :: N
   real(sp),intent(out) :: rout(N)
   real (sp):: v1(N), v2(N)
 

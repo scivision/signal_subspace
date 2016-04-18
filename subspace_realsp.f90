@@ -1,5 +1,5 @@
 module subspace
-    use comm,only: sp,stdout,stderr
+    use comm,only: sp,c_int,stdout,stderr
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
@@ -11,23 +11,22 @@ contains
 
 subroutine esprit(x,N,L,M,fs,tout,sigma)
 
-    integer, intent(in) :: L,M,N
+    integer(c_int), intent(in) :: L,M,N
     real(sp),intent(in) :: x(N)
     real(sp),intent(in) :: fs
     real(sp),intent(out) :: tout(L/2),sigma(L)
 
     real(sp) :: tones(L)
-    integer :: LWORK,i
+    integer(c_int) :: LWORK,i
     real(sp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(sp) :: S(M,M),RWORK(8*M),ang(L),SWORK(8*M) !this Swork is real
-    integer :: getrfinfo,getriinfo, evinfo, svdinfo
+    integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
     real(sp) :: W1(L,L), IPIV(M-1)
     complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
-
-LWORK = 8*M  !at least 5M for sgesvd
    ! integer(i64) :: tic,toc
 
+Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
 call autocov(x,size(x),M,R)
@@ -73,7 +72,7 @@ tout = tones(1:L:2)
 
 !eigenvalues
 do concurrent (i=1:L/2)
-sigma(i) = S(i,i)
+    sigma(i) = S(i,i)
 enddo
 
 end subroutine esprit

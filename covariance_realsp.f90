@@ -1,5 +1,5 @@
 module covariance
-    use comm,only: sp,stdout
+    use comm,only: sp,c_int,stdout
     !use perf, only : sysclock2ms
     Implicit none
     private
@@ -8,7 +8,7 @@ module covariance
 contains
 
 subroutine autocov(x,N,M,C)
-
+! autocovariance estimate of 1-D vector (e.g. noisy sinusoid)
 ! input:
 ! x is a 1-D vector
 ! N is length of x
@@ -16,11 +16,11 @@ subroutine autocov(x,N,M,C)
 ! output:
 ! C is the 2-D result
 
- integer, intent(in) :: M,N
+ integer(c_int), intent(in) :: M,N
  real(sp),intent(in) :: x(N)
  real(sp),intent(out):: C(M,M)
 
- integer :: i
+ integer(c_int) :: i
  real(sp) :: yn(M,1), R(M,M)!, work(M,M)
 
  yn(:,1) = x(M:1:-1)

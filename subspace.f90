@@ -1,5 +1,5 @@
 module subspace
-    use comm,only: dp,pi,stdout,stderr
+    use comm,only: dp,c_int,pi,stdout,stderr
     use covariance,only: autocov
     !use perf, only : sysclock2ms
 
@@ -12,15 +12,15 @@ contains
 
 subroutine esprit(x,N,L,M,fs,tones,sigma)
 
-    integer, intent(in) :: L,M,N
+    integer(c_int), intent(in) :: L,M,N
     complex(dp),intent(in) :: x(N)
     real(dp),intent(in) :: fs
     real(dp),intent(out) :: tones(L),sigma(L)
 
-    integer :: LWORK,i
+    integer(c_int) :: LWORK,i
     complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(dp) :: S(M,M),RWORK(8*M),ang(L)
-    integer :: getrfinfo,getriinfo,evinfo, svdinfo
+    integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
     complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(dp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
@@ -66,7 +66,7 @@ ang = atan2(aimag(eig),real(eig))
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
 do concurrent (i=1:L/2)
-sigma(i) = S(i,i)
+    sigma(i) = S(i,i)
 enddo
 
 end subroutine esprit

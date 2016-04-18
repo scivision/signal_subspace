@@ -13,9 +13,9 @@ integer(c_int) :: Ns = 1024, &
 real(sp) :: fs=48000, &
             f0=12345.6, &
             snr=60  !dB
-character(len=*),parameter :: bfn='bfilt.txt'
+character(len=*),parameter :: bfn='../bfilt.txt'
 
-integer(c_int) :: M,Nb,fstat
+integer(c_int) :: M,Nb,fstat,statfilt
  
 
 real(sp),allocatable :: x(:),b(:),y(:)
@@ -64,11 +64,13 @@ if (fstat.eq.0) then
     !write(stdout,*) b
 
     call system_clock(tic)
-    call fircircfilter(x,Ns,b,size(b),y)
+    call fircircfilter(x,Ns,b,size(b),y,statfilt)
     call system_clock(toc)
     write(stdout,*) 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
-else ! filter coeff file not found
-    write(stderr,*) 'ERROR: FIR Filter coefficient file not found, proceeding without filter ',bfn
+endif
+
+if (fstat.ne.0 .or. statfilt.ne.0) then
+    write(stderr,*) 'skipped FIR filter.'
     y=x
 endif
 !------ estimate frequency of sinusoid in noise --------
