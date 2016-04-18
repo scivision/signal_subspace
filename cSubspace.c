@@ -25,10 +25,9 @@ x = malloc((size_t)Ns*sizeof(float));
 __signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x[0]);
 
 //---- signal estimation -----------------------------
-float * tones = malloc((size_t)Ntone*sizeof(float));
-float * sigma = malloc((size_t)Ntone*sizeof(float));
+float * tones = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));
+float * sigma = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));
 
-// if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
 __subspace_MOD_esprit(&x[0], &Ns, &Ntone, &M, &fs, &tones[0], &sigma[0]);
 
 free(x);
@@ -42,10 +41,12 @@ printf("\n");
 
 if (fabsf(tones[0]-f0)>0.0001*f0){
     fprintf(stderr,"E: failed to meet tolerance\n");
+    free(tones); free(sigma);
     return EXIT_FAILURE;
 }
 else{
     printf("OK\n");
+    free(tones); free(sigma);
     return EXIT_SUCCESS;
 }
 
