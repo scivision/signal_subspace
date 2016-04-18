@@ -1,8 +1,5 @@
 *.txt
-CMakeCache.txt
-CMakeFiles/
-Makefile
-cmake_install.cmake
+bin/
 
 *.o
 *.so
