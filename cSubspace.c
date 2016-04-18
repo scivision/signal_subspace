@@ -21,12 +21,12 @@ const float snr = 60.; // dB, arbitrary
 const float f0 = (float)12345.6; //arbitrary
 
 float * x;
-x = malloc(Ns*sizeof(float));
+x = malloc((size_t)Ns*sizeof(float));
 __signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x[0]);
 
 //---- signal estimation -----------------------------
-float * tones = malloc(Ntone*sizeof(float));
-float * sigma = malloc(Ntone*sizeof(float));
+float * tones = malloc((size_t)Ntone*sizeof(float));
+float * sigma = malloc((size_t)Ntone*sizeof(float));
 
 // if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
 __subspace_MOD_esprit(&x[0], &Ns, &Ntone, &M, &fs, &tones[0], &sigma[0]);

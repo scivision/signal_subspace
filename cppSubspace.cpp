@@ -25,8 +25,8 @@ const float fs=48000.;
 const float snr = 60.; // dB, arbitrary
 const float f0 = float(12345.6); //arbitrary
 
-std::vector<float> x; x.resize(Ns); // noisy signal
-std::vector<float> y; y.resize(Ns); // filtered signal
+std::vector<float> x; x.resize(size_t(Ns)); // noisy signal
+std::vector<float> y; y.resize(size_t(Ns)); // filtered signal
 
 __signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x.front());
 
@@ -35,9 +35,9 @@ __signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x.front());
 std::vector<float> Bfilt = loadfiltercoeff(Bfn);
 bool Bok = std::isfinite(Bfilt[0]);
 
-int statfilt;
+int statfilt=-1;
 if (Bok){
-    int Nb = Bfilt.size();
+    int Nb = int(Bfilt.size());
     if (verbose) printf("Nb: %d\n",Nb);
     __filters_MOD_fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,&y.front(), &statfilt);
 }
@@ -49,8 +49,8 @@ if (!Bok or statfilt!=0){
 
 if (verbose) printf("len(y): %lu \n",y.size());
 //---- signal estimation -----------------------------
-std::vector<float> tones; tones.resize(Ntone);
-std::vector<float> sigma; sigma.resize(Ntone);
+std::vector<float> tones; tones.resize(size_t(Ntone));
+std::vector<float> sigma; sigma.resize(size_t(Ntone));
 
 // if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
 __subspace_MOD_esprit(&y.front(), &Ns, &Ntone, &M, &fs, 
@@ -90,7 +90,7 @@ if (Bfid==nullptr){ // no fclose() on nullptr, can crash on some platforms.
 }
 
 // how many coeff in file (first line)
-int i,Nb; // NOTE: Fortran has signed integers only.
+int Nb; // NOTE: Fortran has signed integers only.
 int ret = fscanf(Bfid,"%d",&Nb);
 if (ret!=1){
     fprintf(stderr,"E: Failed to obtain number of coefficients from %s",Bfn);
@@ -98,12 +98,12 @@ if (ret!=1){
     return Bfilt;
 }
 // Read coeff
-Bfilt.resize(Nb);
+Bfilt.resize(size_t(Nb));
 float val;
-for (i=0; i<Nb; i++){
+for (size_t i=0; i<size_t(Nb); i++){
     ret = fscanf(Bfid,"%f",&val);
     if (ret!=1){
-        fprintf(stderr,"E: Failed to read filter coeff # %d from %s",i,Bfn);
+        fprintf(stderr,"E: Failed to read filter coeff # %zu from %s",i,Bfn);
         Bfilt[0]=NAN;
         fclose(Bfid);
         return Bfilt;
@@ -111,7 +111,7 @@ for (i=0; i<Nb; i++){
     
     Bfilt[i] = val;
 
-    if (verbose) printf("B[%d]= %f\n",i,Bfilt[i]);
+    if (verbose) printf("B[%zu]= %f\n",i,Bfilt[i]);
 } //for i
 
 if (Bfilt.size()!=size_t(Nb)){

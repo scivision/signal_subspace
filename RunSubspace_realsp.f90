@@ -45,6 +45,8 @@ endif
 if (narg.GT.4) then
  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
+
+write(stdout,*) "Fortran Esprit: Real Single Precision"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns),y(Ns),tones(Ntone/2),sigma(Ntone/2))
 !--- checking system numerics --------------
@@ -80,7 +82,7 @@ call esprit(y,Ns,Ntone,M,fs,&
 call system_clock(toc)
 
 
-write(stdout,*) 'Fortran ESPRIT found tone(s) [Hz]: ',tones
+write(stdout,*) 'estimated tone freq [Hz]: ',tones
 write(stdout,*) 'with sigma: ',sigma
 write(stdout,*) 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
 

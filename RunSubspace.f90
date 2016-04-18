@@ -40,6 +40,8 @@ endif
 if (narg.GT.4) then
  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
+
+write(stdout,*) "Fortran Esprit: Complex Double Precision"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns),tones(Ntone),sigma(Ntone))
 !--- checking system numerics --------------
@@ -58,9 +60,9 @@ call system_clock(toc)
 ! -- assert <0.1% error ---------
 call assert(abs(tones(1)-f0).le.0.001*f0)
 
-write(stdout,*) ' ESPRIT found tone(s) [Hz]: ',tones
-write(stdout,*) ' with sigma: ',sigma
-write(stdout,*) ' seconds to compute: ',sysclock2ms(toc-tic)/1000
+write(stdout,*) 'estimated tone freq [Hz]: ',tones
+write(stdout,*) 'with sigma: ',sigma
+write(stdout,*) 'seconds to compute: ',sysclock2ms(toc-tic)/1000
 
 write(stdout,*) 'OK'
 end program test_subspace
