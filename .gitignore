@@ -1,10 +1,7 @@
 *.txt
 bin/
 
-*.o
-*.so
 *.mod
-*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
