@@ -1,5 +1,4 @@
-#include <cstdio>
-#include <cstdlib>
+#include <iostream>
 #include <cmath>
 #include <vector>
 
@@ -14,7 +13,7 @@ std::vector<float> loadfiltercoeff(const char*);
 const bool verbose=false;
 
 int main () {
-printf("C++ Esprit\n");
+std::cout << "C++ Esprit" << std::endl;
 
 const char* Bfn="../bfilt.txt"; //FIXME binary file
 int Ns=1024;
@@ -38,16 +37,16 @@ bool Bok = std::isfinite(Bfilt[0]);
 int statfilt=-1;
 if (Bok){
     int Nb = int(Bfilt.size());
-    if (verbose) printf("Nb: %d\n",Nb);
+    if (verbose) std::cout << "Nb: " << Nb << std::endl;
     __filters_MOD_fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,&y.front(), &statfilt);
 }
 
 if (!Bok or statfilt!=0){
-    fprintf(stderr,"skipping filter.\n");
+    std::cerr << "skipping filter." << std::endl;
     y=x;
 }
 
-if (verbose) printf("len(y): %lu \n",y.size());
+if (verbose) std::cout << "len(y): " << y.size() << std::endl;
 //---- signal estimation -----------------------------
 std::vector<float> tones; tones.resize(size_t(Ntone));
 std::vector<float> sigma; sigma.resize(size_t(Ntone));
@@ -57,19 +56,19 @@ __subspace_MOD_esprit(&y.front(), &Ns, &Ntone, &M, &fs,
                       &tones.front(), &sigma.front());
 
 
-printf("estimated tone freq [Hz]: ");
-for (const auto i: tones) printf("%f ",i);
+std::cout << "estimated tone freq [Hz]: ";
+for (const auto i: tones) std::cout << i;
 
-printf("\nwith sigma:               ");
-for (const auto i: sigma) printf("%f ",i);
-printf("\n");
+std::cout << std::endl << "with sigma:               ";
+for (const auto i: sigma) std::cout << i;
+std::cout << std::endl;
 
 if (fabsf(tones[0]-f0)>0.0001*f0){
-    fprintf(stderr,"E: failed to meet tolerance\n");
+    std::cerr << "E: failed to meet tolerance" << std::endl;
     return EXIT_FAILURE;
 }
 else{
-    printf("OK\n");
+    std::cout << "OK" << std::endl;
     return EXIT_SUCCESS;
 }
 
@@ -85,7 +84,7 @@ Bfilt.resize(1);
 Bfilt[0]=NAN; // signals failure
 
 if (Bfid==nullptr){ // no fclose() on nullptr, can crash on some platforms.
-    fprintf(stderr,"E: could not open %s\n",Bfn);
+    std::cerr << "E: could not open " << Bfn << std::endl;
     return Bfilt;
 }
 
@@ -93,7 +92,7 @@ if (Bfid==nullptr){ // no fclose() on nullptr, can crash on some platforms.
 int Nb; // NOTE: Fortran has signed integers only.
 int ret = fscanf(Bfid,"%d",&Nb);
 if (ret!=1){
-    fprintf(stderr,"E: Failed to obtain number of coefficients from %s",Bfn);
+    std::cerr << "E: Failed to obtain number of coefficients from " << Bfn << std::endl;
     fclose(Bfid);
     return Bfilt;
 }
@@ -103,7 +102,7 @@ float val;
 for (size_t i=0; i<size_t(Nb); i++){
     ret = fscanf(Bfid,"%f",&val);
     if (ret!=1){
-        fprintf(stderr,"E: Failed to read filter coeff # %zu from %s",i,Bfn);
+        std::cerr << "E: Failed to read filter coeff # " << i << " from " << Bfn << std::endl;
         Bfilt[0]=NAN;
         fclose(Bfid);
         return Bfilt;
@@ -111,17 +110,17 @@ for (size_t i=0; i<size_t(Nb); i++){
     
     Bfilt[i] = val;
 
-    if (verbose) printf("B[%zu]= %f\n",i,Bfilt[i]);
+    if (verbose) std::cout << "B[" << i <<"]= " << Bfilt[i] << std::endl;
 } //for i
 
 if (Bfilt.size()!=size_t(Nb)){
-    fprintf(stderr,"E: read %zu coeff from %s but expected %d", Bfilt.size(), Bfn,Nb);
+    std::cerr << "E: read " << Bfilt.size() << " coeff from " << Bfn << " but expected " << Nb << std::endl;
     Bfilt[0]=NAN;
     fclose(Bfid); 
     return Bfilt;
 }
 
-printf("loaded %zu filter coefficients from %s\n",Bfilt.size(),Bfn);
+std::cout << "loaded " << Bfilt.size() << " filter coefficients from " << Bfn << std::endl;
 
 fclose(Bfid); // only if file was opened successfully, or fclose() may SIGSEGV on some platforms.
 
