@@ -24,8 +24,8 @@ const float fs=48000.;
 const float snr = 60.; // dB, arbitrary
 const float f0 = float(12345.6); //arbitrary
 
-std::vector<float> x; x.resize(size_t(Ns)); // noisy signal
-std::vector<float> y; y.resize(size_t(Ns)); // filtered signal
+std::vector<float> x(Ns); // noisy signal
+std::vector<float> y(Ns); // filtered signal
 
 __signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x.front());
 
@@ -48,8 +48,8 @@ if (!Bok or statfilt!=0){
 
 if (verbose) std::cout << "len(y): " << y.size() << std::endl;
 //---- signal estimation -----------------------------
-std::vector<float> tones; tones.resize(size_t(Ntone));
-std::vector<float> sigma; sigma.resize(size_t(Ntone));
+std::vector<float> tones(Ntone);
+std::vector<float> sigma(Ntone);
 
 // if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
 __subspace_MOD_esprit(&y.front(), &Ns, &Ntone, &M, &fs, 
@@ -79,8 +79,7 @@ std::vector<float> loadfiltercoeff(const char* Bfn){
 // read filter coefficients file //FIXME binary file
 FILE * Bfid = fopen(Bfn,"r");
 
-std::vector<float> Bfilt;  // filter coeff.
-Bfilt.resize(1);
+std::vector<float> Bfilt(1);  // filter coeff.
 Bfilt[0]=NAN; // signals failure
 
 if (Bfid==nullptr){ // no fclose() on nullptr, can crash on some platforms.
