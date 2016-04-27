@@ -103,32 +103,20 @@ def test_esprit():
     print('ESPRIT: Fortran is {:.4f} times faster than Python'.format(py['time'].values[0] / fortcmpl['time'].values[0]))
 
 def test_cxx():
-    try: 
-        environ['TRAVIS_PYTHON_VERSION']
-    except KeyError:
-        ret = subprocess.run([str(path / 'bin/cppesprit')])
-        ret.check_returncode()
+    ret = subprocess.run([str(path / 'bin/cppesprit')])
+    ret.check_returncode()
 
 def test_c():
-    try: 
-        environ['TRAVIS_PYTHON_VERSION']
-    except KeyError:
-        ret = subprocess.run([str(path / 'bin/cesprit')])
-        ret.check_returncode()
+    ret = subprocess.run([str(path / 'bin/cesprit')])
+    ret.check_returncode()
 
 def test_fortranreal():
-    try: 
-        environ['TRAVIS_PYTHON_VERSION']
-    except KeyError:
-        ret = subprocess.run([str(path / 'bin/fespritreal')])
-        ret.check_returncode()
+    ret = subprocess.run([str(path / 'bin/fespritreal')])
+    ret.check_returncode()
 
 def test_fortrancmpl():
-    try: 
-        environ['TRAVIS_PYTHON_VERSION']
-    except KeyError:
-        ret = subprocess.run([str(path / 'bin/fespritcmpl')])
-        ret.check_returncode()
+    ret = subprocess.run([str(path / 'bin/fespritcmpl')])
+    ret.check_returncode()
 
 if __name__ == '__main__':
     np.testing.run_module_suite()
