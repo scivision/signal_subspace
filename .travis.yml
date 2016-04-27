@@ -1,10 +1,5 @@
 language: python
 
-os:
-    - linux
-    - osx
-
-
 python:
     - 3.5
 
@@ -16,6 +11,7 @@ git:
 
 addons:
   apt:
+    packages:
     - liblapack-dev
 
 before_install:
