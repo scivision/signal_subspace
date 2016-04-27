@@ -11,8 +11,10 @@ git:
 
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
-    - gfortran
+    - gfortran-5
     - liblapack-dev
 
 before_install:
