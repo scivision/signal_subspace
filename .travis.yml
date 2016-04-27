@@ -35,10 +35,11 @@ install:
     - python setup.py develop
     - conda install --yes scipy=0.16.1 #patch for library travis
 
-#before_script: # stub for test of C++ along with Python -- need Cmake >=3.3
- #   - cd bin
- #   - cmake -DCMAKE_BUILD_TYPE=Debug ..
-#    - make 
+before_script:
+   - cd bin
+   - cmake ..
+   - make 
+   - cd ..
 
 
 script:

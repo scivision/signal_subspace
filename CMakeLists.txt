@@ -1,9 +1,6 @@
-cmake_minimum_required (VERSION 3.3)
+cmake_minimum_required (VERSION 2.8)
 project(spectrum C CXX Fortran)
 
-include(compiler.cmake) # boilerplate compiler flags
-
-set(CMAKE_VERBOSE_MAKEFILE off)
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 find_package(LAPACK)
@@ -32,4 +29,7 @@ add_executable(cesprit cSubspace.c)
 target_link_libraries(cesprit subspace_real)
 set_target_properties(cesprit PROPERTIES C_STANDARD 11)
 
+#---------------------
+#include(compiler.cmake)
+add_compile_options(-mtune=native -ffast-math -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
 
