@@ -12,6 +12,7 @@ git:
 addons:
   apt:
     packages:
+    - gfortran
     - liblapack-dev
 
 before_install:
