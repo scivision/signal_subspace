@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8.12)
 project(spectrum C CXX Fortran)
 
+# *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
 add_compile_options(-mtune=native -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
