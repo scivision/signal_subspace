@@ -20,11 +20,8 @@ contains
     subroutine assert(cond)
         logical, intent(in) :: cond
 
-        if (.not. cond) then
-            write(stderr,*) 'assertion failed, halting test'
-            error stop
-        end if
-
+        if (.not. cond) error stop 'assertion failed, halting test'
+        
     end subroutine assert
 
 End Module perf

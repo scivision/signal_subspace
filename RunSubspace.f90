@@ -1,6 +1,6 @@
 program test_subspace
 
-use comm, only: dp, i64,stdout,stderr,sizeof
+use comm, only: dp, i64,stdout,stderr,sizeof,c_int
 use perf, only: sysclock2ms,assert
 use subspace, only: esprit
 use signals,only: signoise
@@ -18,7 +18,7 @@ real(dp),allocatable :: tones(:),sigma(:)
 
 integer(i64) :: tic,toc
 !----------- parse command line ------------------
-integer :: narg
+integer(c_int) :: narg
 character(len=16) :: arg
 
 narg = command_argument_count()
@@ -65,6 +65,8 @@ write(stdout,*) 'with sigma: ',sigma
 write(stdout,*) 'seconds to compute: ',sysclock2ms(toc-tic)/1000
 
 write(stdout,*) 'OK'
+
+deallocate(x,tones,sigma)
 end program test_subspace
 
 

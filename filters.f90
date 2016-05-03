@@ -4,17 +4,17 @@ module filters
 
     implicit none
 
-    private    
+    real(sp),parameter :: nan = transfer(Z'7FF80000',1.0)
+    private
     public:: fircircfilter
 
 contains
 
-subroutine fircircfilter(x,N,b,L,y,stat)
+subroutine fircircfilter(x,N,b,L,y)
 ! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
     integer(c_int), intent(in) :: N,L
     real(sp),intent(in) :: x(N),b(L) 
     real(sp),intent(out) :: y(N)
-    integer(c_int),intent(out) :: stat ! 0 => OK
 
     integer(c_int) :: k,p,i,j
     real(sp) :: z(L), acc
@@ -23,7 +23,7 @@ subroutine fircircfilter(x,N,b,L,y,stat)
 
     if (N.lt.1) then
         write(stderr,*) "E: expected input array length>0, you passed in len(x)=",N
-        stat=-1
+        y(1) = nan
         return
     elseif (verbose) then
         write(stdout,*) "input signal len(x)=",N
@@ -31,7 +31,7 @@ subroutine fircircfilter(x,N,b,L,y,stat)
 
     if (L.lt.1) then
         write(stderr,*) "E: expected more than zero filter coefficients, len(B)=",L
-        stat=-1
+        y(1) = nan
         return
     elseif (verbose) then
         write(stdout,*) "filter coefficients len(B)=",L
@@ -54,7 +54,6 @@ subroutine fircircfilter(x,N,b,L,y,stat)
         y(i) = acc
     enddo !i
 
-stat=0
 
 end subroutine fircircfilter
 

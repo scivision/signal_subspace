@@ -15,7 +15,8 @@ real(sp) :: fs=48000, &
             snr=60  !dB
 character(len=*),parameter :: bfn='../bfilt.txt'
 
-integer(c_int) :: M,Nb,fstat,statfilt
+integer(c_int) :: M,Nb,fstat
+logical :: filtok
  
 
 real(sp),allocatable :: x(:),b(:),y(:)
@@ -57,6 +58,7 @@ call signoise(fs,f0,snr,Ns,&
               x)
 !------ filter noisy signal --------------
 ! read coefficients 'b'
+filtok=.false.
 open (unit=99, file=bfn, status='old',iostat=fstat)
 if (fstat.eq.0) then
     read(99,*) Nb !first line of file: number of coeff
@@ -66,30 +68,33 @@ if (fstat.eq.0) then
     !write(stdout,*) b
 
     call system_clock(tic)
-    call fircircfilter(x,Ns,b,size(b),y,statfilt)
+    call fircircfilter(x,Ns,b,size(b),y)
     call system_clock(toc)
     write(stdout,*) 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
+
+    filtok = .not.isnan(y(1))
 endif
 
-if (fstat.ne.0 .or. statfilt.ne.0) then
+if (fstat.ne.0 .or. .not.filtok) then
     write(stderr,*) 'skipped FIR filter.'
     y=x
 endif
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(y,Ns,Ntone,M,fs,&
+call esprit(y,size(y),Ntone,M,fs,&
             tones,sigma)
 call system_clock(toc)
 
+! -- assert <0.1% error ---------
+call assert(abs(tones(1)-f0).le.0.001*f0)
 
 write(stdout,*) 'estimated tone freq [Hz]: ',tones
 write(stdout,*) 'with sigma: ',sigma
 write(stdout,*) 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
 
-! -- assert <0.1% error ---------
-call assert(abs(tones(1)-f0).le.0.001*f0)
-
 write(stdout,*) 'OK'
+
+deallocate(x,y,tones,sigma,b)
 end program test_subspace
 
 

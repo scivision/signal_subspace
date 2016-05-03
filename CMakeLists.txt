@@ -1,9 +1,10 @@
 cmake_minimum_required (VERSION 2.8.12)
 project(spectrum C CXX Fortran)
 
+add_compile_options(-mtune=native -ffast-math -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
-find_package(LAPACK)
+find_package(LAPACK REQUIRED)
 
 add_library(subspace_cmpl comm.f90             covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_cmpl lapack)
@@ -28,8 +29,3 @@ set_target_properties(cppesprit PROPERTIES CXX_STANDARD 14)
 add_executable(cesprit cSubspace.c)
 target_link_libraries(cesprit subspace_real)
 set_target_properties(cesprit PROPERTIES C_STANDARD 11)
-
-#---------------------
-#include(compiler.cmake)
-add_compile_options(-mtune=native -ffast-math -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
-
