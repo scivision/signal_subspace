@@ -1,13 +1,14 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <string>
+#include <cstring>
+#include <string> // cstring and string for platform independence
 #include <cmath>
 #include <vector>
 
 extern "C" void __signals_MOD_signoise(const float*, const float*, const float*, int*, float []);
 
-extern "C" void __filters_MOD_fircircfilter(float [], int*,float [],int*,float []);
+extern "C" void __filters_MOD_fircircfilter(float [], int*,float [],int*,float [],bool*);
 
 extern "C" void __subspace_MOD_esprit(float [], int*, int*, int*, const float*, float [], float []);
 
@@ -35,25 +36,25 @@ __signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x.front());
 //---- filter noisy signal ------------------------
 
 std::vector<float> Bfilt = loadfiltercoeff(Bfn);
-bool Bok = std::isfinite(Bfilt[0]);
+bool Bok = std::isfinite(Bfilt.at(0));
 bool filtok = false;
-
+if (verbose) std::cout << "len(y): " << y.size() << std::endl;
 if (Bok){
     int Nb = int(Bfilt.size());
 
     if (verbose) std::cout << "Nb: " << Nb << std::endl;
 
-    __filters_MOD_fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,&y.front());
-
-    filtok = !isnan(y[0]);
+    __filters_MOD_fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,
+                                &y.front(),&filtok);
 }
 
+if (verbose) std::cout << "Bok: " << Bok << " filtok: " << filtok << std::endl;
+
 if (!Bok or !filtok){
-    std::cerr << "skipping filter." << std::endl;
+    std::cerr << "C++ Esprit: skipping filter." << std::endl;
     y=x;
 }
 
-if (verbose) std::cout << "len(y): " << y.size() << std::endl;
 //---- signal estimation -----------------------------
 std::vector<float> tones((size_t(Ntone)));
 std::vector<float> sigma((size_t(Ntone)));
@@ -85,8 +86,7 @@ else{
 std::vector<float> loadfiltercoeff(std::string Bfn){
 // read filter coefficients file //FIXME binary file
 std::vector<float> Bfilt(1);  // filter coeff.
-Bfilt[0]=NAN; // signals failure
-
+Bfilt.at(0)=NAN; // signals failure
 
 std::ifstream Bfile;
 Bfile.open(Bfn,std::ifstream::in);
@@ -117,7 +117,7 @@ while(iss>>val){
 
 if (i != size_t(Nb)){
     std::cerr << "E: read " << i << " coeff from " << Bfn << " but expected " << Nb << std::endl;
-    Bfilt[0]=NAN;
+    Bfilt.at(0)=NAN;
     return Bfilt;
 }
 

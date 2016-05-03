@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8.12)
 project(spectrum C CXX Fortran)
 
-add_compile_options(-mtune=native -ffast-math -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
+add_compile_options(-mtune=native -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 find_package(LAPACK REQUIRED)

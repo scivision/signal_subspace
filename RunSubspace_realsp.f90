@@ -1,6 +1,6 @@
 program test_subspace
 
-use comm, only: sp, i64,stdout,stderr,sizeof,c_int
+use comm, only: sp, i64,stdout,stderr,sizeof,c_int,c_bool
 use perf, only: sysclock2ms,assert
 use subspace, only: esprit
 use signals,only: signoise
@@ -16,7 +16,7 @@ real(sp) :: fs=48000, &
 character(len=*),parameter :: bfn='../bfilt.txt'
 
 integer(c_int) :: M,Nb,fstat
-logical :: filtok
+logical(c_bool) :: filtok
  
 
 real(sp),allocatable :: x(:),b(:),y(:)
@@ -68,11 +68,9 @@ if (fstat.eq.0) then
     !write(stdout,*) b
 
     call system_clock(tic)
-    call fircircfilter(x,Ns,b,size(b),y)
+    call fircircfilter(x,size(x),b,size(b), y,filtok)
     call system_clock(toc)
     write(stdout,*) 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
-
-    filtok = .not.isnan(y(1))
 endif
 
 if (fstat.ne.0 .or. .not.filtok) then
@@ -94,7 +92,8 @@ write(stdout,*) 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
 
 write(stdout,*) 'OK'
 
-deallocate(x,y,tones,sigma,b)
+deallocate(x,y,tones,sigma)
+if (fstat.eq.0) deallocate(b)
 end program test_subspace
 
 
