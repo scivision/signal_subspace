@@ -30,9 +30,6 @@ def main():
 
     if Sr is not None:
         b  = remez(L, [0, 0.1, 0.15, 0.35, 0.4, 0.5], [0, 1, 0])
-        with open('bfilt.txt','w') as h:
-            h.write(str(b.size) +"\n")
-            b.tofile(h,sep=" ")
 
         tic=time()
         yrpy = lfilter(b,1,xr)

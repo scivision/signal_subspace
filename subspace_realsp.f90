@@ -4,7 +4,8 @@ module subspace
     !use perf, only : sysclock2ms
     Implicit none
 
-    real(sp),parameter :: pi = 4_sp*atan(1._sp)
+    real(sp),parameter :: pi = 4.*atan(1.)
+    private
     public::esprit,pi
 
 contains
@@ -24,9 +25,10 @@ subroutine esprit(x,N,L,M,fs,tout,sigma)
     real(sp) :: W1(L,L), IPIV(M-1)
     complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
+
+    LWORK = 8*M  !at least 5M for sgesvd
    ! integer(i64) :: tic,toc
 
-Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
 call autocov(x,size(x),M,R)
@@ -67,8 +69,6 @@ ang = atan2(aimag(eig),real(eig))
 tones = abs(fs*ang/(2*pi))
 
 tout = tones(1:L:2)
-!write(stdout,*) 'tones ',tones
-!write(stdout,*) 'tout ',tout
 
 !eigenvalues
 do concurrent (i=1:L/2)
