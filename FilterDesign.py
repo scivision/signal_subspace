@@ -36,7 +36,7 @@ def plotfilt(b,L,fs,ofn):
 
     fg,axs = subplots(2,1,sharex=False)
     freq, response = freqz(b)
-    axs[0].plot(freq*fs/(2*pi),10*log10(abs(response)))
+    axs[0].plot(freq*fs/(2*pi),20*log10(abs(response)))
     axs[0].set_title('filter response  {} taps'.format(L))
     axs[0].set_ylim(top=1)  
     axs[0].set_ylabel('|H| [db]')
@@ -57,6 +57,32 @@ def plotfilt(b,L,fs,ofn):
         ofn = ofn.with_suffix('.png')
         print('writing {}'.format(ofn))
         fg.savefig(str(ofn),dpi=100,bbox_inches='tight')
+
+def butterplot(fs,fc):
+    """ example from scipy.signal.butter page """
+
+
+    ax = figure().gca()
+    ax.semilogx(fs*0.5/np.pi*w, 20*np.log10(abs(h)))
+    ax.set_title('Butterworth filter frequency response')
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Amplitude [dB]')
+    ax.grid(which='both', axis='both')
+    ax.axvline(fc, color='green') # cutoff frequency
+    ax.set_ylim(-50,0)
+
+def chebyshevplot(fs):
+    """ example from scipy.signal.cheby1 page """
+    b, a = signal.cheby1(4, 5, 100, 'high', analog=True)
+    w, h = signal.freqs(b, a)
+    plt.semilogx(w, 20*np.log10(abs(h)))
+    plt.title('Chebyshev Type I frequency response (rp=5)')
+    plt.xlabel('Frequency [radians / second]')
+    plt.ylabel('Amplitude [dB]')
+    plt.margins(0, 0.1)
+    plt.grid(which='both', axis='both')
+    plt.axvline(100, color='green') # cutoff frequency
+    plt.axhline(-5, color='green') # rp
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
