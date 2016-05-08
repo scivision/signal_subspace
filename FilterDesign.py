@@ -42,7 +42,6 @@ def plotfilt(b,L,fs,ofn):
     axs[0].set_ylabel('|H| [db]')
     axs[0].set_xlabel('frequency [Hz]')
 
-
     t = arange(0,L/fs,1/fs)
     axs[1].plot(t,b)
     axs[1].set_xlabel ('time [sec]')

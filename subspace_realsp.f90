@@ -5,8 +5,9 @@ module subspace
     Implicit none
 
     real(sp),parameter :: pi = 4.*atan(1.)
-    private
-    public::esprit,pi
+! do not put private here, because module parameters like pi won't be passed out
+! for Numpy / f2py 1.10.4 (and other)  BUG in Numpy.
+    public::esprit
 
 contains
 

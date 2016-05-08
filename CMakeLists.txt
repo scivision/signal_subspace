@@ -5,7 +5,7 @@ project(spectrum C CXX Fortran)
 add_compile_options(-mtune=native -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
-find_package(LAPACK REQUIRED)
+find_package(LAPACK) #or other math library providing the linear algebra e.g. MKL
 
 add_library(subspace_cmpl comm.f90             covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_cmpl lapack)

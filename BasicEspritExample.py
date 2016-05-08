@@ -5,6 +5,7 @@ from time import time
 from matplotlib.pyplot import subplots,show
 #
 from spectral_analysis.importfort import fort
+from spectral_analysis.filter import fircirc
 Sc,Sr = fort()
 
 fs=48e3; F=12345.6 #arbitrary
@@ -76,30 +77,6 @@ def main():
         axs[1,-1].set_xlabel ('sample number')
 
         show()
-
-def fircirc(b,x):
-    p=0
-    nx = x.size
-    nb = b.size
-    z = np.zeros(nb)
-    y = np.empty(nx)
-
-    for n in range(nx):
-        if p>=nb:
-            p=0
-        z[p] = x[n]
-        acc = 0.
-        k = p
-        for j in range(nb):
-            acc += b[j]*z[k]
-            k-=1
-            if k<0:
-                k=nb-1
-
-        y[n] = acc
-        p+=1
-
-    return y
 
 def plotperiodogram(t,x,fs,ax,ttxt):
     fax,Pxx = periodogram(x,fs,'hanning')

@@ -1,10 +1,8 @@
 module signals
     use comm,only: sp, c_int, init_random_seed
     implicit none
-    real(sp),parameter :: pi = 4_sp*atan(1._sp)
-
-    private
-    public :: signoise,randn
+    real(sp),parameter :: pi = 4.*atan(1.)
+    public :: signoise,randn, pi
 contains
 
 subroutine signoise(fs,f0,snr,Ns,x)
@@ -31,39 +29,25 @@ subroutine signoise(fs,f0,snr,Ns,x)
 
 end subroutine signoise
 
-subroutine randn (N,rout)
-! https://people.sc.fsu.edu/~jburkardt/f_src/normal/normal.f90
+subroutine randn (N,noise)
+! implements Box-Muller Transform
+! https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 !
-!  returns a unit pseudonormal C8.
-!
-!  Licensing:
-!
-!    This code is distributed under the GNU LGPL license.
-!
-!  Modified:
-!
-!    31 May 2007, 13 Mar 2016
-!
-!  Author:
-!
-!    John Burkardt, Michael Hirsch
-!
-!  Parameters:
-!    Input, N length of 1-D complex dp noise vector
-!    Output, complex (dp ) rout, 1-D vector drawn from gaussian PDF.
-
+! Input:
+! N: length of 1-D noise vector
+! Output:
+! noise: Gaussian 1-D noise vector
 
   integer(c_int),intent(in) :: N
-  real(sp),intent(out) :: rout(N)
-  real (sp):: v1(N), v2(N)
+  real(sp),intent(out) :: noise(N)
+  real (sp):: u1(N), u2(N)
 
- CALL init_random_seed()
+  call init_random_seed()
 
-  call random_number(v1)
-  call random_number(v2)
+  call random_number(u1)
+  call random_number(u2)
 
-  rout = sqrt ( - 2._sp * log ( v1 ) ) * cos ( 2._sp * pi * v2 )
-
+  noise = sqrt ( - 2. * log ( u1 ) ) * cos ( 2. * pi * u2 )
 
 end subroutine randn
 
