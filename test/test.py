@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 from os import environ
 import subprocess
 from pathlib import Path
@@ -6,7 +6,7 @@ from time import time
 import numpy as np
 from pandas import DataFrame
 #
-from spectral_analysis.subspace import compute_autocovariance,esprit
+from spectral_analysis import compute_autocovariance,esprit
 from spectral_analysis.importfort import fort
 Sc,Sr = fort()
 

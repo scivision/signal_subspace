@@ -1,7 +1,0 @@
-setuptools
-nose
-numpy
-scipy
-matplotlib
-pandas
-seaborn
