@@ -4,13 +4,13 @@ dist: trusty
 language: python
 
 python:
-    - 3.5
+    - 3.6
 
 notifications:
   email: false
 
 git:
-  depth: 1
+  depth: 3
 
 addons:
   apt:
@@ -33,7 +33,7 @@ install:
     - source activate test
     - pip -q install coveralls
     - python setup.py develop
-    - conda install --yes scipy=0.16.1 #patch for library travis
+    - conda install numpy scipy matplotlib seaborn pandas
 
 before_script:
    - cd bin
@@ -43,7 +43,7 @@ before_script:
 
 
 script:
-    - coverage run test/test.py
+    - coverage run tests/test.py
 
 after_success:
     - coveralls

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import setuptools #enables develop
 
 req=['nose','numpy','scipy','matplotlib','pandas','seaborn']
@@ -9,7 +9,7 @@ setup(name='spectral_analysis',
       version='0.5',
 	  description='1-D & 2-D spectral analysis methods',
 	  author='Michael Hirsch, Ph.D.',
-	  url='https://github.com/scienceopen/spectral_analysis',
+	  url='https://github.com/scivision/spectral_analysis',
       dependency_links = [],
 	  install_requires=req,
       extras_require={},

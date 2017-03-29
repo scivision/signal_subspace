@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/scienceopen/spectral_analysis.svg?branch=master
-    :target: https://travis-ci.org/scienceopen/spectral_analysis
+.. image:: https://travis-ci.org/scivision/spectral_analysis.svg?branch=master
+    :target: https://travis-ci.org/scivision/spectral_analysis
 
 =================
 spectral_analysis
