@@ -32,8 +32,8 @@ install:
     - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
     - source activate test
     - pip -q install coveralls
-    - python setup.py develop
     - conda install numpy scipy matplotlib seaborn pandas
+    - python setup.py develop
 
 before_script:
    - cd bin
