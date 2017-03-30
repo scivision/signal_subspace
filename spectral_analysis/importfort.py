@@ -8,15 +8,15 @@ def fort():
         assert Sc.comm.j.dtype=='complex128'
         assert_allclose(Sc.comm.pi, pi)
     except (ImportError,AssertionError) as e:
-        print('problem importing Fortran Esprit complex {}'.format(e))
+        print('problem importing Fortran subspace complex',e)
         Sc=None
 
     try:
         import fortsubspace_real as Sr
         assert Sr.subspace.pi.dtype=='float32' #0d array
         assert_allclose(Sr.subspace.pi, pi)
-    except ImportError as e:
-        print('not able to import Fortran Esprit real {}'.format(e))
+    except (ImportError,AssertionError) as e:
+        print('problem importing Fortran subspace real',e)
         Sr=None
 
     return Sc,Sr
