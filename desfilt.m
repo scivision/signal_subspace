@@ -1,3 +1,7 @@
+try % octave
+  pkg load signal
+end
+
 fs=48e3;
 L=72; %number of taps
 f = [0 0.2 0.3 0.7 0.8 1];
