@@ -1,9 +1,13 @@
+from matplotlib.pyplot import subplots,show
+#
+from spectral_analysis.importfort import fort
+Sc,Sr = fort()
 
 
 def plot_noisehist():
     N = 10000
 
-    from matplotlib.pyplot import subplots,show
+
     fg,axs = subplots(3,1)
 
     noiser = Sr.signals.randn(N)
