@@ -144,7 +144,7 @@ def rootmusic(x,L,M=None,fs=1):
         :param x: ndarray, vector or 2-D: Nensemble x Nsamples
         :param L: int. Number of components to be extracted.
         :param M:  int, optional. Size of signal block.
-        :param Fe: float. Sampling Frequency.
+        :param fs:  Sampling Frequency. [Hz]
         :returns: ndarray containing the L frequencies
     """
    # length of the vector x
