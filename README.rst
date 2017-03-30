@@ -1,10 +1,10 @@
-.. image:: https://travis-ci.org/scivision/spectral_analysis.svg?branch=master
-    :target: https://travis-ci.org/scivision/spectral_analysis
+.. image:: https://travis-ci.org/scivision/signal_subspace.svg?branch=master
+    :target: https://travis-ci.org/scivision/signal_subspace
 
 =================
-spectral_analysis
+Signal Subspace
 =================
-1-D and ensemble signal analysis with subspace methods such as Esprit and RootMusic in Fortran, C, and Python
+1-D and ensemble signal subspace analysis with methods such as Esprit and RootMusic in Fortran, C, and Python
 
 based in part upon the `Spectral Analysis Lib public domain code <https://github.com/vincentchoqueuse/spectral_analysis_project>`_
 
