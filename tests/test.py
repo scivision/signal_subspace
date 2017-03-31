@@ -6,8 +6,8 @@ from time import time
 import numpy as np
 from pandas import DataFrame
 #
-from spectral_analysis import compute_autocovariance,esprit
-from spectral_analysis.importfort import fort
+from signal_subspace import compute_autocovariance,esprit
+from signal_subspace.importfort import fort
 Sc,Sr = fort()
 
 path=Path(__file__).parents[1]
