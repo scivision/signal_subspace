@@ -1,26 +1,59 @@
 #!/usr/bin/env python
+"""
+Design FIR filter coefficients using Parks-McClellan algorithm and plot filter transfer function.
+Michael Hirsch, Ph.D.
+
+example for PiRadar CW prototype:
+./FilterDesign.py 9950 10050 100e3 -L 4096 -m firwin -o cwfir.asc
+
+Refs:
+http://www.iowahills.com/5FIRFiltersPage.html
+"""
 import numpy as np
-from warnings import warn
+from sys import stderr
 from pathlib import Path
 import scipy.signal as signal
 from matplotlib.pyplot import subplots,show,figure
 import seaborn as sns
-sns.set_context('talk',font_scale=1.5)
+sns.set_context('talk')
 
-def computefir(L,ofn):
+def computefir(fc,L:int, ofn, fs:int, method:str):
     """
+    bandpass FIR design
+    
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html
     http://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.remez.html
+    
+    L: number of taps
+    
+    output:
+    b: FIR filter coefficients
     """
+    
+    assert len(fc) == 2,'specify lower and upper bandpass filter corner frequencies in Hz.'
 
-    if not (L % 2):
-        warn('For high pass filter, select odd number of taps!')
-
-    b  = signal.remez(L, [0, 0.075, 0.125, 0.5], [0, 1])
+    if method == 'remez':
+        b  = signal.remez(numtaps=L, 
+                      bands=[0, 0.9*fc[0], fc[0],fc[1], 1.1*fc[1], 0.5*fs], 
+                      desired=[0, 1,0],
+                      Hz=fs)
+    elif method == 'firwin':
+        b = signal.firwin(L,[fc[0],fc[1]],
+                          window='blackman',
+                          pass_zero=False,nyq=fs//2)
+    elif method == 'firwin2':
+        b = signal.firwin2(L,[0,fc[0],fc[1],fs//2],[0,1,1,0],
+                           window='blackman',
+                           nyq=fs//2,
+                           #antisymmetric=True,
+                           )
+    else:
+        raise ValueError(f'unknown filter design method {method}')
 
     if ofn:
         ofn = Path(ofn).expanduser()
-        print('writing {}'.format(ofn))
-#TODO make binary
+        print(f'writing {ofn}')
+# FIXME make binary
         with ofn.open('w') as h:
             h.write(f'{b.size}\n') # first line is number of coefficients
             b.tofile(h,sep=" ") # second line is space-delimited coefficents
@@ -34,9 +67,13 @@ def plotfilt(b,L,fs,ofn):
 
     fg,axs = subplots(2,1,sharex=False)
     freq, response = signal.freqz(b)
-    axs[0].plot(freq*fs/(2*np.pi),20*np.log10(abs(response)))
-    axs[0].set_title('filter response  {} taps'.format(L))
-    axs[0].set_ylim(top=1)
+    response_dB = 20*np.log10(abs(response))
+    if response_dB.max()>0:
+        print('WARNING: filter may be unstable',file=stderr)
+        
+    axs[0].plot(freq*fs/(2*np.pi), response_dB)
+    axs[0].set_title(f'filter response  {L} taps')
+    axs[0].set_ylim((-100,None))
     axs[0].set_ylabel('|H| [db]')
     axs[0].set_xlabel('frequency [Hz]')
 
@@ -89,14 +126,17 @@ def chebyshevplot(fs):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     p = ArgumentParser()
+    p.add_argument('fc',help='lower,upper bandpass filter corner frequences [Hz]',nargs=2,type=float)
+    p.add_argument('fs',help='optional sampling frequency [Hz]',type=float)
     p.add_argument('-o','--ofn',help='output coefficient file to write')
     p.add_argument('-L',help='number of coefficients for FIR filter',type=int,default=63)
-    p.add_argument('--fs',help='optional sampling frequency for plots',type=float)
+    p.add_argument('-m','--method',help='filter design method [remez,firwin,firwin2]',default='firwin')
+    p.add_argument('-k','--filttype',help='filter type: low, high, bandpass',default='low')
     p = p.parse_args()
 
-    b=computefir(p.L,p.ofn)
+    b=computefir(p.fc, p.L, p.ofn, p.fs,p.method)
 
-    plotfilt(b,p.L,p.fs,p.ofn)
+    plotfilt(b, p.L, p.fs, p.ofn)
 
     show()
 
