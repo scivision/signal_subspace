@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from os import environ
 import subprocess
 from pathlib import Path
 from time import time
