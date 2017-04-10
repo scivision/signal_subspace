@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 """
-Design FIR filter coefficients using Parks-McClellan algorithm and plot filter transfer function.
+Design FIR filter coefficients using Parks-McClellan or windowing algorithm 
+and plot filter transfer function.
 Michael Hirsch, Ph.D.
 
-example for PiRadar CW prototype:
+example for PiRadar CW prototype, 
+writing filter coefficients for use by filters.f90:
 ./FilterDesign.py 9950 10050 100e3 -L 4096 -m firwin -o cwfir.asc
 
 Refs:

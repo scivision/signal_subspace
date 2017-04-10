@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from scipy.signal import remez
+import scipy.signal as signal
 
 
 def fircoef(L,fc,fs):
@@ -12,10 +12,13 @@ def fircoef(L,fc,fs):
 
     fcn = fc/(0.5*fs)
 
-    return remez(L, [0, 0.6*fcn, fcn, 0.5], [0, 1])
+    return signal.remez(L, [0, 0.6*fcn, fcn, 0.5], [0, 1])
 
 
 def fircirc(b,x):
+    """
+    This function may be a candidate for Numba or Cython speedup
+    """
     p=0
     nx = x.size
     nb = b.size
