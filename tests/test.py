@@ -80,7 +80,7 @@ def test_esprit():
         fest,sigma = esprit(xc,Ntone//2,M=m,fs=fs,verbose=False)
         toc = time()-tic
         py.loc[m,:] = [fest-f0,sigma,toc]
-       # print('PYTHON time signal N= {} M={} freq error {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest-fb,sigma,toc))
+        print(f'PYTHON time signal N= {xc.size} M={m} freq error {fest-f0} Hz, sigma {sigma}, time {toc:.4f} sec')
 #%% fortran
         if Sc is not None:
             tic = time()
@@ -116,4 +116,5 @@ def test_fortrancmpl():
     subprocess.check_call([path / 'bin/fespritcmpl'])
 
 if __name__ == '__main__':
+   # test_esprit()
     np.testing.run_module_suite()

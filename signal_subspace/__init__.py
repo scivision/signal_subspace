@@ -9,7 +9,7 @@ def corrmtx(x,m):
     from https://github.com/cokelaer/spectrum/
     like matlab corrmtx(x,'mod'), with a different normalization factor.
     """
-    x = np.asfortranarray(x, dtype=float)
+    x = np.asarray(x, dtype=float)
     assert x.ndim==1
 
     N = x.size
@@ -32,15 +32,16 @@ def compute_covariance(X):
     The covariance is estimated as :math:`\textbf{R}=\frac{1}{N}\textbf{X}\textbf{X}^{H}`
 
 
-        :param X: M*N ndarray
+        :param X: M*N ndarray  Nobservations x Nsamples e.g. 8 x 1024 for 8 pulses with 1024 samples each
         :param type: string, optional
         :returns: covariance matrix of size M*M
         """
     assert isinstance(X, np.ndarray)
+    assert X.ndim==2
 
-    #Number of columns
+    #Number of columns (samples per observation)
     N = X.shape[1]
-    R = 1./N * X @ X.conj().T # TODO should be X.conj().T @ X ?
+    R = 1./N * X @ X.conj().T
 
     return R
 
@@ -60,11 +61,11 @@ def compute_autocovariance(x,M):
 
     # Create covariance matrix for psd estimation
     # length of the vector x
-    x = np.asfortranarray(x)
+    x = np.asarray(x)
     assert x.ndim==1
-    N=x.shape[0]
+    N=x.size
 
-    #Create column vector from row array
+    #Create column vector (Nx1) from row array
     x_vect = x[None,:].T
 
     # init covariance matrix
@@ -97,7 +98,8 @@ def pseudospectrum_MUSIC(x,L,M=None,Fe=1,f=None):
         """
 
     # length of the vector x
-    N=x.shape[0]
+    assert x.ndim==1
+    N=x.size
 
     if any(f) is None:
         f = np.linspace(0.,Fe//2,512)
@@ -136,17 +138,15 @@ def rootmusic(x,L,M=None,fs=1):
 
         .. math:: z=e^{-2j\pi f/Fe}
 
-        :param x: ndarray, vector or 2-D: Nensemble x Nsamples
+        :param x: ndarray, vector: Nsamples
         :param L: int. Number of components to be extracted.
         :param M:  int, optional. Size of signal block.
         :param fs:  Sampling Frequency. [Hz]
         :returns: ndarray containing the L frequencies
     """
    # length of the vector x
-    if x.ndim==1:
-        N=x.size
-    else:
-        N=x.shape[0]
+    assert x.ndim==1
+    N=x.size
 
     if M is None:
         M=N//2
@@ -194,7 +194,7 @@ def esprit(x,L,M=None,fs=1,verbose=False):
 
         The frequencies are related to the roots as :math:`z=e^{-2j\pi f/Fe}`. See [STO97]_ section 4.7 for more information about the implementation.
 
-        :param x: ndarray, Nsamples x Nensemble
+        :param x: ndarray, Nsamples
         :param L: int. Number of components to be extracted.
         :param M:  int, optional. Size of signal block.
         :param Fs: float. Sampling Frequency.
@@ -208,15 +208,14 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         >>> f=sa.Esprit(x,1,None,Fe)
         >>> print(f)
         """
-    # length of the vector x
-    x = np.asfortranarray(x)
 
-    assert x.ndim in(1,2)
-    N=x.shape[0]
+    x = np.asarray(x)
+    assert x.ndim==1
+    # length of the vector x
+    N=x.size
 
     if M is None:
         M=N//2
-
 #%% extract signal subspace  99.9 % of computation time
     tic=time()
     R=compute_autocovariance(x,M) #75% of computation time
