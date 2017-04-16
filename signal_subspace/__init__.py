@@ -27,25 +27,6 @@ def corrmtx(x,m):
 
     return C
 
-def compute_covariance(X):
-    r"""This function estimate the covariance of a zero-mean numpy matrix.
-    The covariance is estimated as :math:`\textbf{R}=\frac{1}{N}\textbf{X}\textbf{X}^{H}`
-
-
-        :param X: M*N ndarray  Nobservations x Nsamples e.g. 8 x 1024 for 8 pulses with 1024 samples each
-        :returns: covariance matrix of size M*M
-        """
-    assert isinstance(X, np.ndarray)
-    assert X.ndim==2
-    M,N = X.shape
-    if M==1: # single measurement of N samples
-        return compute_autocovariance(X,N//2)
-
-    R =  X @ X.conj().T
-
-    return R / N
-
-
 def compute_autocovariance(x,M):
 
     r""" This function compute the auto-covariance matrix of a numpy signal. The auto-covariance is computed as follows
@@ -224,7 +205,7 @@ def esprit(x,L,M=None,fs=1,verbose=False):
     if x.ndim==1:
         R=compute_autocovariance(x,M) #75% of computation time
     else:
-        R=compute_covariance(x)
+        R= np.cov(x,rowvar=False) # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
     if verbose: print(' autocov time {:.6f} sec.'.format(time()-tic))
     #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
 
