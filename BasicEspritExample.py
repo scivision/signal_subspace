@@ -4,8 +4,8 @@ from scipy.signal import periodogram,remez,freqz,lfilter
 from time import time
 from matplotlib.pyplot import subplots,show
 #
-from spectral_analysis.importfort import fort
-from spectral_analysis.filter import fircirc
+from signal_subspace.importfort import fort
+from signal_subspace.filter import fircirc
 Sc,Sr = fort()
 
 fs=48e3; F=12345.6 #arbitrary
