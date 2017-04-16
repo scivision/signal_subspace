@@ -33,17 +33,17 @@ def compute_covariance(X):
 
 
         :param X: M*N ndarray  Nobservations x Nsamples e.g. 8 x 1024 for 8 pulses with 1024 samples each
-        :param type: string, optional
         :returns: covariance matrix of size M*M
         """
     assert isinstance(X, np.ndarray)
     assert X.ndim==2
+    M,N = X.shape
+    if M==1: # single measurement of N samples
+        return compute_autocovariance(X,N//2)
 
-    #Number of columns (samples per observation)
-    N = X.shape[1]
-    R = 1./N * X @ X.conj().T
+    R =  X @ X.conj().T
 
-    return R
+    return R / N
 
 
 def compute_autocovariance(x,M):
@@ -61,7 +61,7 @@ def compute_autocovariance(x,M):
 
     # Create covariance matrix for psd estimation
     # length of the vector x
-    x = np.asarray(x)
+    x = np.asarray(x).squeeze()
     assert x.ndim==1
     N=x.size
 
@@ -210,15 +210,21 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         """
 
     x = np.asarray(x)
-    assert x.ndim==1
+    assert x.ndim in (1,2)
     # length of the vector x
-    N=x.size
+    if x.ndim==1:
+        N=x.size
+    else:
+        N=x.shape[1]
 
     if M is None:
         M=N//2
 #%% extract signal subspace  99.9 % of computation time
     tic=time()
-    R=compute_autocovariance(x,M) #75% of computation time
+    if x.ndim==1:
+        R=compute_autocovariance(x,M) #75% of computation time
+    else:
+        R=compute_covariance(x)
     if verbose: print(' autocov time {:.6f} sec.'.format(time()-tic))
     #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
 
