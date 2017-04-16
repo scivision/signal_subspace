@@ -1,5 +1,4 @@
-from numpy.linalg import inv
-from numpy import asarray, zeros, fliplr,ndarray,any,linspace,exp,transpose,matrix,pi,arange,angle,roots,complex128
+import numpy as np
 from scipy.linalg import toeplitz
 from numpy import linalg as lg
 from time import time
@@ -10,22 +9,19 @@ def corrmtx(x,m):
     from https://github.com/cokelaer/spectrum/
     like matlab corrmtx(x,'mod'), with a different normalization factor.
     """
-    x = asarray(x, dtype=float)
+    x = np.asfortranarray(x, dtype=float)
     assert x.ndim==1
 
     N = x.size
 
     Tp = toeplitz(x[m:N], x[m::-1])
 
-    if x.dtype == complex:
-        C = zeros((2*(N-m), m+1), dtype=complex)
-    else:
-        C = zeros((2*(N-m), m+1))
+    C = np.zeros((2*(N-m), m+1), dtype=x.dtype)
 
     for i in range(0, N-m):
         C[i] = Tp[i]
 
-    Tp = fliplr(Tp.conj())
+    Tp = np.fliplr(Tp.conj())
     for i in range(N-m, 2*(N-m)):
         C[i] = Tp[i-N+m]
 
@@ -40,11 +36,11 @@ def compute_covariance(X):
         :param type: string, optional
         :returns: covariance matrix of size M*M
         """
-    assert isinstance(X,ndarray)
+    assert isinstance(X, np.ndarray)
 
     #Number of columns
-    N=X.shape[1]
-    R=(1./N).dot(X).dot(X.conj().T)
+    N = X.shape[1]
+    R = 1./N * X @ X.conj().T # TODO should be X.conj().T @ X ?
 
     return R
 
@@ -64,23 +60,23 @@ def compute_autocovariance(x,M):
 
     # Create covariance matrix for psd estimation
     # length of the vector x
-    x = asarray(x)
+    x = np.asfortranarray(x)
     assert x.ndim==1
-    N=x.size
+    N=x.shape[0]
 
     #Create column vector from row array
     x_vect = x[None,:].T
 
     # init covariance matrix
     yn = x_vect[M-1::-1]
-    #R  = yn @ yn.conj().T
-    R = yn.dot(yn.conj().T) #zeroth lag
+
+    R = yn @ yn.conj().T #zeroth lag
     #about 5-8% of computation time
     for i in range(1,N-M): #no zero because we just computed it
         #extract the column vector
         yn = x_vect[M-1+i:i-1:-1]
-        #R  = R + yn @ yn.conj().T
-        R = R + yn.dot(yn.conj().T)
+
+        R = R + yn @ yn.conj().T
 
     return R / N
 
@@ -104,31 +100,30 @@ def pseudospectrum_MUSIC(x,L,M=None,Fe=1,f=None):
     N=x.shape[0]
 
     if any(f) is None:
-        f=linspace(0.,Fe//2,512)
+        f = np.linspace(0.,Fe//2,512)
 
     if M is None:
         M=N//2
 
     #extract noise subspace
-    R=compute_autocovariance(x,M)
-    U,S,V=lg.svd(R)
+    R = compute_autocovariance(x,M)
+    U,S,V = lg.svd(R)
     G=U[:,L:]
 
     #compute MUSIC pseudo spectrum
-    N_f=f.shape
-    cost=zeros(N_f)
+    N_f = f.shape
+    cost = np.zeros(N_f)
 
     tic=time()
     for indice,f_temp in enumerate(f):
         # construct a (note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T)
-        vect_exp=-2j*pi*f_temp*arange(0,M)/Fe
-        a=exp(vect_exp)
-        a=transpose(matrix(a))
+        vect_exp=-2j*np.pi*f_temp*np.arange(M)/Fe
+        a = np.exp(vect_exp)
         #Cost function
-        cost[indice]=1./lg.norm((G.H)*a)
+        cost[indice]=1./lg.norm(G.conj().T @ a.T)
 
-    print('pmusic: {:.6f} sec'.format(time()-tic))
-    return f,cost
+    print(f'pmusic: {time()-tic:.6f} sec')
+    return f, cost
 
 def rootmusic(x,L,M=None,fs=1):
 
@@ -162,11 +157,10 @@ def rootmusic(x,L,M=None,fs=1):
     G=U[:,L:]
 
     #construct matrix P
-    #P=G @ G.conj().T
-    P = G.dot(G.conj().T)
+    P = G @ G.conj().T
 
     #construct polynomial Q
-    Q = zeros(2*M-1,dtype=complex128)
+    Q = np.zeros(2*M-1,dtype='complex128')
     #Extract the sum in each diagonal  0.1% of computation time
     for (idx,val) in enumerate(range(M-1,-M,-1)):
         Q[idx] = P.diagonal(val).sum()
@@ -174,7 +168,7 @@ def rootmusic(x,L,M=None,fs=1):
 
     #Compute the roots 92% of computation time here
     tic=time()
-    rts=roots(Q)
+    rts= np.roots(Q)
     print(time()-tic)
 
     #Keep the roots with radii <1 and with non zero imaginary part
@@ -187,12 +181,12 @@ def rootmusic(x,L,M=None,fs=1):
     component_roots = rts[index_sort[:L]]
 
     #extract frequencies ((note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T))
-    ang = -angle(component_roots)
+    ang = -np.angle(component_roots)
 
     #frequency normalisation
-    f = fs*ang / (2.*pi)
+    f = fs*ang / (2.*np.pi)
 
-    return f,S[:L]
+    return f, S[:L]
 
 def esprit(x,L,M=None,fs=1,verbose=False):
 
@@ -200,7 +194,7 @@ def esprit(x,L,M=None,fs=1,verbose=False):
 
         The frequencies are related to the roots as :math:`z=e^{-2j\pi f/Fe}`. See [STO97]_ section 4.7 for more information about the implementation.
 
-        :param x: ndarray, Nensemble x Nsamples
+        :param x: ndarray, Nsamples x Nensemble
         :param L: int. Number of components to be extracted.
         :param M:  int, optional. Size of signal block.
         :param Fs: float. Sampling Frequency.
@@ -215,10 +209,10 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         >>> print(f)
         """
     # length of the vector x
-    x = asarray(x)
+    x = np.asfortranarray(x)
 
-    assert x.ndim==1
-    N=x.size
+    assert x.ndim in(1,2)
+    N=x.shape[0]
 
     if M is None:
         M=N//2
@@ -239,15 +233,15 @@ def esprit(x,L,M=None,fs=1,verbose=False):
     S2=U[1:,:L]
 
     #Compute matrix Phi (Stoica 4.7.12)  <0.1 % of computation time
-    Phi=inv(S1.conj().T.dot(S1)).dot(S1.conj().T).dot(S2)
+    Phi=lg.inv(S1.conj().T @ S1) @ S1.conj().T @ S2
 
     #Perform eigenvalue decomposition <0.1 % of computation time
     V,U=lg.eig(Phi)
 
     #extract frequencies ((note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T))
-    ang = -angle(V)
+    ang = -np.angle(V)
 
     #frequency normalisation
-    f = fs*ang/(2.*pi)
+    f = fs*ang/(2.*np.pi)
 
     return f,S[:L]

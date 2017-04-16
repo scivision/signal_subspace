@@ -26,6 +26,7 @@ subroutine esprit(x,N,L,M,fs,tout,sigma)
     real(sp) :: W1(L,L), IPIV(M-1)
     complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
+!    print*, shape(x)
 
     LWORK = 8*M  !at least 5M for sgesvd
    ! integer(i64) :: tic,toc
