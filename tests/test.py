@@ -34,11 +34,11 @@ def test_autocov():
         Cr = Sr.covariance.autocov(x.real,M)
         tocfortreal = time() - tic
     except Exception as e:
-        print('problem loading Fortran module {}'.format(e))
+        print(f'problem loading Fortran module {e}')
         tocfortcmpl=tocfortreal=Cc=Cr=np.nan
 
-    #print('autocovariance: python {:.6f} sec  fortran {:.6f} sec'.format(tocpy,tocfortcmpl))
-    print('autocovariance: Fortran is {:.3f} times faster than Python \n'.format(tocpy/tocfortcmpl))
+    #print(f'autocovariance: python {tocpy:.6f} sec  fortran {tocfortcmpl:.6f} sec')
+    print(f'autocovariance: Fortran is {tocpy/tocfortcmpl:.3f} times faster than Python \n')
 
     np.testing.assert_allclose(C,Cc,rtol=1)
     np.testing.assert_allclose(C.real,Cr,rtol=1)
@@ -52,6 +52,8 @@ def test_esprit():
     FORTRAN results seem to scale by O(N^2.825)
     0.170 sec for N=480, fs=48e3, Ntone=1, M=N/2
     16.615 sec. for N=2400, ... .. .
+
+    later found literature stating ESPRIT is O(M^3) (or was it N^3?)
     """
     f0 = 12345.6
     fs = 48e3
@@ -93,29 +95,25 @@ def test_esprit():
 
         #print('FORTRAN time signal N= {} M={} freq error {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest-fb,sigma,toc))
 
-    print('python complex: time {:.4f} sec.'.format(py['time'].values[0]))
+    print(f'python complex: time {py["time"].values[0]:.4f} sec.')
 
-    print('Fortran complex: time {:.4f} sec.'.format(fortcmpl['time'].values[0]))
+    print(f'Fortran complex: time {fortcmpl["time"].values[0]:.4f} sec.')
 
-    print('Fortran real: time {:.4f} sec.'.format(fortreal['time'].values[0]))
+    print(f'Fortran real: time {fortreal["time"].values[0]:.4f} sec.')
 
-    print('ESPRIT: Fortran is {:.4f} times faster than Python'.format(py['time'].values[0] / fortcmpl['time'].values[0]))
+    print(f'fESPRIT: Fortran is {py["time"].values[0] / fortcmpl["time"].values[0]:.4f} times faster than Python')
 
 def test_cxx():
-    ret = subprocess.run([str(path / 'bin/cppesprit')])
-    ret.check_returncode()
+    subprocess.check_call([path / 'bin/cppesprit'])
 
 def test_c():
-    ret = subprocess.run([str(path / 'bin/cesprit')])
-    ret.check_returncode()
+    subprocess.check_call([path / 'bin/cesprit'])
 
 def test_fortranreal():
-    ret = subprocess.run([str(path / 'bin/fespritreal')])
-    ret.check_returncode()
+    subprocess.check_call([path / 'bin/fespritreal'])
 
 def test_fortrancmpl():
-    ret = subprocess.run([str(path / 'bin/fespritcmpl')])
-    ret.check_returncode()
+    subprocess.check_call([path / 'bin/fespritcmpl'])
 
 if __name__ == '__main__':
     np.testing.run_module_suite()
