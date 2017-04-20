@@ -4,6 +4,7 @@ dist: trusty
 language: python
 
 python:
+    - 3.5
     - 3.6
 
 notifications:
@@ -40,6 +41,7 @@ install:
     - conda create -n test python=$TRAVIS_PYTHON_VERSION
     - source activate test
     - pip -q install coveralls
+
     - conda install numpy scipy matplotlib seaborn pandas
     - python setup.py develop
 
@@ -50,6 +52,6 @@ before_script:
    - cd ..
 
 
-script: coverage run tests/test.py
+script: coverage run tests/test.py 
 
 after_success: coveralls
