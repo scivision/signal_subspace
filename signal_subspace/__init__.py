@@ -50,11 +50,11 @@ def compute_autocovariance(x,M):
     x_vect = x[None,:].T
 
     # init covariance matrix
-    yn = x_vect[M-1::-1]
+    yn = x_vect[M-1::-1]  # reverse order from M-1 to 0
 
     R = yn @ yn.conj().T #zeroth lag
     #about 5-8% of computation time
-    for i in range(1,N-M): #no zero because we just computed it
+    for i in range(1, N-M): #no zero because we just computed it
         #extract the column vector
         yn = x_vect[M-1+i:i-1:-1]
 
@@ -190,7 +190,7 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         >>> print(f)
         """
 
-    x = np.asarray(x)
+    x = np.asarray(x).squeeze()
     assert x.ndim in (1,2)
     # length of the vector x
     if x.ndim==1:
@@ -206,13 +206,13 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         R=compute_autocovariance(x,M) #75% of computation time
     else:
         R= np.cov(x,rowvar=False) # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
-    if verbose: 
+    if verbose:
         print('autocov sec.', time()-tic)
     #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
 
     tic=time()
     U,S,V=lg.svd(R) #25% of computation time
-    if verbose: 
+    if verbose:
         print('svd sec.', time()-tic)
 #%% take eigenvalues and determine sinusoid frequencies
     #Remove last row

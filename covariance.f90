@@ -21,15 +21,15 @@ subroutine autocov(x,N,M,C)
  complex(dp),intent(out):: C(M,M)
 
  integer(c_int) :: i
- complex(dp) :: yn(M,1), R(M,M)!, work(M,M)
+ complex(dp) :: yn(M,1), R(M,M) !, work(M,M)
 
- yn(:,1) = x(M:1:-1)
+ yn(:,1) = x(M:1:-1) ! index from M to 1, reverse order
 
  R = matmul(yn,conjg(transpose(yn)))
  !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,R,M) !slower, worse accuracy than matmul in Gfortran 5.2.1
 
- do i = 1,N-M-1 ! yes, -1; NO, not concurrent!
-    yn(:,1) = x(M+i-1:i:-1) !yes, -1
+ do i = 2, N-M ! not concurrent
+    yn(:,1) = x(M-1+i:i-1:-1)
     R = R + matmul(yn,conjg(transpose(yn)))
     !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,work,M)
     !R = R + work
