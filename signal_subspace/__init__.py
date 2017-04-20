@@ -105,7 +105,7 @@ def pseudospectrum_MUSIC(x,L,M=None,Fe=1,f=None):
         #Cost function
         cost[indice]=1./lg.norm(G.conj().T @ a.T)
 
-    print(f'pmusic: {time()-tic:.6f} sec')
+    print('pmusic: sec. to compute:',time()-tic)
     return f, cost
 
 def rootmusic(x,L,M=None,fs=1):
