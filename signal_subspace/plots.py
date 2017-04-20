@@ -1,6 +1,10 @@
+from pathlib import Path
+from sys import stderr
+import numpy as np
+import scipy.signal as signal
 from matplotlib.pyplot import subplots,show
 #
-from spectral_analysis.importfort import fort
+from .importfort import fort
 Sc,Sr = fort()
 
 
@@ -26,3 +30,36 @@ def plot_noisehist():
     ax.hist(noisepy,bins=64)
     ax.set_title('python randn')
     show()
+
+def plotfilt(b, fs:int, ofn=None):
+    if fs is None:
+        fs=1 #normalized freq
+
+    L = b.size
+
+    fg,axs = subplots(2,1,sharex=False)
+    freq, response = signal.freqz(b)
+    response_dB = 20*np.log10(abs(response))
+    if response_dB.max()>0:
+        print('WARNING: filter may be unstable',file=stderr)
+
+    axs[0].plot(freq*fs/(2*np.pi), response_dB)
+    axs[0].set_title(f'filter response  {L} taps')
+    axs[0].set_ylim((-100,None))
+    axs[0].set_ylabel('|H| [db]')
+    axs[0].set_xlabel('frequency [Hz]')
+
+    t = np.arange(0, L/fs, 1/fs)
+    axs[1].plot(t,b)
+    axs[1].set_xlabel ('time [sec]')
+    axs[1].set_title('impulse response')
+    axs[1].set_ylabel('amplitude')
+    axs[1].autoscale(True,tight=True)
+
+    fg.tight_layout()
+
+    if ofn:
+        ofn = Path(ofn).expanduser()
+        ofn = ofn.with_suffix('.png')
+        print('writing',ofn)
+        fg.savefig(str(ofn),dpi=100,bbox_inches='tight')

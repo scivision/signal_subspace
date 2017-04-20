@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
-Design FIR filter coefficients using Parks-McClellan or windowing algorithm 
+Design FIR filter coefficients using Parks-McClellan or windowing algorithm
 and plot filter transfer function.
 Michael Hirsch, Ph.D.
 
-example for PiRadar CW prototype, 
+example for PiRadar CW prototype,
 writing filter coefficients for use by filters.f90:
 ./FilterDesign.py 9950 10050 100e3 -L 4096 -m firwin -o cwfir.asc
 
@@ -12,31 +12,32 @@ Refs:
 http://www.iowahills.com/5FIRFiltersPage.html
 """
 import numpy as np
-from sys import stderr
 from pathlib import Path
 import scipy.signal as signal
-from matplotlib.pyplot import subplots,show,figure
+from matplotlib.pyplot import show,figure
 import seaborn as sns
 sns.set_context('talk')
+#
+from signal_subspace.plots import plotfilt
 
 def computefir(fc,L:int, ofn, fs:int, method:str):
     """
     bandpass FIR design
-    
+
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html
     http://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.remez.html
-    
+
     L: number of taps
-    
+
     output:
     b: FIR filter coefficients
     """
-    
+
     assert len(fc) == 2,'specify lower and upper bandpass filter corner frequencies in Hz.'
 
     if method == 'remez':
-        b  = signal.remez(numtaps=L, 
-                      bands=[0, 0.9*fc[0], fc[0],fc[1], 1.1*fc[1], 0.5*fs], 
+        b  = signal.remez(numtaps=L,
+                      bands=[0, 0.9*fc[0], fc[0],fc[1], 1.1*fc[1], 0.5*fs],
                       desired=[0, 1,0],
                       Hz=fs)
     elif method == 'firwin':
@@ -61,38 +62,6 @@ def computefir(fc,L:int, ofn, fs:int, method:str):
             b.tofile(h,sep=" ") # second line is space-delimited coefficents
 
     return b
-
-def plotfilt(b,L,fs,ofn):
-    if fs is None:
-        fs=1. #normalized freq
-
-
-    fg,axs = subplots(2,1,sharex=False)
-    freq, response = signal.freqz(b)
-    response_dB = 20*np.log10(abs(response))
-    if response_dB.max()>0:
-        print('WARNING: filter may be unstable',file=stderr)
-        
-    axs[0].plot(freq*fs/(2*np.pi), response_dB)
-    axs[0].set_title(f'filter response  {L} taps')
-    axs[0].set_ylim((-100,None))
-    axs[0].set_ylabel('|H| [db]')
-    axs[0].set_xlabel('frequency [Hz]')
-
-    t = np.arange(0, L/fs, 1/fs)
-    axs[1].plot(t,b)
-    axs[1].set_xlabel ('time [sec]')
-    axs[1].set_title('impulse response')
-    axs[1].set_ylabel('amplitude')
-    axs[1].autoscale(True,tight=True)
-
-    fg.tight_layout()
-
-    if ofn:
-        ofn = Path(ofn).expanduser()
-        ofn = ofn.with_suffix('.png')
-        print('writing',ofn)
-        fg.savefig(str(ofn),dpi=100,bbox_inches='tight')
 
 def butterplot(fs,fc):
     """
@@ -138,7 +107,7 @@ if __name__ == '__main__':
 
     b=computefir(p.fc, p.L, p.ofn, p.fs,p.method)
 
-    plotfilt(b, p.L, p.fs, p.ofn)
+    plotfilt(b, p.fs, p.ofn)
 
     show()
 
