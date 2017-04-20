@@ -45,6 +45,7 @@ def test_autocov():
 
 def test_esprit():
     """
+    ESPRIT TEST PYTHON
     It appears that this PYTHON implementation of ESPRIT scales by O(N^3.25)
     0.0588 sec for N=480,fs=48e3,Ntone=1, M=N/2
     11.2199 sec for N=2400, .. .. . .
