@@ -143,13 +143,13 @@ def rootmusic(x,L,M=None,fs=1):
     #construct polynomial Q
     Q = np.zeros(2*M-1,dtype='complex128')
     #Extract the sum in each diagonal  0.1% of computation time
-    for (idx,val) in enumerate(range(M-1,-M,-1)):
+    for (idx,val) in enumerate(range(M-1, -M, -1)):
         Q[idx] = P.diagonal(val).sum()
 
 
     #Compute the roots 92% of computation time here
-    tic=time()
-    rts= np.roots(Q)
+    tic = time()
+    rts = np.roots(Q)
     print(time()-tic)
 
     #Keep the roots with radii <1 and with non zero imaginary part
@@ -157,7 +157,7 @@ def rootmusic(x,L,M=None,fs=1):
     rts = rts[rts.imag != 0]
 
     #Find the L roots closest to the unit circle
-    distance_from_circle=abs(abs(rts)-1)
+    distance_from_circle = abs(abs(rts)-1)
     index_sort = distance_from_circle.argsort()
     component_roots = rts[index_sort[:L]]
 
@@ -169,7 +169,7 @@ def rootmusic(x,L,M=None,fs=1):
 
     return f, S[:L]
 
-def esprit(x,L,M=None,fs=1,verbose=False):
+def esprit(x,L, M=None, fs=1, verbose=False):
 
     r""" This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
 
@@ -203,9 +203,9 @@ def esprit(x,L,M=None,fs=1,verbose=False):
 #%% extract signal subspace  99.9 % of computation time
     tic=time()
     if x.ndim==1:
-        R=compute_autocovariance(x,M) #75% of computation time
+        R = compute_autocovariance(x,M) #75% of computation time
     else:
-        R= np.cov(x,rowvar=False) # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
+        R = np.cov(x, rowvar=False) # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
     if verbose:
         print('autocov sec.', time()-tic)
     #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran

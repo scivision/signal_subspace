@@ -58,7 +58,7 @@ def test_esprit():
     """
     f0 = 12345.6
     fs = 48e3
-    snr=60.
+    snr = 60. # dB
     Ntone = 2
     Ns = 1024
 #%% create signal
