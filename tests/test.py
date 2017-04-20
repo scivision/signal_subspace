@@ -34,11 +34,11 @@ def test_autocov():
         Cr = Sr.covariance.autocov(x.real,M)
         tocfortreal = time() - tic
     except Exception as e:
-        print(f'problem loading Fortran module {e}')
+        print('problem loading Fortran module',e)
         tocfortcmpl=tocfortreal=Cc=Cr=np.nan
 
     #print(f'autocovariance: python {tocpy:.6f} sec  fortran {tocfortcmpl:.6f} sec')
-    print(f'autocovariance: Fortran is {tocpy/tocfortcmpl:.3f} times faster than Python \n')
+    print('autocovariance: Fortran faster than Python by factor:',tocpy/tocfortcmpl)
 
     np.testing.assert_allclose(C,Cc,rtol=1)
     np.testing.assert_allclose(C.real,Cr,rtol=1)
@@ -82,43 +82,43 @@ def test_esprit():
         toc = time()-tic
         py.loc[m,:] = [fest-f0, sigma, toc]
         np.testing.assert_allclose(fest, f0, rtol=1e-6)
-        assert sigma[0] > 100,f'sigma {sigma[0]} is small'
-        print(f'PYTHON time signal N= {xc.size} M={m} freq {fest} Hz, sigma {sigma}, time {toc:.4f} sec')
+        assert sigma[0] > 100, print('too small sigma',sigma[0])
+      #  print(f'PYTHON time signal N= {xc.size} M={m} freq {fest} Hz, sigma {sigma}, time {toc:.4f} sec')
 #%% fortran
         if Sc is not None:
             tic = time()
             fest,sigma = Sc.subspace.esprit(xc, Ntone, m, fs)
             np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
-            assert sigma[0] > 100,f'sigma {sigma[0]} is small'
+            assert sigma[0] > 100, print('too small sigma',sigma[0])
             fortcmpl.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         if Sr is not None:
             fest,sigma = Sr.subspace.esprit(xr,Ntone,m, fs)
             np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
-            assert sigma[0] > 40,f'sigma {sigma[0]} is small'
+            assert sigma[0] > 40, print('too small sigma',sigma[0])
             fortreal.loc[m,:] = [fest-f0,sigma,time()-tic]
 
-        #print('FORTRAN time signal N= {} M={} freq error {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest-fb,sigma,toc))
+        #print('FORTRAN time signal N= {} M={} freq {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest,sigma,toc))
 
-    print(f'python complex: time {py["time"].values[0]:.4f} sec.')
+    print('python complex: sec.',py["time"].values[0])
 
-    print(f'Fortran complex: time {fortcmpl["time"].values[0]:.4f} sec.')
+    print('Fortran complex: sec.',fortcmpl["time"].values[0])
 
-    print(f'Fortran real: time {fortreal["time"].values[0]:.4f} sec.')
+    print('Fortran real: sec.',fortreal["time"].values[0])
 
-    print(f'fESPRIT: Fortran is {py["time"].values[0] / fortcmpl["time"].values[0]:.4f} times faster than Python')
+    print('fESPRIT: Fortran faster than Python by factor:',py["time"].values[0] / fortcmpl["time"].values[0])
 
 def test_cxx():
-    subprocess.check_call([path / 'bin/cppesprit'])
+    subprocess.check_call([str(path / 'bin/cppesprit')])
 
 def test_c():
-    subprocess.check_call([path / 'bin/cesprit'])
+    subprocess.check_call([str(path / 'bin/cesprit')])
 
 def test_fortranreal():
-    subprocess.check_call([path / 'bin/fespritreal'])
+    subprocess.check_call([str(path / 'bin/fespritreal')])
 
 def test_fortrancmpl():
-    subprocess.check_call([path / 'bin/fespritcmpl'])
+    subprocess.check_call([str(path / 'bin/fespritcmpl')])
 
 if __name__ == '__main__':
     #test_esprit()
