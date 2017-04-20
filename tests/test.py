@@ -64,33 +64,37 @@ def test_esprit():
     #t = np.arange(0,0.01,1/fs)
     #xc = np.exp(1j*2*np.pi*f0*t) + 0.01*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
 
-    xr = Sr.signals.signoise(fs,f0,snr,Ns)
-    xc = Sc.signals.signoise(fs,f0,snr,Ns)
+    xr = Sr.signals.signoise(fs, f0, snr, Ns)
+    xc = Sc.signals.signoise(fs, f0, snr, Ns)
 
     # measure signal
-    M = [100]
+    M = [100] # iterating over block length
 
-    py = DataFrame(index=M,columns=['err','sigma','time'])
-    fortreal = DataFrame(index=M,columns=['err','sigma','time'])
-    fortcmpl = DataFrame(index=M,columns=['err','sigma','time'])
+    py = DataFrame(index=M, columns=['err','sigma','time'])
+    fortreal = DataFrame(index=M, columns=['err','sigma','time'])
+    fortcmpl = DataFrame(index=M, columns=['err','sigma','time'])
 
     for m in M:
 #%% python
         tic = time()
-        fest,sigma = esprit(xc,Ntone//2,M=m,fs=fs,verbose=False)
+        fest,sigma = esprit(xc, Ntone//2, M=m, fs=fs, verbose=False)
         toc = time()-tic
-        py.loc[m,:] = [fest-f0,sigma,toc]
-        print(f'PYTHON time signal N= {xc.size} M={m} freq error {fest-f0} Hz, sigma {sigma}, time {toc:.4f} sec')
+        py.loc[m,:] = [fest-f0, sigma, toc]
+        np.testing.assert_allclose(fest, f0, rtol=1e-6)
+        assert sigma[0] > 100,f'sigma {sigma[0]} is small'
+        print(f'PYTHON time signal N= {xc.size} M={m} freq {fest} Hz, sigma {sigma}, time {toc:.4f} sec')
 #%% fortran
         if Sc is not None:
             tic = time()
             fest,sigma = Sc.subspace.esprit(xc, Ntone, m, fs)
-            np.testing.assert_allclose(fest[0],f0,rtol=0.1)
+            np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
+            assert sigma[0] > 100,f'sigma {sigma[0]} is small'
             fortcmpl.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         if Sr is not None:
             fest,sigma = Sr.subspace.esprit(xr,Ntone,m, fs)
-            np.testing.assert_allclose(fest[0],f0,rtol=0.1)
+            np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
+            assert sigma[0] > 40,f'sigma {sigma[0]} is small'
             fortreal.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         #print('FORTRAN time signal N= {} M={} freq error {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest-fb,sigma,toc))
@@ -116,5 +120,5 @@ def test_fortrancmpl():
     subprocess.check_call([path / 'bin/fespritcmpl'])
 
 if __name__ == '__main__':
-   # test_esprit()
+    #test_esprit()
     np.testing.run_module_suite()
