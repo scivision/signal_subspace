@@ -206,12 +206,14 @@ def esprit(x,L,M=None,fs=1,verbose=False):
         R=compute_autocovariance(x,M) #75% of computation time
     else:
         R= np.cov(x,rowvar=False) # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
-    if verbose: print(' autocov time {:.6f} sec.'.format(time()-tic))
+    if verbose: 
+        print('autocov sec.', time()-tic)
     #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
 
     tic=time()
     U,S,V=lg.svd(R) #25% of computation time
-    if verbose: print('svd time {:.6f} sec.'.format(time()-tic))
+    if verbose: 
+        print('svd sec.', time()-tic)
 #%% take eigenvalues and determine sinusoid frequencies
     #Remove last row
     S1=U[:-1,:L]
@@ -230,4 +232,4 @@ def esprit(x,L,M=None,fs=1,verbose=False):
     #frequency normalisation
     f = fs*ang/(2.*np.pi)
 
-    return f,S[:L]
+    return f, S[:L]
