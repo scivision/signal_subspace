@@ -1,5 +1,8 @@
 .. image:: https://travis-ci.org/scivision/signal_subspace.svg?branch=master
     :target: https://travis-ci.org/scivision/signal_subspace
+.. image:: https://coveralls.io/repos/github/scivision/signal_subspace/badge.svg?branch=master
+:target: https://coveralls.io/github/scivision/signal_subspace?branch=master
+
 
 =================
 Signal Subspace
@@ -19,7 +22,7 @@ Prereqs
 -------
 ::
 
-    sudo apt-get install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make cmake
+    apt install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make cmake
 
 
 For all languages (Fortran, C, C++, Python) at once, simply type::
