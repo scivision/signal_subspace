@@ -7,7 +7,6 @@ try:
     conda.cli.main('install',*req)
 except Exception as e:
     pip.main(['install'] +req)
-pip.main(['install']+pipreq)
 # %%
 import setuptools #enables develop
 from numpy.distutils.core import setup,Extension
