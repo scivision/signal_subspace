@@ -82,20 +82,20 @@ def test_esprit():
         toc = time()-tic
         py.loc[m,:] = [fest-f0, sigma, toc]
         np.testing.assert_allclose(fest, f0, rtol=1e-6)
-        assert sigma[0] > 100, print('too small sigma',sigma[0])
+        assert sigma[0] > 100, 'too small sigma {}'.format(sigma[0])
       #  print(f'PYTHON time signal N= {xc.size} M={m} freq {fest} Hz, sigma {sigma}, time {toc:.4f} sec')
 #%% fortran
         if Sc is not None:
             tic = time()
             fest,sigma = Sc.subspace.esprit(xc, Ntone, m, fs)
             np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
-            assert sigma[0] > 100, print('too small sigma',sigma[0])
+            assert sigma[0] > 100, 'too small sigma {}'.format(sigma[0])
             fortcmpl.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         if Sr is not None:
             fest,sigma = Sr.subspace.esprit(xr,Ntone,m, fs)
             np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
-            assert sigma[0] > 40, print('too small sigma',sigma[0])
+            assert sigma[0] > 40, 'too small sigma {}'.format(sigma[0])
             fortreal.loc[m,:] = [fest-f0,sigma,time()-tic]
 
         #print('FORTRAN time signal N= {} M={} freq {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest,sigma,toc))
