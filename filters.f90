@@ -25,7 +25,7 @@ subroutine fircircfilter(x,N,b,L, y,filtok)
 
     filtok=.false.
 
-    if (N.lt.1) then
+    if (N < 1) then
         write(stderr,*) "E: expected input array length>0, you passed in len(x)=",N
         y(1) = nan
         return
@@ -33,7 +33,7 @@ subroutine fircircfilter(x,N,b,L, y,filtok)
         write(stdout,*) "input signal len(x)=",size(x)," output signal len(y)=",size(y)
     endif
 
-    if (L.lt.1) then
+    if (L < 1) then
         write(stderr,*) "E: expected more than zero filter coefficients, len(B)=",L
         y(1) = nan
         return
@@ -48,18 +48,18 @@ subroutine fircircfilter(x,N,b,L, y,filtok)
     endif
     
     p = 0
-    z = 0. !fill array with zeros
+    z(:) = 0. 
 
     do i = 1,N
         p = p+1
-        if (p.gt.L)  p = 1
+        if (p > L)  p = 1
         z(p) = x(i)
         acc = 0.
         k = p
         do j = 1,L
             acc = acc + b(j)*z(k)
             k = k-1
-            if (k.lt.1)  k = L
+            if (k < 1)  k = L
         enddo !j
         y(i) = acc
     enddo !i

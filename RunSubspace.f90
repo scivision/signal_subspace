@@ -23,21 +23,21 @@ character(len=16) :: arg
 
 narg = command_argument_count()
 
-if (narg.GT.0) then
+if (narg > 0) then
  call get_command_argument(1,arg); read(arg,*) Ns
 endif
-if (narg.GT.1) then
+if (narg > 1) then
  call get_command_argument(2,arg); read(arg,*) fs
 endif
-if (narg.GT.2) then
+if (narg > 2) then
  call get_command_argument(3,arg); read(arg,*) Ntone
 endif
-if (narg.GT.3) then
+if (narg > 3) then
     call get_command_argument(4,arg); read(arg,*) M
  else
-    M=Ns/2
+    M = Ns / 2
 endif
-if (narg.GT.4) then
+if (narg > 4) then
  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 
@@ -66,7 +66,7 @@ write(stdout,*) 'seconds to compute: ',sysclock2ms(toc-tic)/1000
 
 write(stdout,*) 'OK'
 
-deallocate(x,tones,sigma)
+! deallocate(x,tones,sigma) ! this is automatic going out of scope
 end program test_subspace
 
 

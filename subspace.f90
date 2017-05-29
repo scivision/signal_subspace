@@ -17,10 +17,10 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
     real(dp),intent(in) :: fs
     real(dp),intent(out) :: tones(L),sigma(L)
 
-    integer(c_int) :: LWORK,i
+    integer :: LWORK,i
     complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(dp) :: S(M,M),RWORK(8*M),ang(L)
-    integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
+    integer :: getrfinfo,getriinfo, evinfo, svdinfo
     complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(dp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
@@ -36,19 +36,29 @@ call autocov(x,size(x),M,R)
 !-------- SVD -------------------
 !call system_clock(tic)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
-if (svdinfo.ne.0) write(stderr,*) 'ZGESVD return code',svdinfo
+if (svdinfo /= 0) then
+    write(stderr,*) 'ZGESVD return code',svdinfo
+    error stop
+endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
-S1 = U(1:M-1,1:L)
-S2 = U(2:M,1:L)
+S1 = U(1:M-1, :L)
+S2 = U(2:M, :L)
 
 !call system_clock(tic)
 W1=matmul(conjg(transpose(S1)),S1)
 call zgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
+if (getrfinfo /= 0) then
+    write(stderr,*) 'ZGETRF inverse output code',getrfinfo
+    error stop
+endif
 call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
-if (getrfinfo.ne.0) write(stderr,*) 'ZGETRF inverse output code',getrfinfo
-if (getriinfo.ne.0) write(stderr,*) 'ZGETRI output code',getriinfo
+
+if (getriinfo /= 0) then
+    write(stderr,*) 'ZGETRI output code',getriinfo
+    error stop
+endif
 
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 !call system_clock(toc)
@@ -56,7 +66,10 @@ Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 
 !call system_clock(tic)
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
-if (evinfo.ne.0) write(stderr,*) 'ZGEEVS output code',evinfo
+if (evinfo /= 0) then
+    write(stderr,*) 'ZGEEVS output code',evinfo
+    error stop
+endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 

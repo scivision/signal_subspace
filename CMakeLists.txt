@@ -2,7 +2,9 @@ cmake_minimum_required (VERSION 2.8.12)
 project(spectrum C CXX Fortran)
 
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
-add_compile_options(-mtune=native -Wall -Wextra -Wpedantic -fexceptions -Werror=array-bounds)
+#add_compile_options(-mtune=native -Wall -Wextra -pedantic -fexceptions -Werror=array-bounds)
+
+#add_compile_options(-L/opt/intel/lib -lifcore -limf -lsvml -lintlc -lmkl)
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 find_package(LAPACK) #or other math library providing the linear algebra e.g. MKL
@@ -12,7 +14,7 @@ target_link_libraries(subspace_cmpl lapack)
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 
 add_library(subspace_real comm.f90 filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
-target_link_libraries(subspace_real lapack)
+target_link_libraries(subspace_real lapack)# svml intlc ifcore imf)
 set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 #------ test program: Fortran Complex Double Precision ----------
 add_executable(fespritcmpl perf.f90  RunSubspace.f90)
@@ -30,3 +32,23 @@ set_target_properties(cppesprit PROPERTIES CXX_STANDARD 14)
 add_executable(cesprit cSubspace.c)
 target_link_libraries(cesprit subspace_real)
 set_target_properties(cesprit PROPERTIES C_STANDARD 11)
+
+
+#---- intel compiler
+# note that you can compile first with GCC then link with ICPC (kind of silly 
+# since main computation is done in Fortran, but just to show the concept)
+# cmake ..
+# make
+# icpc ../cppSubspace.cpp libsubspace_real.a -lgfortran -llapack
+
+# using Intel Compiler requires linking:
+# svml intlc ifcore imf
+# that do not work for GCC
+# 
+# cd bin
+# rm -r *
+# FC=ifort CC=icc CXX=icpc cmake ..
+# make
+# icpc ../cppSubspace.cpp libsubspace_real.a -lifcore -lsvml -lintlc -limf
+
+

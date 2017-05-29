@@ -34,5 +34,6 @@ setup(name='signal_subspace',
                     sources=['comm.f90', 'filters.f90', 'signals_realsp.f90', 'covariance_realsp.f90', 'subspace_realsp.f90'],
                     f2py_options=['--quiet'],
                     extra_link_args=['-llapack'])],
+      install_requires=req,
 	  )
 

@@ -19,10 +19,10 @@ subroutine esprit(x,N,L,M,fs,tout,sigma)
     real(sp),intent(out) :: tout(L/2),sigma(L)
 
     real(sp) :: tones(L)
-    integer(c_int) :: LWORK,i
+    integer :: LWORK,i
     real(sp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
     real(sp) :: S(M,M),RWORK(8*M),ang(L),SWORK(8*M) !this Swork is real
-    integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
+    integer :: getrfinfo,getriinfo, evinfo, svdinfo
     real(sp) :: W1(L,L), IPIV(M-1)
     complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
@@ -41,7 +41,10 @@ call autocov(x,size(x),M,R)
 !call system_clock(tic)
 !http://www.netlib.org/lapack/explore-html/d4/dca/group__real_g_esing.html
 call sgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,svdinfo)
-if (svdinfo.ne.0) write(stderr,*) 'SGESVD return code',svdinfo
+if (svdinfo /= 0) then
+    write(stderr,*) 'SGESVD return code',svdinfo
+    error stop
+endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
@@ -50,10 +53,18 @@ S2 = U(2:M,1:L)
 
 !call system_clock(tic)
 W1=matmul((transpose(S1)),S1)
+
 call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
+if (getrfinfo /= 0) then
+    write(stderr,*) 'ZGETRF inverse output code',getrfinfo
+    error stop
+endif 
+
 call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
-if (getrfinfo.ne.0) write(stderr,*) 'ZGETRF inverse output code',getrfinfo
-if (getriinfo.ne.0) write(stderr,*) 'ZGETRI output code',getriinfo
+if (getriinfo /= 0) then 
+    write(stderr,*) 'ZGETRI output code',getriinfo
+    error stop
+endif
 
 Phi = matmul(matmul(W1, transpose(S1)), S2)
 !call system_clock(toc)
@@ -61,7 +72,10 @@ Phi = matmul(matmul(W1, transpose(S1)), S2)
 
 !call system_clock(tic)
 call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
-if (evinfo.ne.0) write(stderr,*) 'CGEEV output code',evinfo
+if (evinfo /= 0) then 
+    write(stderr,*) 'CGEEV output code',evinfo
+    error stop
+endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 

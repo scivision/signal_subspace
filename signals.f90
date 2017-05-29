@@ -17,7 +17,7 @@ subroutine signoise(fs,f0,snr,Ns,x)
     integer :: i
 
     do i=1,size(x)
-    t = (i-1)/fs
+    t = (i-1) / fs
     x(i) = sqrt(2._dp) * exp(J*2._dp*pi*f0*t)
     enddo
 !--- add noise
