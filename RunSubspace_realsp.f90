@@ -1,6 +1,7 @@
 program test_subspace
-
-use comm, only: sp, i64,stdout,stderr,sizeof,c_int,c_bool
+use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
+use,intrinsic:: iso_c_binding, only: c_int,c_bool
+use comm, only: sp, sizeof
 use perf, only: sysclock2ms,assert
 use subspace, only: esprit
 use signals,only: signoise
@@ -15,62 +16,53 @@ real(sp) :: fs=48000, &
             snr=60  !dB
 character(len=*),parameter :: bfn='../bfilt.txt'
 
-integer(c_int) :: M,Nb,fstat
+integer(c_int) :: M,Nb
+integer:: fstat
 logical(c_bool) :: filtok
  
 
-real(sp),allocatable :: x(:),b(:),y(:)
+real(sp),allocatable :: x(:), b(:), y(:)
 real(sp),allocatable :: tones(:),sigma(:)
 
-integer(i64) :: tic,toc
-!----------- parse command line ------------------
-integer(c_int) :: narg
+integer(int64) :: tic,toc
+integer :: narg,u
 character(len=16) :: arg
-
+!----------- parse command line ------------------
+M = Ns / 2
 narg = command_argument_count()
 
-if (narg > 0) then
- call get_command_argument(1,arg); read(arg,*) Ns
-endif
-if (narg > 1) then
- call get_command_argument(2,arg); read(arg,*) fs
-endif
-if (narg > 2) then
- call get_command_argument(3,arg); read(arg,*) Ntone
-endif
-if (narg > 3) then
-    call get_command_argument(4,arg); read(arg,*) M
- else
-    M = Ns /2 
-endif
-if (narg > 4) then
- call get_command_argument(5,arg); read(arg,*) snr !dB
-endif
+if (narg > 0) call get_command_argument(1,arg); read(arg,*) Ns
+if (narg > 1) call get_command_argument(2,arg); read(arg,*) fs
+if (narg > 2) call get_command_argument(3,arg); read(arg,*) Ntone
+if (narg > 3) call get_command_argument(4,arg); read(arg,*) M
+if (narg > 4) call get_command_argument(5,arg); read(arg,*) snr !dB
 
-write(stdout,*) "Fortran Esprit: Real Single Precision"
+print *, "Fortran Esprit: Real Single Precision"
 !---------- assign variable size arrays ---------------
-allocate(x(Ns),y(Ns),tones(Ntone/2),sigma(Ntone/2))
+allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
 !--- checking system numerics --------------
-if (sizeof(fs) /= 4) write(stderr,*) 'expected 4-byte real but you have real bytes: ', sizeof(fs)
-
+if (sizeof(fs) /= 4) then
+    write(stderr,*) 'expected 4-byte real but you have real bytes: ', sizeof(fs)
+    error stop
+endif
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr,Ns,&
               x)
 !------ filter noisy signal --------------
 ! read coefficients 'b'
 filtok=.false.
-open (unit=99, file=bfn, status='old',iostat=fstat)
+open (newunit=u, file=bfn, status='old', action='read', iostat=fstat)
 if (fstat == 0) then
-    read(99,*) Nb !first line of file: number of coeff
+    read(u,*) Nb !first line of file: number of coeff
     allocate(b(Nb))
-    read(99,*) b ! second line all coeff
-    close(99)
-    !write(stdout,*) b
+    read(u,*) b ! second line all coeff
+    close(u)
+    print *, b
 
     call system_clock(tic)
     call fircircfilter(x, size(x), b, size(b), y, filtok)
     call system_clock(toc)
-    write(stdout,*) 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
+    print *, 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
 endif
 
 if (fstat /= 0 .or. .not. filtok) then
@@ -86,9 +78,9 @@ call system_clock(toc)
 ! -- assert <0.1% error ---------
 call assert(abs(tones(1)-f0) <= 0.001*f0)
 
-write(stdout,*) 'estimated tone freq [Hz]: ',tones
-write(stdout,*) 'with sigma: ',sigma
-write(stdout,*) 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
+print *, 'estimated tone freq [Hz]: ',tones
+print *, 'with sigma: ',sigma
+print *, 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
 
 print *,'OK'
 

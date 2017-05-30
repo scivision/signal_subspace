@@ -1,5 +1,5 @@
 module subspace
-    use comm,only: dp,c_int,pi,stdout,stderr
+    use comm,only: dp,c_int,pi,stderr
     use covariance,only: autocov
     !use perf, only : sysclock2ms
 
@@ -54,7 +54,6 @@ if (getrfinfo /= 0) then
     error stop
 endif
 call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
-
 if (getriinfo /= 0) then
     write(stderr,*) 'ZGETRI output code',getriinfo
     error stop

@@ -1,12 +1,14 @@
 module filters
-    
-    use comm, only: sp,c_int, c_bool, stderr,stdout
+    use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
+    use, intrinsic:: iso_c_binding, only: c_int, c_bool
+    use, intrinsic:: ieee_arithmetic, only: ieee_is_nan
+    use comm, only: sp
 
     implicit none
-
+    private
     ! https://www.doc.ic.ac.uk/~eedwards/compsys/float/nan.html
     real(sp),parameter :: nan = transfer(Z'7FF80000',1.0) 
-    private
+
     public:: fircircfilter
 
 contains
@@ -14,11 +16,12 @@ contains
 subroutine fircircfilter(x,N,b,L, y,filtok)
 ! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
     integer(c_int), intent(in) :: N,L
-    real(sp),intent(in) :: x(N),b(L) 
+    real(sp),intent(in) :: x(N), b(L) 
     real(sp),intent(out) :: y(N)
     logical(c_bool),intent(out) :: filtok
 
-    integer(c_int) :: k,p,i,j
+    integer(c_int) :: k,p
+    integer :: i,j
     real(sp) :: z(L), acc
     logical,parameter :: verbose=.false.
 
@@ -30,7 +33,7 @@ subroutine fircircfilter(x,N,b,L, y,filtok)
         y(1) = nan
         return
     elseif (verbose) then
-        write(stdout,*) "input signal len(x)=",size(x)," output signal len(y)=",size(y)
+        print *, "input signal len(x)=",size(x)," output signal len(y)=",size(y)
     endif
 
     if (L < 1) then
@@ -38,10 +41,10 @@ subroutine fircircfilter(x,N,b,L, y,filtok)
         y(1) = nan
         return
     elseif (verbose) then
-        write(stdout,*) "filter coefficients len(B)=",L
+        print *, "filter coefficients len(B)=",L
     endif
 
-    if (isnan(b(1)))  then
+    if (any(ieee_is_nan(b))) then
         write(stderr,*) 'E: NaN filter coefficients'
         y(1) = nan
         return

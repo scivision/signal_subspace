@@ -1,5 +1,5 @@
 module covariance
-    use comm,only: dp,c_int,stdout
+    use comm,only: dp,c_int
     !use perf, only : sysclock2ms
     Implicit none
     private
@@ -20,7 +20,7 @@ subroutine autocov(x,N,M,C)
  complex(dp),intent(in) :: x(N)
  complex(dp),intent(out):: C(M,M)
 
- integer(c_int) :: i
+ integer :: i
  complex(dp) :: yn(M,1), R(M,M) !, work(M,M)
 
  yn(:,1) = x(M:1:-1) ! index from M to 1, reverse order

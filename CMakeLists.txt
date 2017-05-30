@@ -4,7 +4,9 @@ project(spectrum C CXX Fortran)
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
 add_compile_options(-mtune=native -Wall -Wextra -pedantic -fexceptions -Werror=array-bounds)
 
-#add_compile_options(-L/opt/intel/lib -lifcore -limf -lsvml -lintlc -lmkl)
+if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+    add_compile_options(-L/opt/intel/lib -lifcore -limf -lsvml -lintlc -lmkl)
+endif()
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 find_package(LAPACK) #or other math library providing the linear algebra e.g. MKL
@@ -12,18 +14,22 @@ find_package(LAPACK) #or other math library providing the linear algebra e.g. MK
 add_library(subspace_cmpl comm.f90             covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_cmpl lapack)
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
+target_compile_options(subspace_cmpl PRIVATE -std=f2008ts)
 
 add_library(subspace_real comm.f90 filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
 target_link_libraries(subspace_real lapack)# svml intlc ifcore imf)
 set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
+target_compile_options(subspace_real PRIVATE -std=f2008ts)
 #------ test program: Fortran Complex Double Precision ----------
 add_executable(fespritcmpl perf.f90  RunSubspace.f90)
 target_link_libraries(fespritcmpl subspace_cmpl)
 set_target_properties(fespritcmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
+target_compile_options(fespritcmpl PUBLIC -std=f2008ts)
 #------ test program: Fortran Real Single Precision -------------
 add_executable(fespritreal perf.f90 RunSubspace_realsp.f90)
 target_link_libraries(fespritreal subspace_real)
 set_target_properties(fespritreal PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
+target_compile_options(fespritreal PUBLIC -std=f2008ts)
 #------ test program: C++ Real Single ---------------------------
 add_executable(cppesprit cppSubspace.cpp)
 target_link_libraries(cppesprit subspace_real)

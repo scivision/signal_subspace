@@ -48,8 +48,8 @@ endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
-S1 = U(1:M-1,1:L)
-S2 = U(2:M,1:L)
+S1 = U(1:M-1, :L)
+S2 = U(2:M, :L)
 
 !call system_clock(tic)
 W1=matmul((transpose(S1)),S1)
@@ -58,7 +58,7 @@ call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
     write(stderr,*) 'ZGETRF inverse output code',getrfinfo
     error stop
-endif 
+endif
 
 call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then 
@@ -72,7 +72,7 @@ Phi = matmul(matmul(W1, transpose(S1)), S2)
 
 !call system_clock(tic)
 call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
-if (evinfo /= 0) then 
+if (evinfo /= 0) then
     write(stderr,*) 'CGEEV output code',evinfo
     error stop
 endif

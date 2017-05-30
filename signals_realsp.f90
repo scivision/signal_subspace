@@ -14,16 +14,16 @@ subroutine signoise(fs,f0,snr,Ns,x)
 
     real(sp) :: t,nvar
     real(sp) :: noise(Ns)
-    integer(c_int) :: i
+    integer :: i
 
     do i=1,size(x)
-    t = (i-1)/fs
-    x(i) = sqrt(2._sp) * cos(2._sp*pi*f0*t)
+    t = (i-1) / fs
+    x(i) = sqrt(2.) * cos(2.*pi*f0*t)
     enddo
 !--- add noise
     call randn(Ns,noise)
 
-    nvar = 10._sp**(-snr/10._sp)
+    nvar = 10.**(-snr/10.)
 
     x = x + sqrt(nvar)*noise
 
