@@ -31,11 +31,21 @@ character(len=16) :: arg
 M = Ns / 2
 narg = command_argument_count()
 
-if (narg > 0) call get_command_argument(1,arg); read(arg,*) Ns
-if (narg > 1) call get_command_argument(2,arg); read(arg,*) fs
-if (narg > 2) call get_command_argument(3,arg); read(arg,*) Ntone
-if (narg > 3) call get_command_argument(4,arg); read(arg,*) M
-if (narg > 4) call get_command_argument(5,arg); read(arg,*) snr !dB
+if (narg > 0) then
+    call get_command_argument(1,arg); read(arg,*) Ns
+endif
+if (narg > 1) then
+    call get_command_argument(2,arg); read(arg,*) fs
+endif
+if (narg > 2) then
+    call get_command_argument(3,arg); read(arg,*) Ntone
+endif
+if (narg > 3) then
+    call get_command_argument(4,arg); read(arg,*) M
+endif
+if (narg > 4) then
+    call get_command_argument(5,arg); read(arg,*) snr !dB
+endif
 
 print *, "Fortran Esprit: Real Single Precision"
 !---------- assign variable size arrays ---------------
