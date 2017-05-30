@@ -5,7 +5,7 @@ project(spectrum C CXX Fortran)
 add_compile_options(-mtune=native -Wall -Wextra -pedantic -fexceptions -Werror=array-bounds)
 
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
-    add_compile_options(-L/opt/intel/lib -lifcore -limf -lsvml -lintlc -lmkl)
+    link_libraries(ifcoremt imf svml intlc)
 endif()
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
