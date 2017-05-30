@@ -19,7 +19,7 @@ complex(dp),allocatable :: x(:)
 real(dp),allocatable :: tones(:),sigma(:)
 
 integer(int64) :: tic,toc
-integer :: narg,u
+integer :: narg
 character(len=16) :: arg
 !----------- parse command line ------------------
 M = Ns / 2

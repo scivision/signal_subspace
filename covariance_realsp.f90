@@ -1,5 +1,6 @@
 module covariance
-    use comm,only: sp,c_int
+    use, intrinsic:: iso_c_binding, only: c_int
+    use comm,only: sp
     !use perf, only : sysclock2ms
     Implicit none
     private

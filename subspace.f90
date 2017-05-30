@@ -1,5 +1,7 @@
 module subspace
-    use comm,only: dp,c_int,pi,stderr
+    use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
+    use, intrinsic:: iso_c_binding, only: c_int
+    use comm,only: dp,pi
     use covariance,only: autocov
     !use perf, only : sysclock2ms
 

@@ -1,6 +1,7 @@
 ! https://github.com/JuliaLang/julia/blob/master/test/perf/micro/perf.f90
 module perf
-    use comm,only : dp,i64, stderr
+    use, intrinsic:: iso_fortran_env, only: int64
+    use comm,only : dp
     implicit none
 contains
 
@@ -8,8 +9,8 @@ contains
     ! Convert a number of clock ticks, as returned by system_clock called
     ! with integer(i64) arguments, to milliseconds
 
-        integer(i64), intent(in) :: t
-        integer(i64) :: rate
+        integer(int64), intent(in) :: t
+        integer(int64) :: rate
         real(dp) ::  r
         call system_clock(count_rate=rate)
         r = 1000.d0 / rate

@@ -1,4 +1,5 @@
 module signals
+    use, intrinsic:: iso_c_binding, only: c_int
     use comm,only: dp,pi,J, init_random_seed
     implicit none
 

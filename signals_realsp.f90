@@ -1,5 +1,6 @@
 module signals
-    use comm,only: sp, c_int, init_random_seed
+    use, intrinsic:: iso_c_binding, only: c_int
+    use comm,only: sp, init_random_seed
     implicit none
     real(sp),parameter :: pi = 4.*atan(1.)
     public :: signoise,randn, pi
