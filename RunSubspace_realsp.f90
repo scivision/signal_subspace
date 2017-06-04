@@ -1,7 +1,7 @@
 program test_subspace
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int,c_bool
-use comm, only: sp, sizeof
+use comm, only: sp
 use perf, only: sysclock2ms,assert
 use subspace, only: esprit
 use signals,only: signoise
@@ -67,12 +67,13 @@ if (fstat == 0) then
     allocate(b(Nb))
     read(u,*) b ! second line all coeff
     close(u)
-    print *, b
+!    print *,'FIR Coefficients'
+!    print '(EN10.1)', b
 
     call system_clock(tic)
-    call fircircfilter(x, size(x), b, size(b), y, filtok)
+    call fircircfilter(x, size(x,kind=c_int), b, size(b,kind=c_int), y, filtok)
     call system_clock(toc)
-    print *, 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
+    print '(A,EN10.1)', 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
 endif
 
 if (fstat /= 0 .or. .not. filtok) then
@@ -81,16 +82,16 @@ if (fstat /= 0 .or. .not. filtok) then
 endif
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(y, size(y), Ntone, M, fs, &
+call esprit(y, size(y,kind=c_int), Ntone, M, fs, &
             tones,sigma)
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------
 call assert(abs(tones(1)-f0) <= 0.001*f0)
 
-print *, 'estimated tone freq [Hz]: ',tones
-print *, 'with sigma: ',sigma
-print *, 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
+print '(A,100F10.2)', 'estimated tone freq [Hz]: ',tones
+print '(A,100F5.1)', 'with sigma: ',sigma
+print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
 
 print *,'OK'
 

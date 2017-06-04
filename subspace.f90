@@ -12,7 +12,7 @@ module subspace
 
 contains
 
-subroutine esprit(x,N,L,M,fs,tones,sigma)
+subroutine esprit(x,N,L,M,fs,tones,sigma) bind(c)
 
     integer(c_int), intent(in) :: L,M,N
     complex(dp),intent(in) :: x(N)
@@ -20,8 +20,8 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
     real(dp),intent(out) :: tones(L),sigma(L)
 
     integer :: LWORK,i
-    complex(dp) :: R(M,M),U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(dp) :: S(M,M),RWORK(8*M),ang(L)
+    complex(dp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
+    real(dp) :: S(M,M), RWORK(8*M), ang(L)
     integer :: getrfinfo,getriinfo, evinfo, svdinfo
     complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(dp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
@@ -31,7 +31,7 @@ subroutine esprit(x,N,L,M,fs,tones,sigma)
 Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
-call autocov(x,size(x),M,R)
+call autocov(x, size(x,kind=c_int), M, R)
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute autocovariance estimate:',sysclock2ms(toc-tic)
 

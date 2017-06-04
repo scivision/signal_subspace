@@ -6,11 +6,11 @@
 #include <cmath>
 #include <vector>
 
-extern "C" void __signals_MOD_signoise(const float*, const float*, const float*, int*, float []);
+extern "C" void signoise(const float*, const float*, const float*, int*, float []);
 
-extern "C" void __filters_MOD_fircircfilter(float [], int*,float [],int*,float [],bool*);
+extern "C" void fircircfilter(float [], int*,float [],int*,float [],bool*);
 
-extern "C" void __subspace_MOD_esprit(float [], int*, int*, int*, const float*, float [], float []);
+extern "C" void esprit(float [], int*, int*, int*, const float*, float [], float []);
 
 std::vector<float> loadfiltercoeff(std::string);
 
@@ -31,7 +31,7 @@ const float f0 = float(12345.6); //arbitrary
 std::vector<float> x((size_t(Ns))); // noisy signal
 std::vector<float> y((size_t(Ns))); // filtered signal
 
-__signals_MOD_signoise(&fs, &f0, &snr, &Ns, &x.front());
+signoise(&fs, &f0, &snr, &Ns, &x.front());
 
 //---- filter noisy signal ------------------------
 
@@ -44,7 +44,7 @@ if (Bok){
 
     if (verbose) std::cout << "Nb: " << Nb << std::endl;
 
-    __filters_MOD_fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,
+    fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,
                                 &y.front(),&filtok);
 }
 
@@ -60,7 +60,7 @@ std::vector<float> tones((size_t(Ntone)));
 std::vector<float> sigma((size_t(Ntone)));
 
 // if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
-__subspace_MOD_esprit(&y.front(), &Ns, &Ntone, &M, &fs, 
+esprit(&y.front(), &Ns, &Ntone, &M, &fs, 
                       &tones.front(), &sigma.front());
 
 

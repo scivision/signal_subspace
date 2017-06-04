@@ -6,21 +6,20 @@ module signals
     public :: signoise,randn, pi
 contains
 
-subroutine signoise(fs,f0,snr,Ns,x)
+subroutine signoise(fs,f0,snr,Ns,x) bind(c)
 
     real(sp),intent(in) :: fs,f0,snr
     integer(c_int), intent(in) :: Ns
     real(sp),intent(out) :: x(Ns)
 
 
-    real(sp) :: t,nvar
+    real(sp) :: t(Ns),nvar
     real(sp) :: noise(Ns)
     integer :: i
 
-    do i=1,size(x)
-    t = (i-1) / fs
-    x(i) = sqrt(2.) * cos(2.*pi*f0*t)
-    enddo
+    t = [(i, i=0,size(x)-1)] / fs
+    x = sqrt(2.) * cos(2.*pi*f0*t)
+
 !--- add noise
     call randn(Ns,noise)
 

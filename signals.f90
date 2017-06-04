@@ -1,26 +1,24 @@
 module signals
     use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: dp,pi,J, init_random_seed
+    use comm,only: dp, pi, J, init_random_seed
     implicit none
 
     private
     public :: signoise,randn
 contains
 
-subroutine signoise(fs,f0,snr,Ns,x)
+subroutine signoise(fs,f0,snr,Ns,x) bind(c)
 
     real(dp),intent(in) :: fs,f0,snr
     integer(c_int), intent(in) :: Ns
     complex(dp),intent(out) :: x(Ns)
 
-    real(dp) :: t,nvar
+    real(dp) :: t(Ns),nvar
     complex(dp) :: noise(Ns)
     integer :: i
 
-    do i=1,size(x)
-    t = (i-1) / fs
-    x(i) = sqrt(2._dp) * exp(J*2._dp*pi*f0*t)
-    enddo
+    t = [(i, i=0,size(x)-1)] / fs
+    x = sqrt(2._dp) * exp(J*2._dp*pi*f0*t)
 !--- add noise
     call randn(Ns,noise)
 

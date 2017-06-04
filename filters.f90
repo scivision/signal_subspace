@@ -13,7 +13,7 @@ module filters
 
 contains
 
-subroutine fircircfilter(x,N,b,L, y,filtok)
+subroutine fircircfilter(x,N,b,L, y,filtok) bind(c)
 ! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
     integer(c_int), intent(in) :: N,L
     real(sp),intent(in) :: x(N), b(L) 
@@ -51,17 +51,17 @@ subroutine fircircfilter(x,N,b,L, y,filtok)
     endif
     
     p = 0
-    z(:) = 0. 
+    z(:) = 0
 
     do i = 1,N
-        p = p+1
+        p = p + 1_c_int
         if (p > L)  p = 1
         z(p) = x(i)
-        acc = 0.
+        acc = 0
         k = p
         do j = 1,L
             acc = acc + b(j)*z(k)
-            k = k-1
+            k = k - 1_c_int
             if (k < 1)  k = L
         enddo !j
         y(i) = acc
