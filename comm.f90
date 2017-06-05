@@ -2,7 +2,7 @@ module comm
     use, intrinsic :: iso_c_binding, only: sp=>C_FLOAT, dp=>C_DOUBLE, int64=>C_LONG_LONG, sizeof=>c_sizeof
     implicit none
     
-    complex(dp),parameter :: J=(0._dp,1._dp)
+    complex(dp),parameter :: J=(0._dp, 1._dp)
     real(dp),parameter :: pi = 4._dp*atan(1._dp)
 
 contains

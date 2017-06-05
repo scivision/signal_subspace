@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package(MKL)
 if(MKL_FOUND)
     set(MKLROOT $ENV{MKLROOT})
-    include_directories(${MKL_INCLUDE_DIRS} ${MKLROOT}/include/intel64/lp64)
+    include_directories(${MKL_INCLUDE_DIRS})
     set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
 else()
     find_package(BLAS REQUIRED)
@@ -24,9 +24,9 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
 else() # gfortran
 # NOTE: -fdefault-integer-8 -m64  are crucial for MKL using gfortran to avoid SIGSEGV at runtime!
     set(FLAGS ${FLAGS} -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
-    set(FFLAGS ${FFLAGS} -fall-intrinsics -std=f2008ts -fbacktrace -ffpe-trap=zero,overflow,underflow)
+    set(FFLAGS ${FFLAGS} -fall-intrinsics -std=f2008ts -fbacktrace)# -ffpe-trap=zero,overflow,underflow)
     if (MKL_FOUND)
-       # set(FFLAGS ${FFLAGS} -fdefault-integer-8 -m64)
+        set(FFLAGS ${FFLAGS} -fdefault-integer-8 -m64)
     endif()
 endif()
 
@@ -35,12 +35,12 @@ add_compile_options(-mtune=native -g ${FLAGS})
 
 #------------------------------------------------------------------------------------------------
 add_library(subspace_cmpl comm.f90             covariance.f90 subspace.f90 signals.f90)
-target_link_libraries(subspace_cmpl ${FLIBS})
+target_link_libraries(subspace_cmpl PRIVATE ${FLIBS})
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS})
 
 add_library(subspace_real comm.f90 filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
-target_link_libraries(subspace_real ${FLIBS})
+target_link_libraries(subspace_real PRIVATE ${FLIBS})
 set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(subspace_real PRIVATE ${FFLAGS})
 
@@ -56,11 +56,11 @@ set_target_properties(fespritreal PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(fespritreal PUBLIC ${FFLAGS})
 #------ test program: C++ Real Single ---------------------------
 add_executable(cppesprit cppSubspace.cpp)
-target_link_libraries(cppesprit subspace_real ${FLIBS} ${CLIBS})
+target_link_libraries(cppesprit subspace_real ${CLIBS})
 set_target_properties(cppesprit PROPERTIES CXX_STANDARD 14)
 #------ test program: C Real Single -----------------------------
 add_executable(cesprit cSubspace.c)
-target_link_libraries(cesprit subspace_real ${FLIBS} ${CLIBS})
+target_link_libraries(cesprit subspace_real ${CLIBS})
 set_target_properties(cesprit PROPERTIES C_STANDARD 11)
 
 
