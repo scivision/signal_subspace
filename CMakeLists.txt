@@ -14,6 +14,7 @@ else()
     find_package(BLAS REQUIRED)
     find_package(LAPACK REQUIRED) #or other math library providing the linear algebra e.g. MKL
     set(FLIBS ${FLIBS} blas lapack) 
+    set(FLIBS8 ${FLIBS8} blas lapack) 
 endif()
 
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
@@ -35,23 +36,27 @@ endif()
 add_compile_options(-mtune=native -g ${FLAGS})
 
 #------------------------------------------------------------------------------------------------
-add_library(subspace_cmpl comm.f90             covariance.f90 subspace.f90 signals.f90)
-target_link_libraries(subspace_cmpl PRIVATE ${FLIBS8})
+add_library(comm comm.f90 perf.f90)
+target_compile_options(comm PRIVATE ${FFLAGS})
+
+
+add_library(subspace_cmpl         covariance.f90 subspace.f90 signals.f90)
+target_link_libraries(subspace_cmpl PRIVATE comm ${FLIBS8})
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS})
 
 add_library(subspace_real comm.f90 filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
-target_link_libraries(subspace_real PRIVATE ${FLIBS})
+target_link_libraries(subspace_real PRIVATE comm ${FLIBS})
 set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(subspace_real PRIVATE ${FFLAGS})
 
 #------ test program: Fortran Complex Double Precision ----------
-add_executable(fespritcmpl perf.f90  RunSubspace.f90)
+add_executable(fespritcmpl RunSubspace.f90)
 target_link_libraries(fespritcmpl subspace_cmpl)
 set_target_properties(fespritcmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(fespritcmpl PUBLIC ${FFLAGS})
 #------ test program: Fortran Real Single Precision -------------
-add_executable(fespritreal perf.f90 RunSubspace_realsp.f90)
+add_executable(fespritreal RunSubspace_realsp.f90)
 target_link_libraries(fespritreal subspace_real)
 set_target_properties(fespritreal PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(fespritreal PUBLIC ${FFLAGS})
@@ -67,20 +72,15 @@ set_target_properties(cesprit PROPERTIES C_STANDARD 11)
 
 
 #-------------------------------------------------------------------------------
-# cmake output (added includes in front of .f90)
-# gfortran ../comm.f90 ../perf.f90 ../covariance_realsp.f90 ../subspace_realsp.f90 ../signals_realsp.f90 ../filters.f90  ../RunSubspace_realsp.f90  $MKLROOT/lib/intel64/libmkl_blas95_lp64.a $MKLROOT/lib/intel64/libmkl_lapack95_lp64.a $MKLROOT/lib/intel64/libmkl_gf_lp64.a $MKLROOT/lib/intel64/libmkl_sequential.a $MKLROOT/lib/intel64/libmkl_core.a -ldl -lm  && ./a.out
 
 # ------ mkl manual working --  NOTE: -Wl,--no-as-need prevents runtime errors
-# gfortran -fdefault-integer-8 -g -I$MKLROOT/include/intel64/ilp64 -m64 -I$MKLROOT/include ../comm.f90 ../perf.f90 ../covariance.f90 ../subspace.f90 ../signals.f90 ../RunSubspace.f90 $MKLROOT/lib/intel64/libmkl_blas95_ilp64.a $MKLROOT/lib/intel64/libmkl_lapack95_ilp64.a -L$MKLROOT/lib/intel64 -Wl,--no-as-needed -lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl && ./a.out
+# gfortran -fdefault-integer-8 -g -I$MKLROOT/include/intel64/ilp64 -m64  -I$MKLROOT/include ../comm.f90 ../perf.f90 ../covariance.f90 ../subspace.f90 ../signals.f90 ../RunSubspace.f90 -L$MKLROOT/lib/intel64 -lmkl_blas95_ilp64 -lmkl_lapack95_ilp64 -lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl && ./a.out
 
-# -------- openblas manual  working --
+# OpenBLAS gfortran Complex64 WORKING
 # gfortran ../comm.f90 ../perf.f90 ../covariance.f90 ../subspace.f90 ../signals.f90 ../RunSubspace.f90 -lblas -llapack -lpthread -lm  && ./a.out
 #
-# not working  Parameter 13 SGESVD
-# gfortran -fdefault-integer-8 -I$MKLROOT/include/intel64/ilp64 -m64 -I${MKLROOT}/include  ../comm.f90 ../perf.f90 ../covariance_realsp.f90 ../subspace_realsp.f90 ../signals_realsp.f90 ../filters.f90  ../RunSubspace_realsp.f90 $MKLROOT/lib/intel64/libmkl_blas95_ilp64.a $MKLROOT/lib/intel64/libmkl_lapack95_ilp64.a -L$MKLROOT/lib/intel64 -lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -ldl -lm  && ./a.out
-
-# WORKING 4-byte integer
-# gfortran ../comm.f90 ../perf.f90 ../covariance_realsp.f90 ../subspace_realsp.f90 ../signals_realsp.f90 ../filters.f90  ../RunSubspace_realsp.f90 -L$MKLROOT/lib/intel64 -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -ldl -lm  && ./a.out
+# MKL gfortran Real32 WORKING
+# gfortran ../comm.f90 ../perf.f90 ../covariance_realsp.f90 ../subspace_realsp.f90 ../signals_realsp.f90 ../filters.f90  ../RunSubspace_realsp.f90 -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -ldl -lm  && ./a.out
 #
 # not working 8-byte integer Parameter 13 SGESVD
 # ifort -i8 -I${F95ROOT}/include/intel64/ilp64 -I${MKLROOT}/include  ../comm.f90 ../perf.f90 ../covariance_realsp.f90 ../subspace_realsp.f90 ../signals_realsp.f90 ../filters.f90  ../RunSubspace_realsp.f90 ${MKLROOT}/lib/intel64/libmkl_blas95_ilp64.a ${MKLROOT}/lib/intel64/libmkl_lapack95_ilp64.a -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread -ldl -lm  && ./a.out
