@@ -22,7 +22,7 @@ integer(int64) :: tic,toc
 integer :: narg
 character(len=16) :: arg
 !----------- parse command line ------------------
-M = Ns / 4
+M = Ns / 4_c_int
 narg = command_argument_count()
 
 if (narg > 0) then

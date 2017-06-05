@@ -15,9 +15,9 @@ subroutine signoise(fs,f0,snr,Ns,x) bind(c)
 
     real(sp) :: t(Ns),nvar
     real(sp) :: noise(Ns)
-    integer :: i
+    integer(c_int) :: i
 
-    t = [(i, i=0,size(x)-1)] / fs
+    t = [(i, i=0, size(x)-1)] / fs
     x = sqrt(2.) * cos(2.*pi*f0*t)
 
 !--- add noise
