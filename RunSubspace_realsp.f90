@@ -28,7 +28,7 @@ integer(int64) :: tic,toc
 integer :: narg,u
 character(len=16) :: arg
 !----------- parse command line ------------------
-M = Ns / 2
+M = Ns / 2_c_int
 narg = command_argument_count()
 
 if (narg > 0) then

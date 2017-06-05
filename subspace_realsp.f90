@@ -5,7 +5,8 @@ module subspace
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
-
+    private
+    logical,parameter :: debug=.true.
     real(sp),parameter :: pi = 4.*atan(1.)
 ! do not put private here, because module parameters like pi won't be passed out
 ! for Numpy / f2py 1.10.4 (and other)  BUG in Numpy.
@@ -21,16 +22,18 @@ subroutine esprit(x,N,L,M,fs,tout,sigma) bind(c)
     real(sp),intent(out) :: tout(L/2),sigma(L)
 
     real(sp) :: tones(L)
-    integer :: LWORK,i
+    integer :: i,lwork
+!    integer, parameter :: Lwork=4096
+    integer,parameter :: LRATIO=8
     real(sp) :: R(M,M), U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(sp) :: S(M,M),RWORK(8*M),ang(L),SWORK(8*M) !this Swork is real
-    integer :: getrfinfo,getriinfo, evinfo, svdinfo
+    real(sp) :: S(M,M),RWORK(LRATIO*M),ang(L),SWORK(LRATIO*M) !this Swork is real
+    integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
     real(sp) :: W1(L,L), IPIV(M-1)
-    complex(sp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
+    complex(sp) :: Phi(L,L), CWORK(LRATIO*M), junk(L,L), eig(L)
 
 !    print*, shape(x)
 
-    LWORK = 8*M  !at least 5M for sgesvd
+   LWORK = LRATIO*M  !at least 5M for sgesvd
    ! integer(i64) :: tic,toc
 
 !------ estimate autocovariance from single time sample vector (1-D)
@@ -42,9 +45,12 @@ call autocov(x,size(x,kind=c_int),M,R)
 !-------- SVD -------------------
 !call system_clock(tic)
 !http://www.netlib.org/lapack/explore-html/d4/dca/group__real_g_esing.html
-call sgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,svdinfo)
+if (debug) print *,'LWORK: ',LWORK
+call sgesvd('A','N',M,M,R,M,S,U,M,VT,M, SWORK, LWORK,svdinfo)
+!if (debug) print *,'work(1):',swork(1)
 if (svdinfo /= 0) then
-    write(stderr,*) 'SGESVD return code',svdinfo
+    write(stderr,*) 'SGESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
+    if (M /= LWORK/LRATIO) write(stderr,*) 'possible LWORK overflow'
     error stop
 endif
 !call system_clock(toc)
