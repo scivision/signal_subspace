@@ -8,7 +8,7 @@ module covariance
 
 contains
 
-subroutine autocov(x,N,M,C) bind(c)
+subroutine autocov(x, N, M, C) bind(c)
 ! autocovariance estimate of 1-D vector (e.g. noisy sinusoid)
 ! input:
 ! x is a 1-D vector
@@ -18,8 +18,8 @@ subroutine autocov(x,N,M,C) bind(c)
 ! C is the 2-D result
 
  integer(c_int), intent(in) :: M,N
- complex(dp),intent(in) :: x(N)
- complex(dp),intent(out):: C(M,M)
+ complex(dp), intent(in) :: x(N)
+ complex(dp), intent(out):: C(M,M)
 
  integer(c_int) :: i
  complex(dp) :: yn(M,1), R(M,M) !, work(M,M)
