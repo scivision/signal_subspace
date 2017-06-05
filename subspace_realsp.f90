@@ -5,7 +5,7 @@ module subspace
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
-    private
+!    private ! f2py won't import this Pi if this line exists, bug
     logical,parameter :: debug=.true.
     real(sp),parameter :: pi = 4.*atan(1.)
 ! do not put private here, because module parameters like pi won't be passed out

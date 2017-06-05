@@ -5,7 +5,7 @@ import scipy.signal as signal
 from matplotlib.pyplot import subplots,show
 #
 from .importfort import fort
-Sc,Sr = fort()
+S = fort()
 
 
 def plot_noisehist():
@@ -14,8 +14,8 @@ def plot_noisehist():
 
     fg,axs = subplots(3,1)
 
-    noiser = Sr.signals.randn(N)
-    noisec = Sc.signals.randn(N)
+    noiser = S['r'].signals.randn(N)
+    noisec = S['c'].signals.randn(N)
     noisepy = np.random.randn(N)
 
     ax = axs[0]
