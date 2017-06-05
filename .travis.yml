@@ -22,6 +22,7 @@ addons:
     packages:
     - gfortran-5
     - liblapack-dev
+    - libatlas-base-dev
 
 before_install:
     - mkdir -p $HOME/.local/bin
