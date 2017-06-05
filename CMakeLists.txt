@@ -8,6 +8,7 @@ find_package(MKL)
 if(MKL_FOUND)
     set(MKLROOT $ENV{MKLROOT})
     include_directories(${MKL_INCLUDE_DIRS})
+    set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
     set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
 else()
     find_package(BLAS REQUIRED)
@@ -35,7 +36,7 @@ add_compile_options(-mtune=native -g ${FLAGS})
 
 #------------------------------------------------------------------------------------------------
 add_library(subspace_cmpl comm.f90             covariance.f90 subspace.f90 signals.f90)
-target_link_libraries(subspace_cmpl PRIVATE ${FLIBS})
+target_link_libraries(subspace_cmpl PRIVATE ${FLIBS8})
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS})
 
@@ -46,12 +47,12 @@ target_compile_options(subspace_real PRIVATE ${FFLAGS})
 
 #------ test program: Fortran Complex Double Precision ----------
 add_executable(fespritcmpl perf.f90  RunSubspace.f90)
-target_link_libraries(fespritcmpl subspace_cmpl ${FLIBS})
+target_link_libraries(fespritcmpl subspace_cmpl)
 set_target_properties(fespritcmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(fespritcmpl PUBLIC ${FFLAGS})
 #------ test program: Fortran Real Single Precision -------------
 add_executable(fespritreal perf.f90 RunSubspace_realsp.f90)
-target_link_libraries(fespritreal subspace_real ${FLIBS})
+target_link_libraries(fespritreal subspace_real)
 set_target_properties(fespritreal PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(fespritreal PUBLIC ${FFLAGS})
 #------ test program: C++ Real Single ---------------------------
