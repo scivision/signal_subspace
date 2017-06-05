@@ -9,11 +9,14 @@ if(MKL_FOUND)
     set(MKLROOT $ENV{MKLROOT})
     include_directories(${MKL_INCLUDE_DIRS})
     # Sequential
-    #set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
-    #set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
+#    set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
+#    set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
     # TBB
     set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
     set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
+    # OpenMP
+#    set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
+#    set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
 else()
     find_package(BLAS REQUIRED)
     find_package(LAPACK REQUIRED) #or other math library providing the linear algebra e.g. MKL
