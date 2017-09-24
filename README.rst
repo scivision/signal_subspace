@@ -18,11 +18,23 @@ The core subspace code is written in Fortran 2008 and is called from other langu
 Building
 ========
 
+Since the programs are Fortran/Python based, they should compile and run in virtually any environment/OS from embedded to supercomputer.
+
 Prereqs
 -------
+
+
+Linux
+~~~~~
 ::
 
     apt install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make cmake
+
+Mac
+~~~
+::
+
+    brew install lapack openblas gcc make cmake
 
 
 For all languages (Fortran, C, C++, Python) at once, simply type::
