@@ -67,7 +67,7 @@ def main():
 
     freq, response = freqz(b)
     axs[0,-1].plot(freq*fs/(2*np.pi),10*np.log10(abs(response)))
-    axs[0,-1].set_title('filter response  L={}'.format(L))
+    axs[0,-1].set_title(f'filter response  L={L}')
     axs[0,-1].set_ylim(-40,2)
 
     impulse = np.repeat(0.,L); impulse[0] =1.

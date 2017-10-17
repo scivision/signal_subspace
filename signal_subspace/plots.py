@@ -1,5 +1,5 @@
 from pathlib import Path
-from sys import stderr
+import logging
 import numpy as np
 import scipy.signal as signal
 from matplotlib.pyplot import subplots,show
@@ -41,7 +41,7 @@ def plotfilt(b, fs:int, ofn=None):
     freq, response = signal.freqz(b)
     response_dB = 20*np.log10(abs(response))
     if response_dB.max()>0:
-        print('WARNING: filter may be unstable',file=stderr)
+        logging.error('filter may be unstable')
 
     axs[0].plot(freq*fs/(2*np.pi), response_dB)
     axs[0].set_title(f'filter response  {L} taps')
