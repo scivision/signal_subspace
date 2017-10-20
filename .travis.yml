@@ -3,12 +3,11 @@ language: generic
 os:
   - linux
   - osx
-  
-env: 
-  - TRAVIS_PYTHON_VERSION=3.6 FC=gfortran
 
 dist: trusty
 group: edge
+  
+env: TRAVIS_PYTHON_VERSION=3.6  FC=gfortran-6
 
 notifications:
   email: false
@@ -21,13 +20,16 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - gfortran
+    - gfortran-6
     - liblapack-dev
     - libatlas-base-dev
 
 before_install:
     - if [[ $TRAVIS_OS_NAME == osx ]]; then
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+        brew update;
+        brew install gcc;
+	export FC=gfortran;
       else
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
       fi
@@ -43,14 +45,13 @@ before_install:
     - pip -q install coveralls
 
 install:
-    - python setup.py develop
+  - python setup.py develop
 
 before_script:
    - cd bin
    - cmake ..
    - make 
    - cd ..
-
 
 script: coverage run tests/test.py -v
 
