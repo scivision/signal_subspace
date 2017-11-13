@@ -1,12 +1,5 @@
 #!/usr/bin/env python
-req=['nose','numpy','scipy','matplotlib','pandas','seaborn','pathlib2']
-# %%
-import pip
-try:
-    import conda.cli
-    conda.cli.main('install',*req)
-except Exception as e:
-    pip.main(['install'] +req)
+req=['nose','numpy','scipy', 'matplotlib','pandas','seaborn']
 # %%
 import setuptools #enables develop
 from numpy.distutils.core import setup,Extension
@@ -35,5 +28,6 @@ setup(name='signal_subspace',
                     f2py_options=['--quiet'],
                     extra_link_args=['-llapack'])],
       install_requires=req,
+      python_requires='>=3.6',
 	  )
 

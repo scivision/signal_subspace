@@ -9,7 +9,7 @@ dist: trusty
 group: edge
   
 env: 
-  - FC=gfortran
+  - FC=gfortran TRAVIS_PYTHON_VERSION=3
 
 notifications:
   email: false
@@ -39,12 +39,12 @@ before_install:
 
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
-#    - conda create -n test python=$TRAVIS_PYTHON_VERSION
-#    - source activate test
+    - conda create -n test python=$TRAVIS_PYTHON_VERSION
+    - source activate test
     - pip -q install coveralls
 
 install:
-  - python setup.py develop
+  - pip install -e .
 
 before_script:
    - cd bin
