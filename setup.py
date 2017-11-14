@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-req=['nose','numpy','scipy', 'matplotlib','pandas','seaborn']
+req=['nose','numpy','scipy', 'pandas']
+ereq=['matplotlib','seaborn']
 # %%
 from numpy.distutils.core import setup,Extension
 
@@ -27,6 +28,7 @@ setup(name='signal_subspace',
                     f2py_options=['--quiet'],
                     extra_link_args=['-llapack'])],
       install_requires=req,
+      extras_require={'plot':ereq},
       python_requires='>=3.6',
 	  )
 
