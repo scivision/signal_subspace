@@ -9,7 +9,6 @@ os:
 
 dist: trusty
 group: edge
-  
 
 notifications:
   email: false
