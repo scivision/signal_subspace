@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 req=['nose','numpy','scipy', 'matplotlib','pandas','seaborn']
 # %%
-import setuptools #enables develop
 from numpy.distutils.core import setup,Extension
 
 setup(name='signal_subspace',

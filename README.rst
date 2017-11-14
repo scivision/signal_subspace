@@ -4,6 +4,10 @@
 .. image:: https://coveralls.io/repos/github/scivision/signal_subspace/badge.svg?branch=master
     :target: https://coveralls.io/github/scivision/signal_subspace?branch=master
 
+.. image:: https://api.codeclimate.com/v1/badges/5f2cff37394a699b5e7d/maintainability
+   :target: https://codeclimate.com/github/scivision/signal_subspace/maintainability
+   :alt: Maintainability
+
 
 =================
 Signal Subspace
@@ -23,7 +27,9 @@ Since the programs are Fortran/Python based, they should compile and run in virt
 
 Prereqs
 -------
+If you don't already have Numpy::
 
+    pip install numpy
 
 Linux
 ~~~~~
@@ -36,7 +42,13 @@ Mac
 ::
 
     brew install lapack openblas gcc make cmake
-
+    
+Windows
+~~~~~~~
+Recommend using Windows Subsystem for Linux.
+    
+Install
+-------
 
 For all languages (Fortran, C, C++, Python) at once, simply type::
 
