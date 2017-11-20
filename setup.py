@@ -2,10 +2,11 @@
 req=['nose','numpy','scipy', 'pandas']
 ereq=['matplotlib','seaborn']
 # %%
+from setuptools import find_packages
 from numpy.distutils.core import setup,Extension
 
 setup(name='signal_subspace',
-      packages=['signal_subspace'],
+      packages=find_packages(),
       version='1.0.0',
 	  description='1-D & 2-D signal subspace estimation methods',
 	  author='Michael Hirsch, Ph.D.',
