@@ -105,7 +105,7 @@ Compile Fortran ESPRIT to use from Python via f2py
 --------------------------------------------------
 ::
 
-    python setup.py develop
+    pip install -e .
 
 Selftest Fortran/C/C++/Python Esprit from Python
 ------------------------------------------------
