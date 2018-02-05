@@ -20,8 +20,7 @@ subroutine fircircfilter(x,N,b,L, y,filtok) bind(c)
     real(sp),intent(out) :: y(N)
     logical(c_bool),intent(out) :: filtok
 
-    integer(c_int) :: k,p
-    integer :: i,j
+    integer :: k,p, i,j
     real(sp) :: z(L), acc
     logical,parameter :: verbose=.false.
 
@@ -54,14 +53,14 @@ subroutine fircircfilter(x,N,b,L, y,filtok) bind(c)
     z(:) = 0
 
     do i = 1,N
-        p = p + 1_c_int
+        p = p + 1
         if (p > L)  p = 1
         z(p) = x(i)
         acc = 0
         k = p
         do j = 1,L
             acc = acc + b(j)*z(k)
-            k = k - 1_c_int
+            k = k - 1
             if (k < 1)  k = L
         enddo !j
         y(i) = acc

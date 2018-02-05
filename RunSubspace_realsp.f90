@@ -1,7 +1,7 @@
 program test_subspace
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int,c_bool
-use comm, only: sp
+use comm, only: sp, init_random_seed
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
@@ -27,6 +27,8 @@ real(sp),allocatable :: tones(:),sigma(:)
 integer(int64) :: tic,toc
 integer :: narg,u
 character(len=16) :: arg
+
+call init_random_seed()
 !----------- parse command line ------------------
 M = Ns / 2_c_int
 narg = command_argument_count()

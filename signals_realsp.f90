@@ -1,12 +1,13 @@
 module signals
     use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: sp, init_random_seed
+    use comm,only: sp
     implicit none
     real(sp),parameter :: pi = 4.*atan(1.)
     public :: signoise,randn, pi
 contains
 
 subroutine signoise(fs,f0,snr,Ns,x) bind(c)
+! generate noisy tone
 
     real(sp),intent(in) :: fs,f0,snr
     integer(c_int), intent(in) :: Ns
@@ -21,7 +22,7 @@ subroutine signoise(fs,f0,snr,Ns,x) bind(c)
     x = sqrt(2.) * cos(2.*pi*f0*t)
 
 !--- add noise
-    call randn(Ns,noise)
+    call randn(noise)
 
     nvar = 10.**(-snr/10.)
 
@@ -29,7 +30,8 @@ subroutine signoise(fs,f0,snr,Ns,x) bind(c)
 
 end subroutine signoise
 
-subroutine randn (N,noise)
+
+impure elemental subroutine randn(noise)
 ! implements Box-Muller Transform
 ! https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 !
@@ -38,16 +40,13 @@ subroutine randn (N,noise)
 ! Output:
 ! noise: Gaussian 1-D noise vector
 
-  integer(c_int),intent(in) :: N
-  real(sp),intent(out) :: noise(N)
-  real (sp):: u1(N), u2(N)
-
-  call init_random_seed()
+  real(sp),intent(out) :: noise
+  real (sp):: u1, u2
 
   call random_number(u1)
   call random_number(u2)
 
-  noise = sqrt ( - 2. * log ( u1 ) ) * cos ( 2. * pi * u2 )
+  noise = sqrt (-2. * log(u1)) * cos(2.*pi*u2)
 
 end subroutine randn
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-req=['nose','numpy','scipy', 'pandas']
-ereq=['matplotlib','seaborn']
+install_requires=['numpy','scipy', 'pandas']
+tests_require=['nose','coveralls']
 # %%
 from setuptools import find_packages
 from numpy.distutils.core import setup,Extension
@@ -20,16 +20,17 @@ setup(name='signal_subspace',
           'Programming Language :: Python :: 3',
           ],
       ext_modules=[Extension(name='fortsubspace_cmpl',
-                    sources=['comm.f90','filters.f90', 'signals.f90','covariance.f90', 'subspace.f90'],
+                    sources=['comm.f90','filters.f90', 'covariance.f90', 'subspace.f90'],
                     f2py_options=['--quiet'],
                     extra_link_args=['-llapack'] ),
 
                    Extension(name='fortsubspace_real',
-                    sources=['comm.f90', 'filters.f90', 'signals_realsp.f90', 'covariance_realsp.f90', 'subspace_realsp.f90'],
+                    sources=['comm.f90', 'filters.f90','covariance_realsp.f90', 'subspace_realsp.f90'],
                     f2py_options=['--quiet'],
                     extra_link_args=['-llapack'])],
-      install_requires=req,
-      extras_require={'plot':ereq},
+      install_requires=install_requires,
+      extras_require={'plot':['matplotlib','seaborn'],'tests':tests_require},
+      tests_require=tests_require,
       python_requires='>=3.6',
 	  )
 

@@ -7,11 +7,8 @@ python:
 os:
   - linux
 
-dist: trusty
-group: edge
+group: travis_latest
 
-notifications:
-  email: false
 
 git:
   depth: 3
@@ -24,11 +21,10 @@ addons:
       - libatlas-base-dev
 
 before_install:
-  - pip -q install coveralls
   # this is temporary for pip < 9.1
   - pip -q install numpy
 
-install: pip -q install -e .
+install: pip -q install -e .[tests]
 
 before_script:
    - cd bin
@@ -36,7 +32,7 @@ before_script:
    - make 
    - cd ..
 
-script: coverage run tests/test.py -v
+script: coverage run tests/Test.py -v
 
 after_success: coveralls
 
