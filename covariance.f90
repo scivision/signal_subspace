@@ -1,10 +1,10 @@
 module covariance
     use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: dp
+    use comm,only: wp
     !use perf, only : sysclock2ms
     Implicit none
     private
-    public::autocov
+    public:: autocov
 
 contains
 
@@ -18,15 +18,15 @@ subroutine autocov(x, N, M, C) bind(c)
 ! C is the 2-D result
 
  integer(c_int), intent(in) :: M,N
- complex(dp), intent(in) :: x(N)
- complex(dp), intent(out):: C(M,M)
+ complex(wp), intent(in) :: x(N)
+ complex(wp), intent(out):: C(M,M)
 
  integer(c_int) :: i
- complex(dp) :: yn(M,1), R(M,M) !, work(M,M)
+ complex(wp) :: yn(M,1), R(M,M) !, work(M,M)
 
  yn(:,1) = x(M:1:-1) ! index from M to 1, reverse order
 
- R = matmul(yn,conjg(transpose(yn)))
+ R = matmul(yn, conjg(transpose(yn)))
  !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,R,M) !slower, worse accuracy than matmul in Gfortran 5.2.1
 
  do i = 2, N-M ! not concurrent
@@ -36,7 +36,7 @@ subroutine autocov(x, N, M, C) bind(c)
     !R = R + work
  enddo
 
- C = R / real(N,dp)
+ C = R / N
 
 end subroutine autocov
 

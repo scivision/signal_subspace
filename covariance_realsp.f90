@@ -1,10 +1,10 @@
 module covariance
     use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: sp
+    use comm,only: wp
     !use perf, only : sysclock2ms
     Implicit none
     private
-    public::autocov
+    public:: autocov
 
 contains
 
@@ -18,22 +18,22 @@ subroutine autocov(x,N,M,C) bind(c)
 ! C is the 2-D result
 
  integer(c_int), intent(in) :: M,N
- real(sp),intent(in) :: x(N)
- real(sp),intent(out):: C(M,M)
+ real(wp),intent(in) :: x(N)
+ real(wp),intent(out):: C(M,M)
 
  integer(c_int) :: i
- real(sp) :: yn(M,1), R(M,M) !, work(M,M)
+ real(wp) :: yn(M,1), R(M,M) !, work(M,M)
 
  yn(:,1) = x(M:1:-1) ! index from M to 1, reverse order
 
- R = matmul(yn,(transpose(yn)))
+ R = matmul(yn, transpose(yn))
  
  do i = 2, N-M ! not concurrent
     yn(:,1) = x(M-1+i:i-1:-1)
-    R = R + matmul(yn,(transpose(yn)))
+    R = R + matmul(yn, transpose(yn))
  enddo
 
- C = R/real(N,sp)
+ C = R / N
 
 end subroutine autocov
 

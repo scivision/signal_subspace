@@ -1,6 +1,25 @@
 cmake_minimum_required (VERSION 2.8.12)
 project(spectrum C CXX Fortran)
 
+# Polymorphic-like real kind program-wide
+if(realkind)
+    string(TOLOWER ${realkind} realkind)
+endif()
+
+if(realkind STREQUAL real32)   # -Drealkind=real32
+  file(WRITE kind.txt "integer,parameter :: wp=real32")
+  message(STATUS "real kind: real32")
+elseif(realkind STREQUAL real64)
+  file(WRITE kind.txt "integer,parameter :: wp=real64")
+  message(STATUS "real kind: real64")
+elseif(realkind STREQUAL real128)
+  file(WRITE kind.txt "integer,parameter :: wp=real128")
+  message(STATUS "real kind: real128")
+else()  # default to real64
+  file(WRITE kind.txt "integer,parameter :: wp=real64")
+  message(STATUS "real kind: real64")
+endif()
+
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -39,7 +58,7 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
 else() # gfortran
 # NOTE: -fdefault-integer-8 -m64  are crucial for MKL using gfortran to avoid SIGSEGV at runtime!
     set(FLAGS ${FLAGS} -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
-    set(FFLAGS ${FFLAGS} -fall-intrinsics -std=f2008ts -fbacktrace)# -ffpe-trap=zero,overflow,underflow)
+    set(FFLAGS ${FFLAGS} -fall-intrinsics -fbacktrace)# -ffpe-trap=zero,overflow,underflow)
     if (MKL_FOUND)
         set(FFLAGS8 ${FFLAGS8} -fdefault-integer-8 -m64)
     endif()

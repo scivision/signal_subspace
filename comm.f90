@@ -1,9 +1,14 @@
 module comm
-    use, intrinsic :: iso_c_binding, only: sp=>C_FLOAT, dp=>C_DOUBLE, int64=>C_LONG_LONG, sizeof=>c_sizeof
+    use, intrinsic :: iso_c_binding, only: real32=>C_FLOAT, real64=>C_DOUBLE, int64=>C_LONG_LONG
     implicit none
+    private 
+   
+    include 'kind.txt'
     
-    complex(dp),parameter :: J=(0._dp, 1._dp)
-    real(dp),parameter :: pi = 4._dp*atan(1._dp)
+    complex(wp),parameter :: J=(0._wp, 1._wp)
+    real(wp),parameter :: pi = 4._wp*atan(1._wp)
+
+    public :: wp, init_random_seed, J, pi
 
 contains
 

@@ -1,7 +1,7 @@
 program test_subspace
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int
-use comm, only: dp, init_random_seed
+use comm, only: wp, init_random_seed
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
@@ -10,21 +10,21 @@ implicit none
 
 integer(c_int) :: Ns = 1024, &
                   Ntone=2
-real(dp) :: fs=48000, &
-            f0=12345.6, &
+real(wp) :: fs=48000, &
+            f0=12345.6_wp, &
             snr=60  !dB
 integer(c_int) :: M
 
-complex(dp),allocatable :: x(:)
-real(dp),allocatable :: tones(:),sigma(:)
+complex(wp), allocatable :: x(:)
+real(wp), allocatable :: tones(:),sigma(:)
 
 integer(int64) :: tic,toc
 integer :: narg
-character(len=16) :: arg
+character(16) :: arg
 
 call init_random_seed()
 !----------- parse command line ------------------
-M = Ns / 4_c_int
+M = Ns / 4
 narg = command_argument_count()
 
 if (narg > 0) then
@@ -47,12 +47,12 @@ print *, "Fortran Esprit: Complex Double Precision"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), tones(Ntone), sigma(Ntone))
 !--- checking system numerics --------------
-if (sizeof(fs) /= 8) then
-    write(stderr,*) 'expected 8-byte real but you have real bytes: ', sizeof(fs)
+if (storage_size(fs) /= 64) then
+    write(stderr,*) 'expected 64-bit real but you have real bits: ', storage_size(fs)
     error stop
 endif
-if (sizeof(x(1)) /= 16) then
-    write(stderr,*) 'expected 16-byte complex but you have complex bytes: ', sizeof(x(1))
+if (storage_size(x(1)) /= 128) then
+    write(stderr,*) 'expected 128-bit complex but you have complex bits: ', storage_size(x(1))
     error stop
 endif
 
@@ -66,11 +66,11 @@ call esprit(x, size(x,kind=c_int), Ntone, M, fs, &
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------
-if (abs(tones(1)-f0) > 0.001*f0) error stop 'excessive estimation error'
+if (abs(tones(1)-f0) > 0.001_wp*f0) error stop 'excessive estimation error'
 
 print '(A,100F10.2)', 'estimated tone freq [Hz]: ',tones
 print '(A,100F5.1)', 'with sigma: ',sigma
-print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
+print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic) / 1000
 
 print *,'OK'
 

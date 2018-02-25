@@ -1,7 +1,8 @@
 program test_subspace
+use,intrinsic:: ieee_arithmetic
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
-use,intrinsic:: iso_c_binding, only: c_int,c_bool
-use comm, only: sp, init_random_seed
+use,intrinsic:: iso_c_binding, only: c_int
+use comm, only: wp, init_random_seed
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
@@ -11,18 +12,17 @@ implicit none
 
 integer(c_int) :: Ns = 1024, &
                   Ntone = 2
-real(sp) :: fs=48000, &
-            f0=12345.6, &
+real(wp) :: fs=48000, &
+            f0=12345.6_wp, &
             snr=60  !dB
 character(len=*),parameter :: bfn='../bfilt.txt'
 
 integer(c_int) :: M,Nb
 integer:: fstat
-logical(c_bool) :: filtok
  
 
-real(sp),allocatable :: x(:), b(:), y(:)
-real(sp),allocatable :: tones(:),sigma(:)
+real(wp),allocatable :: x(:), b(:), y(:)
+real(wp),allocatable :: tones(:),sigma(:)
 
 integer(int64) :: tic,toc
 integer :: narg,u
@@ -53,8 +53,8 @@ print *, "Fortran Esprit: Real Single Precision"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
 !--- checking system numerics --------------
-if (sizeof(fs) /= 4) then
-    write(stderr,*) 'expected 4-byte real but you have real bytes: ', sizeof(fs)
+if (storage_size(fs) /= 32) then
+    write(stderr,*) 'expected 32-bit real but you have real bits: ', storage_size(fs)
     error stop
 endif
 !------ simulate noisy signal ------------ 
@@ -62,7 +62,6 @@ call signoise(fs,f0,snr,Ns,&
               x)
 !------ filter noisy signal --------------
 ! read coefficients 'b'
-filtok=.false.
 open (newunit=u, file=bfn, status='old', action='read', iostat=fstat)
 if (fstat == 0) then
     read(u,*) Nb !first line of file: number of coeff
@@ -73,12 +72,12 @@ if (fstat == 0) then
 !    print '(EN10.1)', b
 
     call system_clock(tic)
-    call fircircfilter(x, size(x,kind=c_int), b, size(b,kind=c_int), y, filtok)
+    call fircircfilter(x, size(x,kind=c_int), b, size(b,kind=c_int), y)
     call system_clock(toc)
     print '(A,EN10.1)', 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
 endif
 
-if (fstat /= 0 .or. .not. filtok) then
+if (fstat /= 0 .or. ieee_is_nan(y(1))) then
     write(stderr,*) 'skipped FIR filter.'
     y=x
 endif

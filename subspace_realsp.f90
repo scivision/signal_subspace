@@ -1,13 +1,12 @@
 module subspace
     use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
     use, intrinsic:: iso_c_binding, only: c_int,c_long
-    use comm,only: sp
+    use comm,only: wp, pi
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
 !    private ! f2py won't import this Pi if this line exists, bug
     logical,parameter :: debug=.true.
-    real(sp),parameter :: pi = 4.*atan(1.)
 ! do not put private here, because module parameters like pi won't be passed out
 ! for Numpy / f2py 1.10.4 (and other)  BUG in Numpy.
     public::esprit,pi
@@ -17,19 +16,19 @@ contains
 subroutine esprit(x,N,L,M,fs,tout,sigma) bind(c)
 
     integer(c_int), intent(in) :: L,M,N
-    real(sp),intent(in) :: x(N)
-    real(sp),intent(in) :: fs
-    real(sp),intent(out) :: tout(L/2),sigma(L)
+    real(wp),intent(in) :: x(N)
+    real(wp),intent(in) :: fs
+    real(wp),intent(out) :: tout(L/2),sigma(L)
 
-    real(sp) :: tones(L)
+    real(wp) :: tones(L)
     integer :: i,lwork
 !    integer, parameter :: Lwork=4096
     integer,parameter :: LRATIO=8
-    real(sp) :: R(M,M), U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(sp) :: S(M,M),RWORK(LRATIO*M),ang(L),SWORK(LRATIO*M) !this Swork is real
+    real(wp) :: R(M,M), U(M,M),VT(M,M), S1(M-1,L), S2(M-1,L)
+    real(wp) :: S(M,M),RWORK(LRATIO*M),ang(L),SWORK(LRATIO*M) !this Swork is real
     integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
-    real(sp) :: W1(L,L), IPIV(M-1)
-    complex(sp) :: Phi(L,L), CWORK(LRATIO*M), junk(L,L), eig(L)
+    real(wp) :: W1(L,L), IPIV(M-1)
+    complex(wp) :: Phi(L,L), CWORK(LRATIO*M), junk(L,L), eig(L)
 
 !    print*, shape(x)
 
@@ -49,7 +48,7 @@ if (debug) print *,'LWORK: ',LWORK
 call sgesvd('A','N',M,M,R,M,S,U,M,VT,M, SWORK, LWORK,svdinfo)
 !if (debug) print *,'work(1):',swork(1)
 if (svdinfo /= 0) then
-    write(stderr,*) 'SGESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
+    write(stderr,*) 'GESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
     if (M /= LWORK/LRATIO) write(stderr,*) 'possible LWORK overflow'
     error stop
 endif
@@ -64,16 +63,17 @@ W1=matmul((transpose(S1)),S1)
 
 call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
-    write(stderr,*) 'ZGETRF inverse output code',getrfinfo
+    write(stderr,*) 'GETRF inverse output code',getrfinfo
     error stop
 endif
 
 call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then 
-    write(stderr,*) 'ZGETRI output code',getriinfo
+    write(stderr,*) 'GETRI output code',getriinfo
     error stop
 endif
 
+! matmul is faster 
 !call sgemm('N','T',L,L,max(L,N-1),1.0,W1,L,S1,L,1.0,Phi,L) 
 !call sgemm('N','N',L,L,L,1.0,Phi,L,S2,L,1.,Phi,L)
 Phi = matmul(matmul(W1, transpose(S1)), S2)
@@ -84,14 +84,14 @@ Phi = matmul(matmul(W1, transpose(S1)), S2)
 !call system_clock(tic)
 call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
-    write(stderr,*) 'CGEEV output code',evinfo
+    write(stderr,*) 'GEEV output code',evinfo
     error stop
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 
 
-ang = atan2(aimag(eig),real(eig))
+ang = atan2(aimag(eig), real(eig, kind=wp))
 
 tones = abs(fs*ang/(2*pi))
 
