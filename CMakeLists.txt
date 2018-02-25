@@ -46,14 +46,14 @@ else() # gfortran
 endif()
 
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
-add_compile_options(-mtune=native -g ${FLAGS})
+add_compile_options(-mtune=native -O3 -g ${FLAGS})
 
 #------------------------------------------------------------------------------------------------
 add_library(comm comm.f90 perf.f90)
 target_compile_options(comm PRIVATE ${FFLAGS})
 
 
-add_library(subspace_cmpl         covariance.f90 subspace.f90 signals.f90)
+add_library(subspace_cmpl covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_cmpl PRIVATE comm ${FLIBS8})
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS} ${FFLAGS8})
