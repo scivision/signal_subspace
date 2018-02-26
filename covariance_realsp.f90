@@ -1,14 +1,26 @@
 module covariance
-    use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: wp
-    !use perf, only : sysclock2ms
-    Implicit none
-    private
-    public:: autocov
+  use, intrinsic:: iso_c_binding, only: c_int
+  use comm,only: wp
+  !use perf, only : sysclock2ms
+  Implicit none
+  private
+  public:: autocov
 
 contains
 
-subroutine autocov(x,N,M,C) bind(c)
+
+pure subroutine Cautocov(x, N, M, C) bind(C)
+
+ integer(c_int), intent(in) :: M,N
+ real(wp), intent(in) :: x(N)
+ real(wp), intent(out):: C(M,M)
+
+ call autocov(x,C)
+
+end subroutine Cautocov
+
+
+pure subroutine autocov(x, C)
 ! autocovariance estimate of 1-D vector (e.g. noisy sinusoid)
 ! input:
 ! x is a 1-D vector
@@ -17,12 +29,16 @@ subroutine autocov(x,N,M,C) bind(c)
 ! output:
 ! C is the 2-D result
 
- integer(c_int), intent(in) :: M,N
- real(wp),intent(in) :: x(N)
- real(wp),intent(out):: C(M,M)
+ real(wp), intent(in) :: x(:)
+ real(wp), intent(out):: C(:,:)
 
- integer(c_int) :: i
- real(wp) :: yn(M,1), R(M,M) !, work(M,M)
+ integer:: i, N, M
+ real(wp), allocatable :: yn(:,:), R(:,:) !, work(M,M)
+ 
+ N = size(x)
+ M = size(C,1)
+ 
+ allocate(yn(M,1), R(M,M))
 
  yn(:,1) = x(M:1:-1) ! index from M to 1, reverse order
 
