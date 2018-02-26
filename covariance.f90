@@ -33,23 +33,21 @@ pure subroutine autocov(x, C)
  complex(wp), intent(out):: C(:,:)
 
  integer:: i, N, M
- complex(wp), allocatable :: yn(:), R(:,:), yt(:,:) !, work(M,M)
+ complex(wp), allocatable :: yn(:,:), R(:,:) !, work(M,M)
  
  N = size(x)
  M = size(C,1)
  
- allocate(yn(M), yt(1,M), R(M,M))
+ allocate(yn(M,1), R(M,M))
 
- yn = x(M:1:-1) ! index from M to 1, reverse order
- yt(1,:) = yn
-
- R = matmul(spread(yn,2,1), conjg(yt))
+ yn(:,1) = x(M:1:-1) ! index from M to 1, reverse order
+ 
+ R = matmul(yn, conjg(transpose(yn)))
  !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,R,M) !slower, worse accuracy than matmul in Gfortran 5.2.1
 
  do i = 2, N-M ! not concurrent
-    yt(1,:) = x(M-1+i:i-1:-1)
-    yn = yt(1,:)
-    R = R + matmul(spread(yn,2,1), conjg(yt))
+    yn(:,1) = x(M-1+i:i-1:-1)
+    R = R + matmul(yn, conjg(transpose(yn)))
     !call zgemm('N','C',M,M,1,1._dp,yn,M,yn,M,0._dp,work,M)
     !R = R + work
  enddo
