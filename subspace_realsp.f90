@@ -49,7 +49,7 @@ subroutine esprit(x,M,fs,tout,sigma)
     LWORK = LRATIO*M  !at least 5M for gesvd
    ! integer(i64) :: tic,toc
 
-   L = size(sigma)
+   L = 2*size(sigma)
 
    allocate(S1(M-1,L), S2(M-1,L), ang(L), Reig(L),Ieig(L), W1(L,L), Phi(L,L), junk(L,L),tones(L))
 
