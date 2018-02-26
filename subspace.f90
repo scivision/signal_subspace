@@ -1,7 +1,7 @@
 module subspace
   use, intrinsic:: iso_fortran_env, stderr=>error_unit
   use, intrinsic:: iso_c_binding, only: c_int
-  use comm,only: wp,pi
+  use comm,only: wp,pi, debug
   use covariance,only: autocov
   !use perf, only : sysclock2ms
 
@@ -24,15 +24,16 @@ subroutine esprit(x,N,L,M,fs,tones,sigma) bind(c)
 !    integer, parameter :: c256 = kind((0._real128, 1._real128))
 
     integer :: LWORK,i
+    integer,parameter :: LRATIO=8
     complex(wp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(wp) :: S(M,M), RWORK(8*M), ang(L)
+    real(wp) :: S(M,M),RWORK(8*M),ang(L)
     integer :: stat
     complex(wp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(wp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
    ! integer(i64) :: tic,toc
 
-Lwork = 8*M !at least 5M for sgesvd
+Lwork = 8*M !at least 5M for gesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
 call autocov(x, R)
@@ -41,6 +42,8 @@ call autocov(x, R)
 
 !-------- SVD -------------------
 !call system_clock(tic)
+!http://www.netlib.org/lapack/explore-html/d4/dca/group__real_g_esing.html
+if (debug) print *,'LWORK: ',LWORK
 select case (kind(U))
   case (c64)  
     call cgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,stat)
@@ -51,7 +54,8 @@ select case (kind(U))
 end select
 
 if (stat /= 0) then
-    write(stderr,*) 'GESVD return code',stat
+    write(stderr,*) 'GESVD return code',stat,'  LWORK:',LWORK,'  M:',M
+    if (M /= LWORK/LRATIO) write(stderr,*) 'possible LWORK overflow'
     error stop
 endif
 !call system_clock(toc)
@@ -118,7 +122,7 @@ ang = atan2(aimag(eig), real(eig, kind=wp))
 
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
-do concurrent (i=1:L/2)
+do concurrent (i = 1:L/2)
   sigma(i) = S(i,i)
 enddo
 
