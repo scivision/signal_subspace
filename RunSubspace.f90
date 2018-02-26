@@ -54,8 +54,7 @@ print *, "Fortran Esprit: real bits:",storage_size(fs)
 allocate(x(Ns), tones(Ntone), sigma(Ntone))
 
 !------ simulate noisy signal ------------ 
-call signoise(fs,f0,snr,Ns,&
-              x)
+call signoise(fs,f0,snr, x)
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
 call esprit(x, size(x,kind=c_int), Ntone, M, fs, &

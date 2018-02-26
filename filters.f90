@@ -14,7 +14,7 @@ module filters
 contains
 
 
-subroutine cfircircfilter(x,N,b,L,y) bind(C)
+subroutine Cfircircfilter(x,N,b,L,y) bind(C)
 
   integer(c_int), intent(in) :: N,L
   real(wp), intent(in) :: x(N), b(L)
@@ -22,7 +22,7 @@ subroutine cfircircfilter(x,N,b,L,y) bind(C)
   
   call fircircfilter(x,b,y)
 
-end subroutine cfircircfilter
+end subroutine Cfircircfilter
 
 
 subroutine fircircfilter(x,b,y)

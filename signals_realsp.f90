@@ -1,22 +1,38 @@
 module signals
-    use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: wp, pi
-    implicit none
-    private
-    public :: signoise,randn
+  use, intrinsic:: iso_c_binding, only: c_int
+  use comm,only: wp, pi
+  implicit none
+
+  private
+  public :: signoise,randn
 contains
 
-subroutine signoise(fs,f0,snr,Ns,x) bind(c)
+
+subroutine Csignoise(fs,f0,snr,Ns,x) bind(C)
+
+real(wp),intent(in) :: fs,f0,snr
+integer(c_int), intent(in) :: Ns
+real(wp),intent(out) :: x(Ns)
+
+call signoise(fs,f0,snr,x)
+
+end subroutine Csignoise
+
+
+subroutine signoise(fs,f0,snr,x)
 ! generate noisy tone
 
   real(wp),intent(in) :: fs,f0,snr
-  integer(c_int), intent(in) :: Ns
-  real(wp),intent(out) :: x(Ns)
+  real(wp),intent(out) :: x(:)
 
 
-  real(wp) :: t(Ns),nvar
-  real(wp) :: noise(Ns)
-  integer(c_int) :: i
+  real(wp), allocatable :: t(:), noise(:)
+  real(wp) :: nvar
+  integer :: i, Ns
+
+  Ns = size(x)
+  
+  allocate (t(Ns), noise(Ns))
 
   t = [(i, i=0, size(x)-1)] / fs
   x = sqrt(2._wp) * cos(2._wp*pi*f0*t)

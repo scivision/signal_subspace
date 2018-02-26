@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-extern void signoise(const float*, const float*, const float*, int*, float []);
+extern void csignoise(const float*, const float*, const float*, int*, float []);
 
 extern void esprit(float [], int*, int*, int*, const float*, float [], float []);
 
@@ -20,7 +20,7 @@ const float f0 = (float)12345.6; //arbitrary
 
 float * x;
 x = malloc((size_t)Ns*sizeof(float));
-signoise(&fs, &f0, &snr, &Ns, &x[0]);
+csignoise(&fs, &f0, &snr, &Ns, &x[0]);
 
 //---- signal estimation -----------------------------
 float * tones = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));

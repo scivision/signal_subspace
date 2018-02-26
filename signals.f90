@@ -10,25 +10,42 @@ module signals
   public :: signoise,randn
 contains
 
-subroutine signoise(fs,f0,snr,Ns,x) bind(c)
+
+subroutine Csignoise(fs,f0,snr,Ns,x) bind(C)
+
+real(wp),intent(in) :: fs,f0,snr
+integer(c_int), intent(in) :: Ns
+complex(wp),intent(out) :: x(Ns)
+
+call signoise(fs,f0,snr,x)
+
+end subroutine Csignoise
+
+
+subroutine signoise(fs,f0,snr,x)
 ! generate noisy tone
 
-    real(wp),intent(in) :: fs,f0,snr
-    integer(c_int), intent(in) :: Ns
-    complex(wp),intent(out) :: x(Ns)
+  real(wp),intent(in) :: fs,f0,snr
+  complex(wp),intent(out) :: x(:)
+  
 
-    real(wp) :: t(Ns),nvar
-    complex(wp) :: noise(Ns)
-    integer :: i
+  real(wp), allocatable :: t(:)
+  complex(wp), allocatable :: noise(:)
+  real(wp) :: nvar
+  integer :: i, Ns
 
-    t = [(i, i=0,size(x)-1)] / fs
-    x = sqrt(2._wp) * exp(J*2._wp*pi*f0*t)
+  Ns = size(x)
+  
+  allocate (t(Ns), noise(Ns))
+
+  t = [(i, i=0, size(x)-1)] / fs
+  x = sqrt(2._wp) * exp(J*2._wp*pi*f0*t)
 !--- add noise
-    call randn(noise)
+  call randn(noise)
 
-    nvar = 10._wp**(-snr/10._wp)
+  nvar = 10._wp**(-snr/10._wp)
 
-    x = x + sqrt(nvar)*noise
+  x = x + sqrt(nvar)*noise
 
 end subroutine signoise
 

@@ -60,8 +60,7 @@ print *, "Fortran Esprit: real bits:",storage_size(fs)
 allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
 
 !------ simulate noisy signal ------------ 
-call signoise(fs,f0,snr,Ns,&
-              x)
+call signoise(fs,f0,snr, x)
 !------ filter noisy signal --------------
 ! read coefficients 'b'
 open (newunit=u, file=bfn, status='old', action='read', iostat=fstat)
