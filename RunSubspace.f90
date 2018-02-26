@@ -1,6 +1,5 @@
 program test_subspace
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
-use,intrinsic:: iso_c_binding, only: c_int
 use comm, only: wp, init_random_seed, debug
 use perf, only: sysclock2ms
 use subspace, only: esprit
@@ -8,15 +7,15 @@ use signals,only: signoise
 
 implicit none
 
-integer(c_int) :: Ns = 1024, &
+integer :: Ns = 1024, &
                   Ntone = 2
 real(wp) :: fs=48000, &
             f0=12345.6_wp, &
             snr=60  !dB
-integer(c_int) :: M
+integer :: M
 
-complex(wp), allocatable :: x(:)
-real(wp), allocatable :: tones(:),sigma(:)
+complex(wp),allocatable :: x(:)
+real(wp),allocatable :: tones(:),sigma(:)
 
 integer(int64) :: tic,toc
 integer :: narg
@@ -57,12 +56,12 @@ allocate(x(Ns), tones(Ntone), sigma(Ntone))
 call signoise(fs,f0,snr, x)
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(x, size(x,kind=c_int), Ntone, M, fs, &
+call esprit(x, size(x), Ntone, M, fs, &
             tones,sigma)
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------
-if (abs(tones(1)-f0) > 0.001_wp*f0) error stop 'excessive estimation error'
+if (abs(tones(1)-f0) > 0.001_wp*f0) error stop 'excessive frequency estimation error'
 
 print '(A,100F10.2)', 'estimated tone freq [Hz]: ',tones
 print '(A,100F5.1)', 'with sigma: ',sigma
@@ -70,8 +69,5 @@ print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic) / 10
 
 print *,'OK'
 
-! deallocate(x,tones,sigma) ! this is automatic going out of scope
 end program test_subspace
-
-
 
