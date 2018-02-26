@@ -1,7 +1,7 @@
 module subspace
   use, intrinsic:: iso_fortran_env, stderr=>error_unit
-  use, intrinsic:: iso_c_binding, only: c_int,c_long
-  use comm,only: wp, pi, debug
+  use, intrinsic:: iso_c_binding, only: c_int
+  use comm,only: wp,pi, debug
   use covariance,only: autocov
   !use perf, only : sysclock2ms
 
@@ -12,28 +12,46 @@ module subspace
 
 contains
 
-subroutine esprit(x,N,L,M,fs,tout,sigma) bind(c)
 
-    integer(c_int), intent(in) :: L,M,N
-    real(wp),intent(in) :: x(N)
-    real(wp),intent(in) :: fs
-    real(wp),intent(out) :: tout(L/2),sigma(L)
+subroutine Cesprit(x,N,L,M,fs,tones,sigma) bind(c)
+
+  integer(c_int), intent(in) :: L,M,N
+  real(wp),intent(in) :: x(N)
+  real(wp),intent(in) :: fs
+  real(wp),intent(out) :: tones(L/2),sigma(L)
+  
+  call esprit(x,M,fs,tones,sigma)
+  
+end subroutine Cesprit
+
+
+subroutine esprit(x,M,fs,tout,sigma)
+
+    real(wp),intent(in) :: x(:),fs
+    integer, intent(in) :: M
+    real(wp),intent(out) :: tout(:),sigma(:)
 
     integer, parameter :: r32 = kind(0._real32)
     integer, parameter :: r64 = kind(0._real64)
 !    integer, parameter :: r128 = kind(0._real128)
 
-    real(wp) :: tones(L)
+    integer :: L
+
+    real(wp), allocatable :: tones(:), S1(:,:), S2(:,:), ang(:), W1(:,:),Phi(:,:), junk(:,:), Reig(:), Ieig(:)
     integer :: LWORK,i
     integer,parameter :: LRATIO=8
-    real(wp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(wp) :: S(M,M),RWORK(LRATIO*M),ang(L),SWORK(LRATIO*M) !this Swork is real
+    real(wp) :: R(M,M), U(M,M), VT(M,M)
+    real(wp) :: S(M,M),RWORK(LRATIO*M),SWORK(LRATIO*M) !this Swork is real
     integer :: stat
-    real(wp) :: W1(L,L), IPIV(M-1)
-    real(wp) :: Phi(L,L), junk(L,L), Reig(L), Ieig(L)
+    real(wp) ::  IPIV(M-1)
 
-   LWORK = LRATIO*M  !at least 5M for gesvd
+
+    LWORK = LRATIO*M  !at least 5M for gesvd
    ! integer(i64) :: tic,toc
+
+   L = size(sigma)
+
+   allocate(S1(M-1,L), S2(M-1,L), ang(L), Reig(L),Ieig(L), W1(L,L), Phi(L,L), junk(L,L),tones(L))
 
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)

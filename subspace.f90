@@ -50,7 +50,7 @@ subroutine esprit(x,M,fs,tones,sigma)
 
    ! integer(i64) :: tic,toc
    
-   L = size(tones)
+   L = size(sigma)
    
    allocate(S1(M-1,L), S2(M-1,L), ang(L), eig(L), W1(L,L), Phi(L,L), junk(L,L))
 

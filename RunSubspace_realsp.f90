@@ -56,7 +56,7 @@ endif
 
 print *, "Fortran Esprit: real bits:",storage_size(fs)
 !---------- assign variable size arrays ---------------
-allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
+allocate(x(Ns), y(Ns), tones(Ntone/4), sigma(Ntone/2))
 
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr, x)
@@ -83,8 +83,7 @@ if (fstat /= 0 .or. ieee_is_nan(y(1))) then
 endif
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(y, size(y), Ntone, M, fs, &
-            tones,sigma)
+call esprit(y, M, fs, tones,sigma)
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------
