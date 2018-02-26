@@ -56,8 +56,7 @@ allocate(x(Ns), tones(Ntone), sigma(Ntone))
 call signoise(fs,f0,snr, x)
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(x, size(x), Ntone, M, fs, &
-            tones,sigma)
+call esprit(x, M, fs, tones,sigma)
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------

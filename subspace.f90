@@ -12,26 +12,47 @@ module subspace
 
 contains
 
-subroutine esprit(x,N,L,M,fs,tones,sigma) bind(c)
 
-    integer(c_int), intent(in) :: L,M,N
-    complex(wp),intent(in) :: x(N)
-    real(wp),intent(in) :: fs
-    real(wp),intent(out) :: tones(L),sigma(L)
-    
-    integer, parameter :: c64 = kind((0._real32, 1._real32))
-    integer, parameter :: c128 = kind((0._real64, 1._real64))
+subroutine Cesprit(x,N,L,M,fs,tones,sigma) bind(c)
+
+  integer(c_int), intent(in) :: L,M,N
+  complex(wp),intent(in) :: x(N)
+  real(wp),intent(in) :: fs
+  real(wp),intent(out) :: tones(L),sigma(L)
+  
+  call esprit(x,M,fs,tones,sigma)
+  
+end subroutine Cesprit
+
+
+subroutine esprit(x,M,fs,tones,sigma)
+
+  complex(wp),intent(in) :: x(:)
+  integer, intent(in) :: M
+  real(wp),intent(in) :: fs
+  real(wp),intent(out) :: tones(:),sigma(:)
+  
+  integer, parameter :: c64 = kind((0._real32, 1._real32))
+  integer, parameter :: c128 = kind((0._real64, 1._real64))
 !    integer, parameter :: c256 = kind((0._real128, 1._real128))
 
-    integer :: LWORK,i
-    integer,parameter :: LRATIO=8
-    complex(wp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
-    real(wp) :: S(M,M),RWORK(8*M),ang(L)
-    integer :: stat
-    complex(wp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
-    complex(wp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
+  integer :: L
+
+  integer :: LWORK,i
+  integer,parameter :: LRATIO=8
+  complex(wp) :: R(M,M), U(M,M), VT(M,M)
+  real(wp) :: S(M,M),RWORK(8*M)
+  integer :: stat
+  real(wp),allocatable :: ang(:)
+  complex(wp),allocatable :: S1(:,:), S2(:,:),W1(:,:),Phi(:,:),junk(:,:), eig(:)
+  complex(wp) ::  IPIV(M-1), CWORK(8*M),SWORK(8*M) !yes, this swork is complex
+
 
    ! integer(i64) :: tic,toc
+   
+   L = size(tones)
+   
+   allocate(S1(M-1,L), S2(M-1,L), ang(L), eig(L), W1(L,L), Phi(L,L), junk(L,L))
 
 Lwork = 8*M !at least 5M for gesvd
 !------ estimate autocovariance from single time sample vector (1-D)
