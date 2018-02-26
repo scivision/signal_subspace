@@ -1,7 +1,7 @@
 program test_subspace
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int
-use comm, only: wp, init_random_seed
+use comm, only: wp, init_random_seed, debug
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
@@ -9,7 +9,7 @@ use signals,only: signoise
 implicit none
 
 integer(c_int) :: Ns = 1024, &
-                  Ntone=2
+                  Ntone = 2
 real(wp) :: fs=48000, &
             f0=12345.6_wp, &
             snr=60  !dB
@@ -27,6 +27,12 @@ call init_random_seed()
 M = Ns / 4
 narg = command_argument_count()
 
+call get_command_argument(narg,arg)
+if (arg=='-v'.or.arg=='-d') then
+  debug=.true.
+  narg = narg-1
+endif
+
 if (narg > 0) then
   call get_command_argument(1,arg); read(arg,*) Ns
 endif
@@ -43,18 +49,9 @@ if (narg > 4) then
   call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 
-print *, "Fortran Esprit: Complex Double Precision"
+print *, "Fortran Esprit: real bits:",storage_size(fs)
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), tones(Ntone), sigma(Ntone))
-!--- checking system numerics --------------
-if (storage_size(fs) /= 64) then
-    write(stderr,*) 'expected 64-bit real but you have real bits: ', storage_size(fs)
-    error stop
-endif
-if (storage_size(x(1)) /= 128) then
-    write(stderr,*) 'expected 128-bit complex but you have complex bits: ', storage_size(x(1))
-    error stop
-endif
 
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr,Ns,&

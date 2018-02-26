@@ -1,5 +1,5 @@
 module subspace
-  use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
+  use, intrinsic:: iso_fortran_env, stderr=>error_unit
   use, intrinsic:: iso_c_binding, only: c_int
   use comm,only: wp,pi
   use covariance,only: autocov
@@ -18,6 +18,10 @@ subroutine esprit(x,N,L,M,fs,tones,sigma) bind(c)
     complex(wp),intent(in) :: x(N)
     real(wp),intent(in) :: fs
     real(wp),intent(out) :: tones(L),sigma(L)
+    
+    integer, parameter :: c32 = kind((0._real32, 1._real32))
+    integer, parameter :: c64 = kind((0._real64, 1._real64))
+!    complex(real128), parameter :: c128
 
     integer :: LWORK,i
     complex(wp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
@@ -37,7 +41,15 @@ call autocov(x, size(x,kind=c_int), M, R)
 
 !-------- SVD -------------------
 !call system_clock(tic)
-call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
+select case (kind(U))
+  case (c32)  
+    call cgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
+  case (c64)  
+    call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
+  case default 
+    error stop 'unknown type input to GESVD'
+end select
+
 if (svdinfo /= 0) then
     write(stderr,*) 'GESVD return code',svdinfo
     error stop
@@ -45,6 +57,7 @@ endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
+!----------------------
 S1 = U(1:M-1, :L)
 S2 = U(2:M, :L)
 

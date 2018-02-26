@@ -1,2 +1,2 @@
-dict(real=     dict(sp='float',        dp='double'),
-     complex = dict(sp='complex_float',dp="complex_double"))
+dict(real=     dict(real32='float',        real64='double'),
+     complex = dict(real32='complex_float',real64="complex_double"))
