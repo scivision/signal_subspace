@@ -19,14 +19,14 @@ subroutine esprit(x,N,L,M,fs,tones,sigma) bind(c)
     real(wp),intent(in) :: fs
     real(wp),intent(out) :: tones(L),sigma(L)
     
-    integer, parameter :: c32 = kind((0._real32, 1._real32))
-    integer, parameter :: c64 = kind((0._real64, 1._real64))
-!    complex(real128), parameter :: c128
+    integer, parameter :: c64 = kind((0._real32, 1._real32))
+    integer, parameter :: c128 = kind((0._real64, 1._real64))
+!    integer, parameter :: c256 = kind((0._real128, 1._real128))
 
     integer :: LWORK,i
     complex(wp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
     real(wp) :: S(M,M), RWORK(8*M), ang(L)
-    integer :: getrfinfo,getriinfo, evinfo, svdinfo
+    integer :: stat
     complex(wp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
     complex(wp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
 
@@ -42,47 +42,73 @@ call autocov(x, size(x,kind=c_int), M, R)
 !-------- SVD -------------------
 !call system_clock(tic)
 select case (kind(U))
-  case (c32)  
-    call cgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
   case (c64)  
-    call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
+    call cgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,stat)
+  case (c128)  
+    call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,stat)
   case default 
     error stop 'unknown type input to GESVD'
 end select
 
-if (svdinfo /= 0) then
-    write(stderr,*) 'GESVD return code',svdinfo
+if (stat /= 0) then
+    write(stderr,*) 'GESVD return code',stat
     error stop
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
 
-!----------------------
+!-------- LU decomp
 S1 = U(1:M-1, :L)
 S2 = U(2:M, :L)
 
 !call system_clock(tic)
-W1=matmul(conjg(transpose(S1)),S1)
-call zgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
-if (getrfinfo /= 0) then
-    write(stderr,*) 'GETRF inverse output code',getrfinfo
-    error stop
-endif
-call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
-if (getriinfo /= 0) then
-    write(stderr,*) 'GETRI output code',getriinfo
-    error stop
-endif
+W1=matmul(conjg(transpose(S1)), S1)
+select case (kind(U))
+  case (c64) 
+    call cgetrf(L,L,W1,L,ipiv,stat) 
+  case (c128)
+    call zgetrf(L,L,W1,L,ipiv,stat) 
+  case default 
+    error stop 'unknown type input to GETRF'
+end select
 
-Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
+if (stat /= 0) then
+  write(stderr,*) 'GETRF inverse output code',stat
+  error stop
+endif
+!------------ LU inversion
+select case (kind(U))
+  case (c64) 
+    call cgetri(L,W1,L,ipiv,Swork,Lwork,stat) 
+  case (c128)
+    call zgetri(L,W1,L,ipiv,Swork,Lwork,stat) 
+  case default 
+    error stop 'unknown type input to GETRI'
+end select
+
+if (stat /= 0) then
+  write(stderr,*) 'GETRI output code',stat
+  error stop
+endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
 
+!-----------
 !call system_clock(tic)
-call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
-if (evinfo /= 0) then
-    write(stderr,*) 'GEEV output code',evinfo
-    error stop
+Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
+
+select case (kind(U))
+  case (c64) 
+    call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,stat)
+  case (c128)
+    call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,stat)
+  case default 
+    error stop 'unknown type input to GEEV'
+end select
+
+if (stat /= 0) then
+  write(stderr,*) 'GEEV output code',stat
+  error stop
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
@@ -93,7 +119,7 @@ ang = atan2(aimag(eig), real(eig, kind=wp))
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
 do concurrent (i=1:L/2)
-    sigma(i) = S(i,i)
+  sigma(i) = S(i,i)
 enddo
 
 end subroutine esprit
