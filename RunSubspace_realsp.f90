@@ -56,7 +56,7 @@ endif
 
 print *, "Fortran Esprit: real bits:",storage_size(fs)
 !---------- assign variable size arrays ---------------
-allocate(x(Ns), y(Ns), tones(Ntone/4), sigma(Ntone/2))
+allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
 
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr, x)
