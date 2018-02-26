@@ -35,7 +35,7 @@ subroutine esprit(x,N,L,M,fs,tones,sigma) bind(c)
 Lwork = 8*M !at least 5M for sgesvd
 !------ estimate autocovariance from single time sample vector (1-D)
 !call system_clock(tic)
-call autocov(x, size(x,kind=c_int), M, R)
+call autocov(x, R)
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1) write(stdout,*) 'ms to compute autocovariance estimate:',sysclock2ms(toc-tic)
 
