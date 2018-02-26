@@ -1,51 +1,63 @@
 module filters
-    use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
-    use, intrinsic:: iso_c_binding, only: c_int
-    use, intrinsic:: ieee_arithmetic
-    use comm, only: wp
+  use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
+  use, intrinsic:: iso_c_binding, only: c_int
+  use, intrinsic:: ieee_arithmetic
+  use comm, only: wp, debug
 
-    implicit none
-    private
+  implicit none
+  private
 
-    real(wp) :: nan  
+  real(wp) :: nan  
 
-    public:: fircircfilter
+  public:: fircircfilter
 
 contains
 
-subroutine fircircfilter(x,N,b,L, y) bind(c)
-! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
-    integer(c_int), intent(in) :: N,L
-    real(wp),intent(in) :: x(N), b(L) 
-    real(wp),intent(out) :: y(N)
+subroutine cfircircfilter(x,N,b,L,y) bind(C)
 
-    integer :: k,p, i,j
-    real(wp) :: z(L), acc
-    logical,parameter :: verbose=.false.
+  integer(c_int), intent(in) :: N,L
+  real(wp), intent(in) :: x(N), b(L)
+  real(wp), intent(out) :: y(N)
+  
+  call fircircfilter(x,b,y)
+
+end subroutine cfircircfilter
+
+subroutine fircircfilter(x,b,y)
+! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
+
+    real(wp),intent(in) :: x(:), b(:) 
+    real(wp),intent(out) :: y(:)
+
+    integer :: k,p, i,j, L,N
+    real(wp) :: acc, z(size(b))
+    
+    L = size(b)
+    N = size(x)
     
     nan = ieee_value(1._wp, ieee_quiet_nan) 
 
 
     if (N < 1) then
-        write(stderr,*) "E: expected input array length>0, you passed in len(x)=",N
-        y = nan
-        return
-    elseif (verbose) then
-        print *, "input signal len(x)=",size(x)," output signal len(y)=",size(y)
+      write(stderr,*) "E: expected input vector length>0.  shape(x)=",shape(x)
+      y = nan
+      return
+    elseif (debug) then
+      print *, "input shape(x)=",shape(x)," output shape(y)=",shape(y)
     endif
 
-    if (L < 1) then
-        write(stderr,*) "E: expected more than zero filter coefficients, len(B)=",L
-        y = nan
-        return
-    elseif (verbose) then
-        print *, "filter coefficients len(B)=",L
+  if (L < 1) then
+      write(stderr,*) "E: expected more than zero filter coefficients, len(B)=",L
+      y = nan
+      return
+    elseif (debug) then
+      print *, "filter coefficients len(B)=",L
     endif
 
     if (any(ieee_is_nan(b))) then
-        write(stderr,*) 'E: NaN filter coefficients'
-        y = nan
-        return
+      write(stderr,*) 'E: NaN filter coefficients'
+      y = nan
+      return
     endif
     
     p = 0

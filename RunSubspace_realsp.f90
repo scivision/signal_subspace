@@ -2,7 +2,7 @@ program test_subspace
 use,intrinsic:: ieee_arithmetic
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int
-use comm, only: wp, init_random_seed
+use comm, only: wp, init_random_seed, debug
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
@@ -15,7 +15,7 @@ integer(c_int) :: Ns = 1024, &
 real(wp) :: fs=48000, &
             f0=12345.6_wp, &
             snr=60  !dB
-character(len=*),parameter :: bfn='../bfilt.txt'
+character(*),parameter :: bfn='../bfilt.txt'
 
 integer(c_int) :: M,Nb
 integer:: fstat
@@ -30,8 +30,14 @@ character(len=16) :: arg
 
 call init_random_seed()
 !----------- parse command line ------------------
-M = Ns / 2_c_int
+M = Ns / 2
 narg = command_argument_count()
+
+call get_command_argument(narg,arg)
+if (arg=='-v'.or.arg=='-d') then
+  debug=.true.
+  narg = narg-1
+endif
 
 if (narg > 0) then
   call get_command_argument(1,arg); read(arg,*) Ns
@@ -49,14 +55,10 @@ if (narg > 4) then
   call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 
-print *, "Fortran Esprit: Real Single Precision"
+print *, "Fortran Esprit: real bits:",storage_size(fs)
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
-!--- checking system numerics --------------
-if (storage_size(fs) /= 32) then
-  write(stderr,*) 'expected 32-bit real but you have real bits: ', storage_size(fs)
-  error stop
-endif
+
 !------ simulate noisy signal ------------ 
 call signoise(fs,f0,snr,Ns,&
               x)
@@ -72,7 +74,7 @@ if (fstat == 0) then
 !    print '(EN10.1)', b
 
   call system_clock(tic)
-  call fircircfilter(x, size(x,kind=c_int), b, size(b,kind=c_int), y)
+  call fircircfilter(x, b, y)
   call system_clock(toc)
   print '(A,EN10.1)', 'seconds to FIR filter: ',sysclock2ms(toc-tic)/1000
 endif

@@ -1,14 +1,15 @@
 module comm
-    use, intrinsic :: iso_c_binding, only: real32=>C_FLOAT, real64=>C_DOUBLE, int64=>C_LONG_LONG
+    use, intrinsic :: iso_c_binding, only: real32=>C_FLOAT, real64=>C_DOUBLE!, int64=>C_LONG_LONG
     implicit none
     private 
    
     include 'kind.txt'
     
-    complex(wp),parameter :: J=(0._wp, 1._wp)
     real(wp),parameter :: pi = 4._wp*atan(1._wp)
+    
+    logical :: debug
 
-    public :: wp, init_random_seed, J, pi
+    public :: wp, init_random_seed, pi, debug
 
 contains
 

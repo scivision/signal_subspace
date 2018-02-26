@@ -8,7 +8,7 @@
 
 extern "C" void signoise(const float*, const float*, const float*, int*, float []);
 
-extern "C" void fircircfilter(float [], int*,float [],int*,float [],bool*);
+extern "C" void cfircircfilter(float [], int*,float [],int*,float [],bool*);
 
 extern "C" void esprit(float [], int*, int*, int*, const float*, float [], float []);
 
@@ -44,7 +44,7 @@ if (Bok){
 
     if (verbose) std::cout << "Nb: " << Nb << std::endl;
 
-    fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,
+    cfircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,
                                 &y.front(),&filtok);
 }
 

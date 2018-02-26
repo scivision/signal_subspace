@@ -28,19 +28,19 @@ M = Ns / 4
 narg = command_argument_count()
 
 if (narg > 0) then
-    call get_command_argument(1,arg); read(arg,*) Ns
+  call get_command_argument(1,arg); read(arg,*) Ns
 endif
 if (narg > 1) then
-    call get_command_argument(2,arg); read(arg,*) fs
+  call get_command_argument(2,arg); read(arg,*) fs
 endif
 if (narg > 2) then
-    call get_command_argument(3,arg); read(arg,*) Ntone
+  call get_command_argument(3,arg); read(arg,*) Ntone
 endif
 if (narg > 3) then
-    call get_command_argument(4,arg); read(arg,*) M
+  call get_command_argument(4,arg); read(arg,*) M
 endif
 if (narg > 4) then
-    call get_command_argument(5,arg); read(arg,*) snr !dB
+  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 
 print *, "Fortran Esprit: Complex Double Precision"

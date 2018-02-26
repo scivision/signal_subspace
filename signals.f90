@@ -1,9 +1,12 @@
 module signals
   use, intrinsic:: iso_c_binding, only: c_int
-  use comm,only: wp, pi, J
+  use comm,only: wp, pi
   implicit none
 
   private
+  
+  complex(wp), parameter :: J = (0._wp,1._wp)
+  
   public :: signoise,randn
 contains
 

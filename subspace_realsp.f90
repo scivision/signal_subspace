@@ -1,12 +1,11 @@
 module subspace
     use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
     use, intrinsic:: iso_c_binding, only: c_int,c_long
-    use comm,only: wp, pi
+    use comm,only: wp, pi, debug
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
 !    private ! f2py won't import this Pi if this line exists, bug
-    logical,parameter :: debug=.true.
 ! do not put private here, because module parameters like pi won't be passed out
 ! for Numpy / f2py 1.10.4 (and other)  BUG in Numpy.
     public::esprit,pi
