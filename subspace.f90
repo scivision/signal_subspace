@@ -72,7 +72,7 @@ select case (kind(U))
     call cgetrf(L,L,W1,L,ipiv,stat) 
   case (c128)
     call zgetrf(L,L,W1,L,ipiv,stat) 
-  case default 
+  case default
     error stop 'unknown type input to GETRF'
 end select
 
@@ -86,7 +86,7 @@ select case (kind(U))
     call cgetri(L,W1,L,ipiv,Swork,Lwork,stat) 
   case (c128)
     call zgetri(L,W1,L,ipiv,Swork,Lwork,stat) 
-  case default 
+  case default
     error stop 'unknown type input to GETRI'
 end select
 
@@ -117,8 +117,8 @@ endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 
-
-ang = atan2(aimag(eig), real(eig, kind=wp))
+ang = atan2(aimag(eig), real(eig,wp))
+!ang = atan2(eig%im, eig%re)  ! Fortran 2008, Gfortran 7 doesn't support yet!!
 
 tones = abs(fs*ang/(2*pi))
 !eigenvalues

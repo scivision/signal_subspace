@@ -30,7 +30,7 @@ subroutine esprit(x,N,L,M,fs,tout,sigma) bind(c)
     real(wp) :: S(M,M),RWORK(LRATIO*M),ang(L),SWORK(LRATIO*M) !this Swork is real
     integer :: stat
     real(wp) :: W1(L,L), IPIV(M-1)
-    complex(wp) :: Phi(L,L), CWORK(LRATIO*M), junk(L,L), eig(L)
+    real(wp) :: Phi(L,L), junk(L,L), Reig(L), Ieig(L)
 
    LWORK = LRATIO*M  !at least 5M for gesvd
    ! integer(i64) :: tic,toc
@@ -82,23 +82,40 @@ if (stat /= 0) then
   write(stderr,*) 'GETRF inverse output code',stat
   error stop
 endif
+!------------ LU inversion
+select case (kind(U))
+  case (r32)
+    call sgetri(L,W1,L,ipiv,Rwork,Lwork,stat)
+  case (r64)
+    call dgetri(L,W1,L,ipiv,Rwork,Lwork,stat)
+  case default
+    error stop 'unknown type input to GETRI'
+end select
 
-call sgetri(L,W1,L,ipiv,Rwork,Lwork,stat) !LU inversion
 if (stat /= 0) then
   write(stderr,*) 'GETRI output code',stat
   error stop
 endif
+!call system_clock(toc)
 
 ! matmul is faster 
 !call sgemm('N','T',L,L,max(L,N-1),1.0,W1,L,S1,L,1.0,Phi,L) 
 !call sgemm('N','N',L,L,L,1.0,Phi,L,S2,L,1.,Phi,L)
-Phi = matmul(matmul(W1, transpose(S1)), S2)
 
-!call system_clock(toc)
+!-----------
+!call system_clock(tic)
+Phi = matmul(matmul(W1, transpose(S1)), S2)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute Phi via LU inv():',sysclock2ms(toc-tic)
 
-!call system_clock(tic)
-call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,stat)
+select case (kind(U))
+  case (r32)
+    call sgeev('N','N',L,Phi,L,Reig,Ieig,junk,L,junk,L,rwork,lwork,stat)
+  case (r64)
+    call dgeev('N','N',L,Phi,L,Reig,Ieig,junk,L,junk,L,rwork,lwork,stat)
+  case default
+    error stop 'unknown type input to GEEV'
+end select
+
 if (stat /= 0) then
   write(stderr,*) 'GEEV output code',stat
   error stop
@@ -106,8 +123,7 @@ endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
 
-
-ang = atan2(aimag(eig), real(eig, kind=wp))
+ang = atan2(Ieig, Reig)
 
 tones = abs(fs*ang/(2*pi))
 
