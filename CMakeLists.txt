@@ -12,11 +12,8 @@ if(realkind STREQUAL real32)   # -Drealkind=real32
 elseif(realkind STREQUAL real64)
   file(WRITE kind.txt "integer,parameter :: wp=real64")
   message(STATUS "real kind: real64")
-elseif(realkind STREQUAL real128)
-  file(WRITE kind.txt "integer,parameter :: wp=real128")
-  message(STATUS "real kind: real128")
 else()  # default to real64
-  file(WRITE kind.txt "integer,parameter :: wp=real64")
+  file(WRITE kind.txt "integer,parameter :: wp=real32")
   message(STATUS "real kind: real64")
 endif()
 
