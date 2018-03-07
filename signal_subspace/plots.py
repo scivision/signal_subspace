@@ -62,4 +62,4 @@ def plotfilt(b, fs:int, ofn=None):
         ofn = Path(ofn).expanduser()
         ofn = ofn.with_suffix('.png')
         print('writing',ofn)
-        fg.savefig(str(ofn),dpi=100,bbox_inches='tight')
+        fg.savefig(ofn,dpi=100,bbox_inches='tight')

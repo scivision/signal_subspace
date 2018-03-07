@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 install_requires=['numpy','scipy', 'pandas']
-tests_require=['nose','coveralls']
+tests_require=['pytest','nose','coveralls']
 # %%
 from setuptools import find_packages
 from numpy.distutils.core import setup,Extension
@@ -29,7 +29,8 @@ setup(name='signal_subspace',
                     f2py_options=['--quiet'],
                     extra_link_args=['-llapack'])],
       install_requires=install_requires,
-      extras_require={'plot':['matplotlib','seaborn'],'tests':tests_require},
+      extras_require={'plot':['matplotlib','seaborn'],
+                       'tests':tests_require},
       tests_require=tests_require,
       python_requires='>=3.6',
 	  )

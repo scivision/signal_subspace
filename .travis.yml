@@ -32,7 +32,9 @@ before_script:
    - make 
    - cd ..
 
-script: coverage run tests/Test.py -v
+script: 
+  - pytest
+  - coverage run tests/test_all.py -v
 
 after_success: coveralls
 
