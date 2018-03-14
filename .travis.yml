@@ -30,11 +30,11 @@ before_script:
    - cd bin
    - cmake ..
    - make 
-   - cd ..
 
 script: 
-  - pytest
-  - coverage run tests/test_all.py -v
+  - make test
 
-after_success: coveralls
+after_success: 
+  - coverage run ../tests/test_all.py
+  - coveralls
 

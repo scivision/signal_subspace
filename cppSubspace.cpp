@@ -7,9 +7,7 @@
 #include <vector>
 
 extern "C" void csignoise(const float*, const float*, const float*, int*, float []);
-
 extern "C" void cfircircfilter(float [], int*,float [],int*,float [],bool*);
-
 extern "C" void cesprit(float [], int*, int*, int*, const float*, float [], float []);
 
 std::vector<float> loadfiltercoeff(std::string);

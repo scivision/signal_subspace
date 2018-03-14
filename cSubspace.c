@@ -3,7 +3,6 @@
 #include <math.h>
 
 extern void csignoise(const float*, const float*, const float*, int*, float []);
-
 extern void cesprit(float [], int*, int*, int*, const float*, float [], float []);
 
 
@@ -37,6 +36,7 @@ printf("\nwith sigma:               ");
 for (int i=0; i<Ntone; i++) printf("%f ",sigma[i]);
 printf("\n");
 
+// --- ASSERT
 if (fabsf(tones[0]-f0)>0.0001*f0){
     fprintf(stderr,"E: failed to meet tolerance\n");
     free(tones); free(sigma);

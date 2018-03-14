@@ -98,7 +98,20 @@ add_executable(cesprit cSubspace.c)
 target_link_libraries(cesprit subspace_real ${CLIBS})
 set_target_properties(cesprit PROPERTIES C_STANDARD 11)
 
+#----------
+enable_testing()
 
+add_test(NAME FortranReal COMMAND fespritreal)
+add_test(NAME FortranComplex COMMAND fespritcmpl)
+add_test(NAME CReal COMMAND cesprit)
+add_test(NAME C++Real COMMAND cppesprit)
+
+find_package(PythonInterp)
+if((NOT DEFINED ENV{APPVEYOR}) AND (PYTHON_VERSION_STRING STRGREATER_EQUAL 3.6))
+#if(PYTHONINTERP_FOUND)
+  add_test(NAME Python COMMAND pytest -v
+         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+endif()
 
 #-------------------------------------------------------------------------------
 
