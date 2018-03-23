@@ -1,6 +1,6 @@
 ################################################################################
 #
-# \file      cmake/FindLMKL.cmake
+# \file      cmake/FindMKL.cmake
 # \author    J. Bakosi
 # \copyright 2012-2015, Jozsef Bakosi, 2016, Los Alamos National Security, LLC.
 # \brief     Find the Math Kernel Library from Intel
@@ -35,12 +35,20 @@ if (MKL_INCLUDE_DIRS AND MKL_LIBRARIES AND MKL_INTERFACE_LIBRARY AND
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
-  set(INT_LIB "libmkl_intel_ilp64.a")
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
+    set(INT_LIB "libmkl_gf_ilp64.a")
+  else()
+    set(INT_LIB "libmkl_intel_ilp64.a")
+  endif()
   set(SEQ_LIB "libmkl_sequential.a")
   set(THR_LIB "libmkl_intel_thread.a")
   set(COR_LIB "libmkl_core.a")
 else()
-  set(INT_LIB "mkl_intel_ilp64")
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
+    set(INT_LIB "mkl_gf_ilp64")
+  else()
+    set(INT_LIB "mkl_intel_ilp64")
+  endif()
   set(SEQ_LIB "mkl_sequential")
   set(THR_LIB "mkl_intel_thread")
   set(COR_LIB "mkl_core")
