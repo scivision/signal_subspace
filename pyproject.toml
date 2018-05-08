@@ -1,4 +1,2 @@
 [build-system]
-requires = ["setuptools", "wheel",
- "numpy",'scipy','matplotlib','pandas','seaborn',
- "nose"] 
+requires = ["setuptools", "wheel", "numpy"] 
