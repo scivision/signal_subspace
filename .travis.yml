@@ -1,3 +1,4 @@
+# gfortran >= 6 is required
 language: python
 fast_finish: true
 
@@ -7,16 +8,20 @@ python:
 os:
   - linux
 
-group: travis_latest
+env: FC=gfortran-6
 
+group: travis_latest
 
 git:
   depth: 3
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
-      - gfortran
+      - gfortran-6
+      - gcc-6
       - liblapack-dev
       - libatlas-base-dev
 
@@ -26,6 +31,9 @@ before_script:
    - cd bin
    - cmake ..
    - make 
+
+   - make test
+
    - cd ..
 
 script: pytest -v
