@@ -50,17 +50,21 @@ Recommend using Windows Subsystem for Linux.
 Install
 -------
 
-For all languages (Fortran, C, C++, Python) at once, simply type::
+::
 
     cd bin
     cmake ..
     make
+
+Test the compiled libraries::
+
+    make test    
     
-    pip install -e .
+Then you can test Python calling the Fortran libraries by::
 
-Then you can test all languages at once from the bin/ directory by::
+   pip install -e .
 
-    ../test/test.py
+   pytest -v
 
 If you have a need for speed, the `newly no-cost Intel MKL <https://software.intel.com/en-us/articles/free_mkl>`_ is 2-3 times faster than LAPACK.
 

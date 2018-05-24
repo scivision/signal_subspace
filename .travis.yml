@@ -20,11 +20,7 @@ addons:
       - liblapack-dev
       - libatlas-base-dev
 
-before_install:
-  # this is temporary for pip < 9.1
-  - pip -q install numpy
-
-install: pip -q install -e .[tests]
+install: pip install -e .[tests]
 
 before_script:
    - cd bin
@@ -32,7 +28,11 @@ before_script:
    - make 
    - cd ..
 
-script: coverage run tests/Test.py -v
+script: pytest -v
 
-after_success: coveralls
+after_success:
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then
+    coverage run ../tests/test_all.py;
+    coveralls;
+    fi
 

@@ -1,57 +1,67 @@
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.3)
 project(spectrum C CXX Fortran)
-
+enable_testing()
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
 #find_package(MKL)
 if(MKL_FOUND)
     set(MKLROOT $ENV{MKLROOT})
     include_directories(${MKL_INCLUDE_DIRS})
     # Sequential
-#    set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
-#    set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
+#    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
+#    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
     # TBB
-    set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
-    set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
+    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
+    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
     # OpenMP
-#    set(FLIBS ${FLIBS} mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
-#    set(FLIBS8 ${FLIBS8} mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
+#    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
+#    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
 else()
     find_package(ATLAS)
     if(ATLAS_FOUND)
-        set(FLIBS ${FLIBS}  ${Atlas_LAPACK_LIBRARY}) 
-        set(FLIBS8 ${FLIBS8} ${Atlas_LAPACK_LIBRARY}) 
+        list(APPEND FLIBS ${Atlas_LAPACK_LIBRARY}) 
+        list(APPEND FLIBS8 ${Atlas_LAPACK_LIBRARY}) 
     else()
         find_package(LAPACK REQUIRED) 
-        set(FLIBS ${FLIBS}  lapack) 
-        set(FLIBS8 ${FLIBS8} lapack) 
+        list(APPEND FLIBS lapack) 
+        list(APPEND FLIBS8 lapack) 
 
     endif()
 endif()
 
-if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
-    set(CLIBS ${CLIBS} ifcoremt imf svml intlc)
-    set(FFLAGS ${FFLAGS} -check all -fpe0 -warn -traceback -debug extended)
+if(${CMAKE_Fortran_COMPILER_ID} STREQUAL Intel)
+    list(APPEND CLIBS ifcoremt imf svml intlc)
+    list(APPEND FFLAGS -check all -fpe0 -warn -traceback -debug extended)
     if (MKL_FOUND)
-        set(FFLAGS8 ${FFLAGS8} -i8)
+        list(APPEND FFLAGS8 -i8)
     endif()
-else() # gfortran
+elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
+  if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 8.1)
+    list(APPEND FFLAGS -std=f2018)
+  else()
+    list(APPEND FFLAGS -std=f2008ts)
+  endif()
 # NOTE: -fdefault-integer-8 -m64  are crucial for MKL using gfortran to avoid SIGSEGV at runtime!
-    set(FLAGS ${FLAGS} -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
-    set(FFLAGS ${FFLAGS} -fall-intrinsics -std=f2008ts -fbacktrace)# -ffpe-trap=zero,overflow,underflow)
+    list(APPEND FLAGS -mtune=native -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
+    list(APPEND FFLAGS -fall-intrinsics -fbacktrace)# -ffpe-trap=zero,overflow,underflow)
     if (MKL_FOUND)
-        set(FFLAGS8 ${FFLAGS8} -fdefault-integer-8 -m64)
+        list(APPEND FFLAGS8-fdefault-integer-8 -m64)
     endif()
 endif()
 
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
-add_compile_options(-mtune=native -O3 -g ${FLAGS})
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  add_compile_options(-g -O0)
+else()
+  add_compile_options(-O3)
+endif()
+
+add_compile_options(${FLAGS})
 
 #------------------------------------------------------------------------------------------------
 add_library(comm comm.f90 perf.f90)
 target_compile_options(comm PRIVATE ${FFLAGS})
-
 
 add_library(subspace_cmpl covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_cmpl PRIVATE comm ${FLIBS8})
@@ -68,20 +78,23 @@ add_executable(fespritcmpl RunSubspace.f90)
 target_link_libraries(fespritcmpl subspace_cmpl)
 set_target_properties(fespritcmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(fespritcmpl PUBLIC ${FFLAGS})
+add_test(NAME FortranComplexEsprit COMMAND fespritcmpl)
 #------ test program: Fortran Real Single Precision -------------
 add_executable(fespritreal RunSubspace_realsp.f90)
 target_link_libraries(fespritreal subspace_real)
 set_target_properties(fespritreal PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(fespritreal PUBLIC ${FFLAGS})
+add_test(NAME FortranRealEsprit COMMAND fespritreal)
 #------ test program: C++ Real Single ---------------------------
 add_executable(cppesprit cppSubspace.cpp)
 target_link_libraries(cppesprit subspace_real ${CLIBS})
 set_target_properties(cppesprit PROPERTIES CXX_STANDARD 14)
+add_test(NAME C++Esprit COMMAND cppesprit)
 #------ test program: C Real Single -----------------------------
 add_executable(cesprit cSubspace.c)
 target_link_libraries(cesprit subspace_real ${CLIBS})
 set_target_properties(cesprit PROPERTIES C_STANDARD 11)
-
+add_test(NAME C-Esprit COMMAND cesprit)
 
 
 #-------------------------------------------------------------------------------

@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import subprocess
-from pathlib import Path
 from time import time
 import numpy as np
 from pandas import DataFrame
@@ -8,8 +6,6 @@ from pandas import DataFrame
 from signal_subspace import compute_autocovariance,esprit
 from signal_subspace.importfort import fort
 S = fort()
-
-path=Path(__file__).parents[1]
 
 #def test_signoise():
 #    noiser = S['r'].signals.randn(10)
@@ -108,18 +104,6 @@ def test_esprit():
     print('Fortran real: sec.',fortreal["time"].values[0])
 
     print('fESPRIT: Fortran faster than Python by factor:',py["time"].values[0] / fortcmpl["time"].values[0])
-
-def test_cxx():
-    subprocess.check_call([str(path / 'bin/cppesprit')])
-
-def test_c():
-    subprocess.check_call([str(path / 'bin/cesprit')])
-
-def test_fortranreal():
-    subprocess.check_call([str(path / 'bin/fespritreal')])
-
-def test_fortrancmpl():
-    subprocess.check_call([str(path / 'bin/fespritcmpl')])
 
 if __name__ == '__main__':
     #test_esprit()

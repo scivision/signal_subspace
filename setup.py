@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 install_requires=['numpy','scipy', 'pandas']
-tests_require=['nose','coveralls']
+tests_require=['pytest','nose','coveralls']
 # %%
 from setuptools import find_packages
 from numpy.distutils.core import setup,Extension
@@ -9,15 +9,18 @@ setup(name='signal_subspace',
       packages=find_packages(),
       version='1.0.0',
 	  description='1-D & 2-D signal subspace estimation methods',
+      long_description=open('README.rst').read(),
 	  author='Michael Hirsch, Ph.D.',
 	  url='https://github.com/scivision/signal_subspace',
       classifiers=[
-          'Intended Audience :: Science/Research',
           'Development Status :: 5 - Production/Stable',
+          'Environment :: Console',
+          'Intended Audience :: Science/Research',
           'License :: OSI Approved :: MIT License',
-          'Topic :: Scientific/Engineering',
           'Programming Language :: Python',
-          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
+          'Topic :: Scientific/Engineering',
           ],
       ext_modules=[Extension(name='fortsubspace_cmpl',
                     sources=['comm.f90','filters.f90', 'covariance.f90', 'subspace.f90'],
