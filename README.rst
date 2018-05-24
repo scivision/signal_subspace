@@ -50,7 +50,7 @@ Recommend using Windows Subsystem for Linux.
 Install
 -------
 
-::
+.. code:: bash
 
     cd bin
     cmake ..
@@ -59,6 +59,13 @@ Install
 Test the compiled libraries::
 
     make test    
+
+
+Note: for those using the Flang/Clang/LLVM compilers, you may need to tell the executable where to find ``libflang.so`` by something like:
+
+.. code:: bash
+
+    LD_LIBRARY_PATH=$HOME/miniconda3/lib ./cppesprit
     
 Then you can test Python calling the Fortran libraries by::
 

@@ -1,7 +1,7 @@
 program test_subspace
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int
-use comm, only: dp, init_random_seed
+use comm, only: dp, init_random_seed, err
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
@@ -49,11 +49,11 @@ allocate(x(Ns), tones(Ntone), sigma(Ntone))
 !--- checking system numerics --------------
 if (sizeof(fs) /= 8) then
     write(stderr,*) 'expected 8-byte real but you have real bytes: ', sizeof(fs)
-    error stop
+    call err('')
 endif
 if (sizeof(x(1)) /= 16) then
     write(stderr,*) 'expected 16-byte complex but you have complex bytes: ', sizeof(x(1))
-    error stop
+    call err('')
 endif
 
 !------ simulate noisy signal ------------ 
@@ -66,7 +66,7 @@ call esprit(x, size(x,kind=c_int), Ntone, M, fs, &
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------
-if (abs(tones(1)-f0) > 0.001*f0) error stop 'excessive estimation error'
+if (abs(tones(1)-f0) > 0.001*f0) call err('excessive estimation error')
 
 print '(A,100F10.2)', 'estimated tone freq [Hz]: ',tones
 print '(A,100F5.1)', 'with sigma: ',sigma

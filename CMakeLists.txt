@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.3)
 project(spectrum C CXX Fortran)
 enable_testing()
+
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
@@ -25,8 +26,7 @@ else()
     else()
         find_package(LAPACK REQUIRED) 
         list(APPEND FLIBS lapack) 
-        list(APPEND FLIBS8 lapack) 
-
+        list(APPEND FLIBS8 lapack)
     endif()
 endif()
 
@@ -39,8 +39,6 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL Intel)
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
   if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 8.1)
     list(APPEND FFLAGS -std=f2018)
-  else()
-    list(APPEND FFLAGS -std=f2008ts)
   endif()
 # NOTE: -fdefault-integer-8 -m64  are crucial for MKL using gfortran to avoid SIGSEGV at runtime!
     list(APPEND FLAGS -mtune=native -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
@@ -48,7 +46,14 @@ elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
     if (MKL_FOUND)
         list(APPEND FFLAGS8-fdefault-integer-8 -m64)
     endif()
+elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL PGI)
+  list(APPEND FFLAGS -Mallocatable=03)
+elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL Flang)
+  list(APPEND FFLAGS -Mallocatable=03)
+  list(APPEND FLIBS -static-flang-libs)
+  list(APPEND FLIBS8 -static-flang-libs)
 endif()
+
 
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -60,7 +65,12 @@ endif()
 add_compile_options(${FLAGS})
 
 #------------------------------------------------------------------------------------------------
-add_library(comm comm.f90 perf.f90)
+set(okcomp GNU Intel)
+if(CMAKE_Fortran_COMPILER_ID IN_LIST okcomp)
+  add_library(comm comm.f90 perf.f90)
+else()
+  add_library(comm comm_legacy.f90 perf.f90)
+endif()
 target_compile_options(comm PRIVATE ${FFLAGS})
 
 add_library(subspace_cmpl covariance.f90 subspace.f90 signals.f90)
@@ -68,7 +78,7 @@ target_link_libraries(subspace_cmpl PRIVATE comm ${FLIBS8})
 set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS} ${FFLAGS8})
 
-add_library(subspace_real comm.f90 filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
+add_library(subspace_real filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
 target_link_libraries(subspace_real PRIVATE comm ${FLIBS})
 set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
 target_compile_options(subspace_real PRIVATE ${FFLAGS})

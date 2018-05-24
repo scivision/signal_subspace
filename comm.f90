@@ -8,19 +8,19 @@ module comm
 contains
 
 subroutine init_random_seed()
-
     integer :: i, n, clock
     integer, allocatable :: seed(:)
 
     call random_seed(size=n)
     allocate(seed(n))
     call system_clock(count=clock)
-    
-    do concurrent (i=1:n)
-        seed(i) = clock + 37 * (i-1)
-    enddo
-
+    seed = clock + 37 * [ (i - 1, i = 1, n) ]
     call random_seed(put=seed)
 end subroutine
+
+pure subroutine err(msg)
+  character(*), intent(in) :: msg
+  error stop msg
+end subroutine err
 
 end module comm

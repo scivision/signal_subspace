@@ -1,7 +1,7 @@
 module subspace
     use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
     use, intrinsic:: iso_c_binding, only: c_int,c_long
-    use comm,only: sp
+    use comm, only: sp,err
     use covariance,only: autocov
     !use perf, only : sysclock2ms
     Implicit none
@@ -50,8 +50,7 @@ call sgesvd('A','N',M,M,R,M,S,U,M,VT,M, SWORK, LWORK,svdinfo)
 !if (debug) print *,'work(1):',swork(1)
 if (svdinfo /= 0) then
     write(stderr,*) 'SGESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
-    if (M /= LWORK/LRATIO) write(stderr,*) 'possible LWORK overflow'
-    error stop
+    if (M /= LWORK/LRATIO) call err('possible LWORK overflow')
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
@@ -64,14 +63,14 @@ W1=matmul((transpose(S1)),S1)
 
 call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
-    write(stderr,*) 'ZGETRF inverse output code',getrfinfo
-    error stop
+    write(stderr,*) 'SGETRF inverse output code',getrfinfo
+    call err('GETRF')
 endif
 
 call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then 
-    write(stderr,*) 'ZGETRI output code',getriinfo
-    error stop
+    write(stderr,*) 'SGETRI output code',getriinfo
+    call err('GETRI')
 endif
 
 !call sgemm('N','T',L,L,max(L,N-1),1.0,W1,L,S1,L,1.0,Phi,L) 
@@ -85,7 +84,7 @@ Phi = matmul(matmul(W1, transpose(S1)), S2)
 call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
     write(stderr,*) 'CGEEV output code',evinfo
-    error stop
+    call err('GEEV')
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
@@ -98,8 +97,8 @@ tones = abs(fs*ang/(2*pi))
 tout = tones(1:L:2)
 
 !eigenvalues
-do concurrent (i = 1:L/2)
-    sigma(i) = S(i,i)
+do i = 1, L/2
+  sigma(i) = S(i,i)
 enddo
 
 end subroutine esprit

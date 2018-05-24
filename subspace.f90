@@ -1,7 +1,7 @@
 module subspace
     use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
     use, intrinsic:: iso_c_binding, only: c_int
-    use comm,only: dp,pi
+    use comm,only: dp,pi,err
     use covariance,only: autocov
     !use perf, only : sysclock2ms
 
@@ -40,7 +40,7 @@ call autocov(x, size(x,kind=c_int), M, R)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
 if (svdinfo /= 0) then
     write(stderr,*) 'ZGESVD return code',svdinfo
-    error stop
+    call err('GESVD')
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
@@ -53,12 +53,12 @@ W1=matmul(conjg(transpose(S1)),S1)
 call zgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
     write(stderr,*) 'ZGETRF inverse output code',getrfinfo
-    error stop
+    call err('GETRF')
 endif
 call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then
     write(stderr,*) 'ZGETRI output code',getriinfo
-    error stop
+    call err('GETRI')
 endif
 
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
@@ -69,7 +69,7 @@ Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
     write(stderr,*) 'ZGEEVS output code',evinfo
-    error stop
+    call err('GEEV')
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
@@ -79,8 +79,8 @@ ang = atan2(aimag(eig),real(eig))
 
 tones = abs(fs*ang/(2*pi))
 !eigenvalues
-do concurrent (i=1:L/2)
-    sigma(i) = S(i,i)
+do i = 1, L/2
+  sigma(i) = S(i,i)
 enddo
 
 end subroutine esprit
