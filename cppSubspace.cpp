@@ -6,7 +6,7 @@
 #include <cmath>
 #include <vector>
 
-extern "C" void signoise(const float*, const float*, const float*, int*, float []);
+extern "C" void signoise_r(const float*, const float*, const float*, int*, float []);
 
 extern "C" void fircircfilter(float [], int*,float [],int*,float [],bool*);
 
@@ -31,7 +31,7 @@ const float f0 = float(12345.6); //arbitrary
 std::vector<float> x((size_t(Ns))); // noisy signal
 std::vector<float> y((size_t(Ns))); // filtered signal
 
-signoise(&fs, &f0, &snr, &Ns, &x.front());
+signoise_r(&fs, &f0, &snr, &Ns, &x.front());
 
 //---- filter noisy signal ------------------------
 

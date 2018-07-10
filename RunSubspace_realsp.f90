@@ -4,8 +4,8 @@ use,intrinsic:: iso_c_binding, only: c_int,c_bool
 use comm, only: sp, random_init, err
 use perf, only: sysclock2ms
 use subspace, only: esprit
-use signals,only: signoise
-use filters,only: fircircfilter
+use signals, only: signoise
+use filters, only: fircircfilter
 
 implicit none
 
@@ -58,8 +58,7 @@ if (sizeof(fs) /= 4) then
     call err('')
 endif
 !------ simulate noisy signal ------------ 
-call signoise(fs,f0,snr,Ns,&
-              x)
+call signoise(fs, f0, snr, Ns, x)   ! output "X"
 !------ filter noisy signal --------------
 ! read coefficients 'b'
 filtok=.false.
