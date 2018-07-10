@@ -8,7 +8,8 @@ from typing import Tuple
 def corrmtx(x: np.ndarray, m: int) -> np.ndarray:
     """
     from https://github.com/cokelaer/spectrum/
-    like matlab corrmtx(x,'mod'), with a different normalization factor.
+
+    like Matlab corrmtx(x, M, 'modified'), with a different normalization factor.
     """
     x = np.asarray(x, dtype=float)
     assert x.ndim == 1, '1-D only'
@@ -19,12 +20,11 @@ def corrmtx(x: np.ndarray, m: int) -> np.ndarray:
 
     C = np.zeros((2*(N-m), m+1), dtype=x.dtype)
 
-    for i in range(0, N-m):
-        C[i] = Tp[i]
+    C[:N-m, :] = Tp[:N-m, :]
 
     Tp = np.fliplr(Tp.conj())
-    for i in range(N-m, 2*(N-m)):
-        C[i] = Tp[i-N+m]
+
+    C[N-m:, :] = Tp[-N+m:, :]
 
     return C
 
@@ -67,7 +67,7 @@ def compute_autocovariance(x: np.ndarray, M: int) -> np.ndarray:
 
 
 def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
-                         Fe: int=1, f: np.ndarray=None) -> Tuple[np.ndarray, np.ndarray]:
+                         fs: int=1, f: np.ndarray=None) -> Tuple[np.ndarray, np.ndarray]:
     """
     This function compute the MUSIC pseudospectrum. The pseudo spectrum is defined as
 
@@ -79,8 +79,8 @@ def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
     :param x: ndarray of size N
     :param L: int. Number of components to be extracted.
     :param M:  int, optional. Size of signal block.
-    :param Fe: float. Sampling Frequency.
-    :param f: nd array. Frequency locations f where the pseudo spectrum is evaluated.
+    :param fs: float. Sampling Frequency.
+    :param f: ndarray. Frequency locations f where the pseudo spectrum is evaluated.
     :returns: ndarray
     """
 
@@ -89,7 +89,7 @@ def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
     N = x.size
 
     if f is None:
-        f = np.linspace(0., Fe//2, 512)
+        f = np.linspace(0., fs//2, 512)
 
     if M is None:
         M = N // 2
@@ -107,7 +107,7 @@ def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
     tic = time()
     for indice, f_temp in enumerate(f):
         # construct a (note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T)
-        vect_exp = -2j*np.pi*f_temp*np.arange(M)/Fe
+        vect_exp = -2j * np.pi * f_temp * np.arange(M) / fs
         a = np.exp(vect_exp)
         # Cost function
         cost[indice] = 1. / lg.norm(G.conj().T @ a.T)

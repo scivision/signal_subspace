@@ -3,19 +3,36 @@ import pytest
 from time import time
 import numpy as np
 from pandas import DataFrame
-#
-from signal_subspace import compute_autocovariance, esprit
+import signal_subspace as subs
 import subspace
+
+x = np.random.randn(4096).astype(np.complex128)
+
+f0 = 12345.6
+fs = 48e3
+snr = 50.  # dB
+Ntone = 2
+
+t = np.arange(0, 0.01, 1/fs)
+
+nvar = 10**(-snr/10.)
+
+xr = (np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))).real
+xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
+
+
+def test_corrmtx():
+    M = 5
+    subs.corrmtx(x.real, M)
 
 
 def test_autocov():
-    # 2x extra speedup from casting correct type
-    x = np.random.randn(4096).astype(np.complex128)
-
+    """2x extra speedup from casting correct type"""
     M = 5
     tic = time()
-    C = compute_autocovariance(x, M)
+    C = subs.compute_autocovariance(x, M)
     tocpy = time()-tic
+    print(C)
 # %%
     tic = time()
     Cc = subspace.covariance.autocov_c(x, M)
@@ -32,6 +49,10 @@ def test_autocov():
     np.testing.assert_allclose(C.real, Cr, rtol=1)
 
 
+def test_music():
+    fest, sigma = subs.rootmusic(x, L=2, M=200, fs=fs)
+
+
 def test_esprit():
     """
     ESPRIT TEST PYTHON
@@ -45,19 +66,7 @@ def test_esprit():
 
     later found literature stating ESPRIT is O(M^3) (or was it N^3?)
     """
-    f0 = 12345.6
-    fs = 48e3
-    snr = 60.  # dB
-    Ntone = 2
-# %% create signal
-    t = np.arange(0, 0.01, 1/fs)
-
-    nvar = 10**(-snr/10.)
-
-    xr = (np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))).real
-    xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
-
-    # measure signal
+# %% measure signal
     M = [100]  # iterating over block length
 
     py = DataFrame(index=M, columns=['err', 'sigma', 'time'])
@@ -67,7 +76,7 @@ def test_esprit():
     for m in M:
         # %% python
         tic = time()
-        fest, sigma = esprit(xc, Ntone//2, M=m, fs=fs, verbose=False)
+        fest, sigma = subs.esprit(xc, Ntone//2, M=m, fs=fs, verbose=False)
         toc = time()-tic
         py.loc[m, :] = [fest-f0, sigma, toc]
         np.testing.assert_allclose(fest, f0, rtol=1e-6)
@@ -77,12 +86,12 @@ def test_esprit():
 
         tic = time()
         fest, sigma = subspace.subspace.esprit_c(xc, Ntone, m, fs)
-        np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
+        np.testing.assert_allclose(fest[0], f0, rtol=1e-3)
         assert sigma[0] > 50, 'too small sigma {}'.format(sigma[0])
         fortcmpl.loc[m, :] = [fest-f0, sigma, time()-tic]
 
         fest, sigma = subspace.subspace.esprit_r(xr, Ntone, m, fs)
-        np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
+        np.testing.assert_allclose(fest[0], f0, rtol=1e-3)
         assert sigma[0] > 20, 'too small sigma {}'.format(sigma[0])
         fortreal.loc[m, :] = [fest-f0, sigma, time()-tic]
 

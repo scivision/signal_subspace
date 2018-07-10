@@ -1,18 +1,19 @@
 [![image](https://travis-ci.org/scivision/signal_subspace.svg?branch=master)](https://travis-ci.org/scivision/signal_subspace)
-[![image](https://coveralls.io/repos/github/scivision/signal_subspace/badge.svg?branch=master)](https://coveralls.io/github/scivision/signal_subspace?branch=master)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/v69y9qo536kxh9ae?svg=true)](https://ci.appveyor.com/project/scivision/signal-subspace) -->
+[![Coverage Status](https://coveralls.io/repos/github/scivision/signal_subspace/badge.svg?branch=master)](https://coveralls.io/github/scivision/signal_subspace?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/v69y9qo536kxh9ae?svg=true)](https://ci.appveyor.com/project/scivision/signal-subspace)
 [![Maintainability](https://api.codeclimate.com/v1/badges/5f2cff37394a699b5e7d/maintainability)](https://codeclimate.com/github/scivision/signal_subspace/maintainability)
+
+
 
 # Signal Subspace
 
 1-D and ensemble signal subspace analysis with methods such as Esprit
 and RootMusic in Fortran, C, and Python
 
-based in part upon the [Spectral Analysis Lib public domain
-code](https://github.com/vincentchoqueuse/spectral_analysis_project)
+based in part upon the 
+[Spectral Analysis Lib public domain code](https://github.com/vincentchoqueuse/spectral_analysis_project)
 
-The core subspace code is written in Fortran 2008 and is called from
-other languages (Python, C).
+The core subspace code is written in Fortran 2008 and is called from other languages (Python, C).
 
 ## Building
 
@@ -42,12 +43,6 @@ cmake --build .
 Test the compiled libraries:
 
     ctest -V  
-
-Note: for those using the Flang/Clang/LLVM compilers, you may need to tell the executable where to find `libflang.so` by something like:
-
-```sh
-LD_LIBRARY_PATH=$HOME/miniconda3/lib ./cppesprit
-```
 
 Then you can test Python calling the Fortran libraries by:
 
@@ -115,6 +110,12 @@ apt remove libatlas-base-dev
 You may need
 ```sh
 apt install libc++abi-dev
+```
+
+Note: for those using the Flang/Clang/LLVM compilers, you may need to tell the executable where to find `libflang.so` by something like:
+
+```sh
+LD_LIBRARY_PATH=$HOME/miniconda3/lib ./cppesprit
 ```
 
 ### Plots comparing Fortran to Python
