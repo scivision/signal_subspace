@@ -8,7 +8,7 @@ module comm
 
 contains
 
-subroutine init_random_seed()
+subroutine random_init()
     integer :: i, n, clock
     integer, allocatable :: seed(:)
 
@@ -19,7 +19,7 @@ subroutine init_random_seed()
     call random_seed(put=seed)
 end subroutine
 
-pure subroutine err(msg)
+subroutine err(msg)
   character(*), intent(in) :: msg
   write(stderr,*) msg
   stop -1

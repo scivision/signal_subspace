@@ -1,5 +1,6 @@
 module comm
     use, intrinsic :: iso_c_binding, only: sp=>C_FLOAT, dp=>C_DOUBLE, int64=>C_LONG_LONG, sizeof=>c_sizeof
+    use, intrinsic :: iso_fortran_env, only: stderr=>error_unit
     implicit none
     
     complex(dp),parameter :: J=(0._dp, 1._dp)
@@ -7,7 +8,7 @@ module comm
 
 contains
 
-subroutine init_random_seed()
+subroutine random_init()
     integer :: i, n, clock
     integer, allocatable :: seed(:)
 
@@ -18,9 +19,10 @@ subroutine init_random_seed()
     call random_seed(put=seed)
 end subroutine
 
-pure subroutine err(msg)
+subroutine err(msg)
   character(*), intent(in) :: msg
-  error stop msg
+  write(stderr,*) msg
+  error stop 
 end subroutine err
 
 end module comm

@@ -4,7 +4,8 @@ from numpy import linalg as lg
 from time import time
 #
 
-def corrmtx(x,m):
+
+def corrmtx(x, m):
     """
     from https://github.com/cokelaer/spectrum/
     like matlab corrmtx(x,'mod'), with a different normalization factor.
@@ -27,8 +28,8 @@ def corrmtx(x,m):
 
     return C
 
-def compute_autocovariance(x,M):
 
+def compute_autocovariance(x, M):
     r""" This function compute the auto-covariance matrix of a numpy signal. The auto-covariance is computed as follows
 
         .. math:: \textbf{R}=\frac{1}{N}\sum_{M-1}^{N-1}\textbf{x}_{m}\textbf{x}_{m}^{H}
@@ -46,21 +47,22 @@ def compute_autocovariance(x,M):
     assert x.ndim == 1, '1-D only'
     N = x.size
 
-    #Create column vector (Nx1) from row array
-    x_vect = x[None,:].T
+    # Create column vector (Nx1) from row array
+    x_vect = x[None, :].T
 
     # init covariance matrix
     yn = x_vect[M-1::-1]  # reverse order from M-1 to 0
 
-    R = yn @ yn.conj().T #zeroth lag
-    #about 5-8% of computation time
-    for i in range(1, N-M): #no zero because we just computed it
-        #extract the column vector
+    R = yn @ yn.conj().T  # zeroth lag
+    # about 5-8% of computation time
+    for i in range(1, N-M):  # no zero because we just computed it
+        # extract the column vector
         yn = x_vect[M-1+i:i-1:-1]
 
         R = R + yn @ yn.conj().T
 
     return R / N
+
 
 def pseudospectrum_MUSIC(x, L, M=None, Fe=1, f=None):
     r""" This function compute the MUSIC pseudospectrum. The pseudo spectrum is defined as
@@ -88,28 +90,28 @@ def pseudospectrum_MUSIC(x, L, M=None, Fe=1, f=None):
     if M is None:
         M = N // 2
 
-    #extract noise subspace
-    R = compute_autocovariance(x,M)
-    U,S,V = lg.svd(R)
-    G = U[:,L:]
+    # extract noise subspace
+    R = compute_autocovariance(x, M)
+    U, S, V = lg.svd(R)
+    G = U[:, L:]
 
-    #compute MUSIC pseudo spectrum
+    # compute MUSIC pseudo spectrum
     N_f = f.shape
     cost = np.zeros(N_f)
 
-    tic=time()
-    for indice,f_temp in enumerate(f):
+    tic = time()
+    for indice, f_temp in enumerate(f):
         # construct a (note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T)
         vect_exp = -2j*np.pi*f_temp*np.arange(M)/Fe
         a = np.exp(vect_exp)
-        #Cost function
-        cost[indice]=1. / lg.norm(G.conj().T @ a.T)
+        # Cost function
+        cost[indice] = 1. / lg.norm(G.conj().T @ a.T)
 
-    print('pmusic: sec. to compute:',time()-tic)
+    print('pmusic: sec. to compute:', time()-tic)
     return f, cost
 
-def rootmusic(x, L, M=None, fs=1):
 
+def rootmusic(x, L, M=None, fs=1):
     r""" This function estimate the frequency components based on the root-MUSIC algorithm [BAR83]_ .
     The root-Music algorithm find the roots of the following polynomial
 
@@ -132,45 +134,44 @@ def rootmusic(x, L, M=None, fs=1):
     if M is None:
         M = N // 2
 
-    #extract noise subspace
-    R = compute_autocovariance(x,M)
-    U,S,V = lg.svd(R)
-    G = U[:,L:]
+    # extract noise subspace
+    R = compute_autocovariance(x, M)
+    U, S, V = lg.svd(R)
+    G = U[:, L:]
 
-    #construct matrix P
+    # construct matrix P
     P = G @ G.conj().T
 
-    #construct polynomial Q
-    Q = np.zeros(2*M-1,dtype='complex128')
-    #Extract the sum in each diagonal  0.1% of computation time
-    for (idx,val) in enumerate(range(M-1, -M, -1)):
+    # construct polynomial Q
+    Q = np.zeros(2*M-1, dtype='complex128')
+    # Extract the sum in each diagonal  0.1% of computation time
+    for (idx, val) in enumerate(range(M-1, -M, -1)):
         Q[idx] = P.diagonal(val).sum()
 
-
-    #Compute the roots 92% of computation time here
+    # Compute the roots 92% of computation time here
     tic = time()
     rts = np.roots(Q)
     print(time()-tic)
 
-    #Keep the roots with radii <1 and with non zero imaginary part
+    # Keep the roots with radii <1 and with non zero imaginary part
     rts = rts[abs(rts) < 1]
     rts = rts[rts.imag != 0]
 
-    #Find the L roots closest to the unit circle
+    # Find the L roots closest to the unit circle
     distance_from_circle = abs(abs(rts)-1)
     index_sort = distance_from_circle.argsort()
     component_roots = rts[index_sort[:L]]
 
-    #extract frequencies ((note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T))
+    # extract frequencies ((note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T))
     ang = -np.angle(component_roots)
 
-    #frequency normalisation
+    # frequency normalisation
     f = fs*ang / (2.*np.pi)
 
     return f, S[:L]
 
-def esprit(x, L, M=None, fs=1, verbose=False):
 
+def esprit(x, L, M=None, fs=1, verbose=False):
     r""" This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
 
         The frequencies are related to the roots as :math:`z=e^{-2j\pi f/Fe}`. See [STO97]_ section 4.7 for more information about the implementation.
@@ -191,45 +192,46 @@ def esprit(x, L, M=None, fs=1, verbose=False):
         """
 
     x = np.asarray(x).squeeze()
-    assert x.ndim in (1,2)
+    assert x.ndim in (1, 2)
     # length of the vector x
-    if x.ndim==1:
-        N=x.size
+    if x.ndim == 1:
+        N = x.size
     else:
-        N=x.shape[1]
+        N = x.shape[1]
 
     if M is None:
         M = N // 2
-#%% extract signal subspace  99.9 % of computation time
-    tic=time()
-    if x.ndim==1:
-        R = compute_autocovariance(x, M) #75% of computation time
+# %% extract signal subspace  99.9 % of computation time
+    tic = time()
+    if x.ndim == 1:
+        R = compute_autocovariance(x, M)  # 75% of computation time
     else:
-        R = np.cov(x, rowvar=False) # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
+        # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
+        R = np.cov(x, rowvar=False)
     if verbose:
         print('autocov sec.', time()-tic)
-    #R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
+    # R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
 
-    tic=time()
-    U, S, V = lg.svd(R) #25% of computation time
+    tic = time()
+    U, S, V = lg.svd(R)  # 25% of computation time
     if verbose:
         print('svd sec.', time()-tic)
-#%% take eigenvalues and determine sinusoid frequencies
-    #Remove last row
-    S1 = U[:-1,:L]
-    #Remove first row
-    S2 = U[1:,:L]
+# %% take eigenvalues and determine sinusoid frequencies
+    # Remove last row
+    S1 = U[:-1, :L]
+    # Remove first row
+    S2 = U[1:, :L]
 
-    #Compute matrix Phi (Stoica 4.7.12)  <0.1 % of computation time
+    # Compute matrix Phi (Stoica 4.7.12)  <0.1 % of computation time
     Phi = lg.inv(S1.conj().T @ S1) @ S1.conj().T @ S2
 
-    #Perform eigenvalue decomposition <0.1 % of computation time
+    # Perform eigenvalue decomposition <0.1 % of computation time
     V, U = lg.eig(Phi)
 
-    #extract frequencies ((note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T))
+    # extract frequencies ((note that there a minus sign since Yn are defined as [y(n), y(n-1),y(n-2),..].T))
     ang = -np.angle(V)
 
-    #frequency normalisation
+    # frequency normalisation
     f = fs*ang / (2.*np.pi)
 
     return f, S[:L]

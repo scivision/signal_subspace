@@ -1,19 +1,21 @@
 # gfortran >= 6 is required
 language: python
-fast_finish: true
+sudo: required
+dist: xenial
+group: travis_latest
+
+git:
+  depth: 3
+  quiet: true
 
 python:
   - 3.6
+  - 3.7
 
 os:
   - linux
 
 env: FC=gfortran-6
-
-group: travis_latest
-
-git:
-  depth: 3
 
 addons:
   apt:
@@ -30,17 +32,20 @@ install: pip install -e .[tests]
 before_script:
    - cd bin
    - cmake ..
-   - make 
+   - cmake --build .
 
-   - make test
+   - ctest -V
 
    - cd ..
 
-script: pytest -v
+script: 
+  - pytest -sv
+  - flake8
+  - mypy . --ignore-missing-imports
 
 after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.6* ]]; then
-    coverage run ../tests/test_all.py;
+    pytest --cov;
     coveralls;
     fi
 

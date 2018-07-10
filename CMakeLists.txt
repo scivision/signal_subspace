@@ -2,6 +2,12 @@ cmake_minimum_required (VERSION 3.3)
 project(spectrum C CXX Fortran)
 enable_testing()
 
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  add_compile_options(-g -O0)
+else()
+  add_compile_options(-O3)
+endif()
+
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
@@ -32,12 +38,12 @@ endif()
 
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL Intel)
     list(APPEND CLIBS ifcoremt imf svml intlc)
-    list(APPEND FFLAGS -check all -fpe0 -warn -traceback -debug extended)
+   # list(APPEND FFLAGS -check all -fpe0 -warn -traceback -debug extended)
     if (MKL_FOUND)
         list(APPEND FFLAGS8 -i8)
     endif()
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
-  if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 8.1)
+  if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 8)
     list(APPEND FFLAGS -std=f2018)
   endif()
 # NOTE: -fdefault-integer-8 -m64  are crucial for MKL using gfortran to avoid SIGSEGV at runtime!
@@ -49,6 +55,7 @@ elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL PGI)
   list(APPEND FFLAGS -Mallocatable=03)
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL Flang)
+  list(APPEND CXXLIBS)  # Not needed:  stdc++ c++abi   Don't use: -stdlib=libc++
   list(APPEND FFLAGS -Mallocatable=03)
   list(APPEND FLIBS -static-flang-libs)
   list(APPEND FLIBS8 -static-flang-libs)
@@ -56,11 +63,7 @@ endif()
 
 
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  add_compile_options(-g -O0)
-else()
-  add_compile_options(-O3)
-endif()
+
 
 add_compile_options(${FLAGS})
 
@@ -72,32 +75,35 @@ else()
   add_library(comm comm_legacy.f90 perf.f90)
 endif()
 target_compile_options(comm PRIVATE ${FFLAGS})
+set_target_properties(comm PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(subspace_cmpl covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_cmpl PRIVATE comm ${FLIBS8})
-set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
+set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl
+                                               POSITION_INDEPENDENT_CODE ON)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS} ${FFLAGS8})
 
 add_library(subspace_real filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals_realsp.f90)
 target_link_libraries(subspace_real PRIVATE comm ${FLIBS})
-set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
+set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real
+                                               POSITION_INDEPENDENT_CODE ON)
 target_compile_options(subspace_real PRIVATE ${FFLAGS})
 
 #------ test program: Fortran Complex Double Precision ----------
 add_executable(fespritcmpl RunSubspace.f90)
 target_link_libraries(fespritcmpl subspace_cmpl)
 set_target_properties(fespritcmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl)
-target_compile_options(fespritcmpl PUBLIC ${FFLAGS})
+target_compile_options(fespritcmpl PRIVATE ${FFLAGS})
 add_test(NAME FortranComplexEsprit COMMAND fespritcmpl)
 #------ test program: Fortran Real Single Precision -------------
 add_executable(fespritreal RunSubspace_realsp.f90)
 target_link_libraries(fespritreal subspace_real)
 set_target_properties(fespritreal PROPERTIES Fortran_MODULE_DIRECTORY mod.real)
-target_compile_options(fespritreal PUBLIC ${FFLAGS})
+target_compile_options(fespritreal PRIVATE ${FFLAGS})
 add_test(NAME FortranRealEsprit COMMAND fespritreal)
 #------ test program: C++ Real Single ---------------------------
 add_executable(cppesprit cppSubspace.cpp)
-target_link_libraries(cppesprit subspace_real ${CLIBS})
+target_link_libraries(cppesprit subspace_real ${CLIBS} ${CXXLIBS})
 set_target_properties(cppesprit PROPERTIES CXX_STANDARD 14)
 add_test(NAME C++Esprit COMMAND cppesprit)
 #------ test program: C Real Single -----------------------------
