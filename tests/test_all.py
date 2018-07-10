@@ -5,24 +5,7 @@ import numpy as np
 from pandas import DataFrame
 #
 from signal_subspace import compute_autocovariance, esprit
-from signal_subspace.importfort import fort
-S = fort()
-
-
-def test_signoise():
-    fs = 8000
-    f0 = 1000
-    snr = 20
-    Ns = 100
-
-    xr = S['r'].signals.signoise(fs, f0, snr, Ns)
-    xc = S['c'].signals.signoise(fs, f0, snr, Ns)
-
-    assert xr.size == Ns
-    assert xc.size == Ns
-
-    assert xr.dtype == np.float32
-    assert xc.dtype == np.complex128
+import subspace
 
 
 def test_autocov():
@@ -35,11 +18,11 @@ def test_autocov():
     tocpy = time()-tic
 # %%
     tic = time()
-    Cc = S['c'].covariance.autocov(x, M)
+    Cc = subspace.covariance.autocov_c(x, M)
     tocfortcmpl = time()-tic
 
     tic = time()
-    Cr = S['r'].covariance.autocov(x.real, M)
+    Cr = subspace.covariance.autocov_r(x.real, M)
     tocfortreal = time() - tic
 
     print('autocovariance: Complex: Fortran faster than Python by factor:', tocpy/tocfortcmpl)
@@ -66,18 +49,13 @@ def test_esprit():
     fs = 48e3
     snr = 60.  # dB
     Ntone = 2
-    Ns = 1024
 # %% create signal
     t = np.arange(0, 0.01, 1/fs)
 
     nvar = 10**(-snr/10.)
 
-    if True:
-        xr = S['r'].signals.signoise(fs, f0, snr, Ns)
-        xc = S['c'].signals.signoise(fs, f0, snr, Ns)
-    else:
-        xr = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))
-        xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
+    xr = (np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))).real
+    xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
 
     # measure signal
     M = [100]  # iterating over block length
@@ -98,12 +76,12 @@ def test_esprit():
 # %% fortran
 
         tic = time()
-        fest, sigma = S['c'].subspace.esprit(xc, Ntone, m, fs)
+        fest, sigma = subspace.subspace.esprit_c(xc, Ntone, m, fs)
         np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
         assert sigma[0] > 50, 'too small sigma {}'.format(sigma[0])
         fortcmpl.loc[m, :] = [fest-f0, sigma, time()-tic]
 
-        fest, sigma = S['r'].subspace.esprit(xr, Ntone, m, fs)
+        fest, sigma = subspace.subspace.esprit_r(xr, Ntone, m, fs)
         np.testing.assert_allclose(fest[0], f0, rtol=1e-6)
         assert sigma[0] > 20, 'too small sigma {}'.format(sigma[0])
         fortreal.loc[m, :] = [fest-f0, sigma, time()-tic]

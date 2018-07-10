@@ -3,10 +3,9 @@ import numpy as np
 from scipy.signal import periodogram, remez, freqz, lfilter
 from time import time
 from matplotlib.pyplot import subplots, show
-#
-from signal_subspace.importfort import fort
+import subspace
 from signal_subspace.filter import fircirc
-S = fort()
+
 
 fs = 48e3
 F = 12345.6  # arbitrary
@@ -22,7 +21,7 @@ def main():
     xr = np.cos(2*np.pi*F*t) + 0.01*np.random.randn(t.size)
     # %% estimate sinusoid frequency
 
-    festc, sigmac = S['c'].subspace.esprit(xc, Ntone//2, M, fs)
+    festc, sigmac = subspace.subspace.esprit_c(xc, Ntone//2, M, fs)
 
     print('complex')
     print(festc)
@@ -37,7 +36,7 @@ def main():
     tscipy = time()-tic
 
     tic = time()
-    yrfort = S['r'].filters.fircircfilter(xr.astype(np.float32), b)[0]
+    yrfort = subspace.filters.fircircfilter(xr.astype(np.float32), b)[0]
     tfort = time()-tic
     np.testing.assert_allclose(yrfort, yrpy, rtol=1e-4)  # single prec vs double prec
 
@@ -46,7 +45,7 @@ def main():
     print('{:.6f} sec. using circular buffer FIR filter'.format(time()-tic))
     np.testing.assert_allclose(yr, yrpy)
 # %% estimations
-    festr, sigmar = S['r'].subspace.esprit(yr, Ntone, M, fs)
+    festr, sigmar = subspace.subspace.esprit_r(yr, Ntone, M, fs)
     print('real')
     print(festr)
     print(sigmar)
