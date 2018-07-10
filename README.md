@@ -1,6 +1,6 @@
 [![image](https://travis-ci.org/scivision/signal_subspace.svg?branch=master)](https://travis-ci.org/scivision/signal_subspace)
 [![image](https://coveralls.io/repos/github/scivision/signal_subspace/badge.svg?branch=master)](https://coveralls.io/github/scivision/signal_subspace?branch=master)
-[![Build status](https://ci.appveyor.com/api/projects/status/v69y9qo536kxh9ae?svg=true)](https://ci.appveyor.com/project/scivision/signal-subspace)
+<!-- [![Build status](https://ci.appveyor.com/api/projects/status/v69y9qo536kxh9ae?svg=true)](https://ci.appveyor.com/project/scivision/signal-subspace) -->
 [![Maintainability](https://api.codeclimate.com/v1/badges/5f2cff37394a699b5e7d/maintainability)](https://codeclimate.com/github/scivision/signal_subspace/maintainability)
 
 # Signal Subspace

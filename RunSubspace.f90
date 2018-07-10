@@ -20,7 +20,7 @@ real(dp),allocatable :: tones(:),sigma(:)
 
 integer(int64) :: tic,toc
 integer :: narg
-character(len=16) :: arg
+character(16) :: arg
 
 call random_init()
 !----------- parse command line ------------------
@@ -28,19 +28,19 @@ M = Ns / 4_c_int
 narg = command_argument_count()
 
 if (narg > 0) then
-    call get_command_argument(1,arg); read(arg,*) Ns
+  call get_command_argument(1,arg); read(arg,*) Ns
 endif
 if (narg > 1) then
-    call get_command_argument(2,arg); read(arg,*) fs
+  call get_command_argument(2,arg); read(arg,*) fs
 endif
 if (narg > 2) then
-    call get_command_argument(3,arg); read(arg,*) Ntone
+  call get_command_argument(3,arg); read(arg,*) Ntone
 endif
 if (narg > 3) then
-    call get_command_argument(4,arg); read(arg,*) M
+  call get_command_argument(4,arg); read(arg,*) M
 endif
 if (narg > 4) then
-    call get_command_argument(5,arg); read(arg,*) snr !dB
+  call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 
 print *, "Fortran Esprit: Complex Double Precision"
@@ -48,12 +48,12 @@ print *, "Fortran Esprit: Complex Double Precision"
 allocate(x(Ns), tones(Ntone), sigma(Ntone))
 !--- checking system numerics --------------
 if (sizeof(fs) /= 8) then
-    write(stderr,*) 'expected 8-byte real but you have real bytes: ', sizeof(fs)
-    call err('')
+  write(stderr,*) 'expected 8-byte real but you have real bytes: ', sizeof(fs)
+  call err('')
 endif
 if (sizeof(x(1)) /= 16) then
-    write(stderr,*) 'expected 16-byte complex but you have complex bytes: ', sizeof(x(1))
-    call err('')
+  write(stderr,*) 'expected 16-byte complex but you have complex bytes: ', sizeof(x(1))
+  call err('')
 endif
 
 !------ simulate noisy signal ------------ 
@@ -70,12 +70,10 @@ if (abs(tones(1)-f0) > 0.001*f0) call err('excessive estimation error')
 
 print '(A,100F10.2)', 'estimated tone freq [Hz]: ',tones
 print '(A,100F5.1)', 'with sigma: ',sigma
-print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic)/1000
+print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic) / 1000
 
 print *,'OK'
 
 ! deallocate(x,tones,sigma) ! this is automatic going out of scope
 end program test_subspace
-
-
 
