@@ -2,10 +2,10 @@ import numpy as np
 from scipy.linalg import toeplitz
 from numpy import linalg as lg
 from time import time
-#
+from typing import Tuple
 
 
-def corrmtx(x, m):
+def corrmtx(x: np.ndarray, m: int) -> np.ndarray:
     """
     from https://github.com/cokelaer/spectrum/
     like matlab corrmtx(x,'mod'), with a different normalization factor.
@@ -29,17 +29,19 @@ def corrmtx(x, m):
     return C
 
 
-def compute_autocovariance(x, M):
-    r""" This function compute the auto-covariance matrix of a numpy signal. The auto-covariance is computed as follows
+def compute_autocovariance(x: np.ndarray, M: int) -> np.ndarray:
+    """
+    This function compute the auto-covariance matrix of a numpy signal.
+    The auto-covariance is computed as follows
 
-        .. math:: \textbf{R}=\frac{1}{N}\sum_{M-1}^{N-1}\textbf{x}_{m}\textbf{x}_{m}^{H}
+    .. math:: \textbf{R}=\frac{1}{N}\sum_{M-1}^{N-1}\textbf{x}_{m}\textbf{x}_{m}^{H}
 
-        where :math:`\textbf{x}_{m}^{T}=[x[m],x[m-1],x[m-M+1]]`.
+    where :math:`\textbf{x}_{m}^{T}=[x[m],x[m-1],x[m-M+1]]`.
 
-        :param x: 1-D vector of size N
-        :param M:  int, optional. Size of signal block.
-        :returns: NxN ndarray
-        """
+    :param x: 1-D vector of size N
+    :param M:  int, optional. Size of signal block.
+    :returns: NxN ndarray
+    """
 
     # Create covariance matrix for psd estimation
     # length of the vector x
@@ -64,38 +66,41 @@ def compute_autocovariance(x, M):
     return R / N
 
 
-def pseudospectrum_MUSIC(x, L, M=None, Fe=1, f=None):
-    r""" This function compute the MUSIC pseudospectrum. The pseudo spectrum is defined as
+def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
+                         Fe: int=1, f: np.ndarray=None) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    This function compute the MUSIC pseudospectrum. The pseudo spectrum is defined as
 
-        .. math:: S(f)=\frac{1}{\|\textbf{G}^{H}\textbf{a}(f) \|}
+    .. math:: S(f)=\frac{1}{\|\textbf{G}^{H}\textbf{a}(f) \|}
 
-        where :math:`\textbf{G}` corresponds to the noise subspace and :math:`\textbf{a}(f)` is the steering vector.
-        The peak locations give the frequencies of the signal.
+    where :math:`\textbf{G}` corresponds to the noise subspace and :math:`\textbf{a}(f)` is the steering vector.
+    The peak locations give the frequencies of the signal.
 
-        :param x: ndarray of size N
-        :param L: int. Number of components to be extracted.
-        :param M:  int, optional. Size of signal block.
-        :param Fe: float. Sampling Frequency.
-        :param f: nd array. Frequency locations f where the pseudo spectrum is evaluated.
-        :returns: ndarray
-        """
+    :param x: ndarray of size N
+    :param L: int. Number of components to be extracted.
+    :param M:  int, optional. Size of signal block.
+    :param Fe: float. Sampling Frequency.
+    :param f: nd array. Frequency locations f where the pseudo spectrum is evaluated.
+    :returns: ndarray
+    """
 
     # length of the vector x
     assert x.ndim == 1, '1-D only'
     N = x.size
 
-    if any(f) is None:
+    if f is None:
         f = np.linspace(0., Fe//2, 512)
 
     if M is None:
         M = N // 2
 
-    # extract noise subspace
+# %% extract noise subspace
+    assert isinstance(M, int)
     R = compute_autocovariance(x, M)
     U, S, V = lg.svd(R)
     G = U[:, L:]
 
-    # compute MUSIC pseudo spectrum
+# %% compute MUSIC pseudo spectrum
     N_f = f.shape
     cost = np.zeros(N_f)
 
@@ -108,33 +113,36 @@ def pseudospectrum_MUSIC(x, L, M=None, Fe=1, f=None):
         cost[indice] = 1. / lg.norm(G.conj().T @ a.T)
 
     print('pmusic: sec. to compute:', time()-tic)
+
     return f, cost
 
 
-def rootmusic(x, L, M=None, fs=1):
-    r""" This function estimate the frequency components based on the root-MUSIC algorithm [BAR83]_ .
+def rootmusic(x: np.ndarray, L: int, M: int=None, fs: int=1) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    This function estimate the frequency components based on the root-MUSIC algorithm [BAR83]_ .
     The root-Music algorithm find the roots of the following polynomial
 
-        .. math:: P(z)=\textbf{a}^{H}(z)\textbf{G}\textbf{G}^{H}\textbf{a}(z)
+    .. math:: P(z)=\textbf{a}^{H}(z)\textbf{G}\textbf{G}^{H}\textbf{a}(z)
 
-        The frequencies are related to the roots as
+    The frequencies are related to the roots as
 
-        .. math:: z=e^{-2j\pi f/Fe}
+    .. math:: z=e^{-2j\pi f/Fe}
 
-        :param x: ndarray, vector: Nsamples
-        :param L: int. Number of components to be extracted.
-        :param M:  int, optional. Size of signal block.
-        :param fs:  Sampling Frequency. [Hz]
-        :returns: ndarray containing the L frequencies
+    :param x: ndarray, vector: Nsamples
+    :param L: int. Number of components to be extracted.
+    :param M:  int, optional. Size of signal block.
+    :param fs:  Sampling Frequency. [Hz]
+    :returns: ndarray containing the L frequencies
     """
-   # length of the vector x
+    # length of the vector x
     assert x.ndim == 1, '1-D only'
     N = x.size
 
     if M is None:
         M = N // 2
 
-    # extract noise subspace
+# %% extract noise subspace
+    assert isinstance(M, int)
     R = compute_autocovariance(x, M)
     U, S, V = lg.svd(R)
     G = U[:, L:]
@@ -142,7 +150,7 @@ def rootmusic(x, L, M=None, fs=1):
     # construct matrix P
     P = G @ G.conj().T
 
-    # construct polynomial Q
+# %% construct polynomial Q
     Q = np.zeros(2*M-1, dtype='complex128')
     # Extract the sum in each diagonal  0.1% of computation time
     for (idx, val) in enumerate(range(M-1, -M, -1)):
@@ -171,25 +179,28 @@ def rootmusic(x, L, M=None, fs=1):
     return f, S[:L]
 
 
-def esprit(x, L, M=None, fs=1, verbose=False):
-    r""" This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
+def esprit(x: np.ndarray, L: int, M: int=None, fs: int=1,
+           verbose: bool=False) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
 
-        The frequencies are related to the roots as :math:`z=e^{-2j\pi f/Fe}`. See [STO97]_ section 4.7 for more information about the implementation.
+    The frequencies are related to the roots as :math:`z=e^{-2j\pi f/Fe}`.
+    See [STO97]_ section 4.7 for more information about the implementation.
 
-        :param x: ndarray, Nsamples
-        :param L: int. Number of components to be extracted.
-        :param M:  int, optional. Size of signal block.
-        :param Fs: float. Sampling Frequency.
-        :returns: ndarray ndarray containing the L frequencies
+    :param x: ndarray, Nsamples
+    :param L: int. Number of components to be extracted.
+    :param M:  int, optional. Size of signal block.
+    :param Fs: float. Sampling Frequency.
+    :returns: ndarray ndarray containing the L frequencies
 
-        >>> import numpy as np
-        >>> import spectral_analysis.spectral_analysis as sa
-        >>> Fe=500
-        >>> t=1.*np.arange(100)/Fe
-        >>> x=np.exp(2j*np.pi*55.2*t)
-        >>> f=sa.Esprit(x,1,None,Fe)
-        >>> print(f)
-        """
+    >>> import numpy as np
+    >>> import spectral_analysis.spectral_analysis as sa
+    >>> Fe=500
+    >>> t=1.*np.arange(100)/Fe
+    >>> x=np.exp(2j*np.pi*55.2*t)
+    >>> f=sa.Esprit(x,1,None,Fe)
+    >>> print(f)
+    """
 
     x = np.asarray(x).squeeze()
     assert x.ndim in (1, 2)
@@ -203,7 +214,7 @@ def esprit(x, L, M=None, fs=1, verbose=False):
         M = N // 2
 # %% extract signal subspace  99.9 % of computation time
     tic = time()
-    if x.ndim == 1:
+    if x.ndim == 1 and isinstance(M, int):
         R = compute_autocovariance(x, M)  # 75% of computation time
     else:
         # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful

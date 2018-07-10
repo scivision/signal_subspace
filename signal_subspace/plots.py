@@ -31,7 +31,7 @@ def plot_noisehist():
     show()
 
 
-def plotfilt(b, fs: int, ofn=None):
+def plotfilt(b: np.ndarray, fs: int, ofn: Path=None):
     if fs is None:
         fs = 1  # normalized freq
 

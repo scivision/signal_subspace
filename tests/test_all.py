@@ -8,16 +8,26 @@ from signal_subspace import compute_autocovariance, esprit
 from signal_subspace.importfort import fort
 S = fort()
 
-def test_signoise():
-    noiser = S['r'].signals.randn(10)
-    assert isinstance(noiser[0], np.float32)
 
-    noisec = S['c'].signals.randn(10)
-    assert isinstance(noisec[0], np.complex128)
+def test_signoise():
+    fs = 8000
+    f0 = 1000
+    snr = 20
+    Ns = 100
+
+    xr = S['r'].signals.signoise(fs, f0, snr, Ns)
+    xc = S['c'].signals.signoise(fs, f0, snr, Ns)
+
+    assert xr.size == Ns
+    assert xc.size == Ns
+
+    assert xr.dtype == np.float32
+    assert xc.dtype == np.complex128
 
 
 def test_autocov():
-    x = np.random.randn(4096).astype(np.complex128)  # 2x extra speedup from casting correct type
+    # 2x extra speedup from casting correct type
+    x = np.random.randn(4096).astype(np.complex128)
 
     M = 5
     tic = time()
@@ -62,12 +72,12 @@ def test_esprit():
 
     nvar = 10**(-snr/10.)
 
-    xr = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))
-    xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
-
-    if False:
+    if True:
         xr = S['r'].signals.signoise(fs, f0, snr, Ns)
         xc = S['c'].signals.signoise(fs, f0, snr, Ns)
+    else:
+        xr = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))
+        xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
 
     # measure signal
     M = [100]  # iterating over block length

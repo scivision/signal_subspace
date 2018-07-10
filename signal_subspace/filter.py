@@ -3,19 +3,19 @@ import numpy as np
 import scipy.signal as signal
 
 
-def fircoef(L, fc, fs):
+def fircoef(L: int, fc: float, fs: int) -> np.ndarray:
     """
     remez uses normalized frequency, where 0.5 is Nyquist frequency
     fc: corner frequency [Hz]
 
     """
 
-    fcn = fc/(0.5*fs)
+    fcn = fc / (0.5*fs)
 
     return signal.remez(L, [0, 0.6*fcn, fcn, 0.5], [0, 1])
 
 
-def fircirc(b, x):
+def fircirc(b: np.ndarray, x: np.ndarray) -> np.ndarray:
     """
     This function may be a candidate for Numba or Cython speedup
     """

@@ -2,7 +2,8 @@ from numpy.testing import assert_allclose
 from numpy import pi
 import logging
 
-def fort():
+
+def fort() -> dict:
 
     S = {}
     try:
@@ -23,4 +24,3 @@ def fort():
         logging.error(f'problem importing Fortran subspace real  {e}')
 
     return S
-
