@@ -83,7 +83,7 @@ set_target_properties(subspace_cmpl PROPERTIES Fortran_MODULE_DIRECTORY mod.cmpl
                                                POSITION_INDEPENDENT_CODE ON)
 target_compile_options(subspace_cmpl PRIVATE ${FFLAGS} ${FFLAGS8})
 
-add_library(subspace_real filters.f90 covariance_realsp.f90 subspace_realsp.f90 signals.f90)
+add_library(subspace_real filters.f90 covariance.f90 subspace.f90 signals.f90)
 target_link_libraries(subspace_real PRIVATE comm ${FLIBS})
 set_target_properties(subspace_real PROPERTIES Fortran_MODULE_DIRECTORY mod.real
                                                POSITION_INDEPENDENT_CODE ON)

@@ -12,12 +12,12 @@ module signals
     procedure signoise_r, signoise_c
   end interface signoise
   
-  private
+  private :: randn
   
   real(dp) :: pi = 4._dp * atan(1._dp)
   real(sp) :: pi_sp = 4._sp * atan(1._sp)
   
-  public :: signoise
+  public :: signoise, signoise_r, signoise_c  ! latter two for f2py
 contains
 
 subroutine signoise_c(fs,f0,snr,Ns,x) bind(c)

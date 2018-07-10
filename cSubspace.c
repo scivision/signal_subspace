@@ -4,7 +4,7 @@
 
 extern void signoise_r(const float*, const float*, const float*, int*, float []);
 
-extern void esprit(float [], int*, int*, int*, const float*, float [], float []);
+extern void esprit_r(float [], int*, int*, int*, const float*, float [], float []);
 
 
 int main () {
@@ -26,7 +26,7 @@ signoise_r(&fs, &f0, &snr, &Ns, &x[0]);
 float * tones = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));
 float * sigma = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));
 
-esprit(&x[0], &Ns, &Ntone, &M, &fs, &tones[0], &sigma[0]);
+esprit_r(&x[0], &Ns, &Ntone, &M, &fs, &tones[0], &sigma[0]);
 
 free(x);
 
