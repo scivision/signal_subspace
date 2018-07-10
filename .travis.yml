@@ -19,13 +19,18 @@ env: FC=gfortran-6
 
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
+#    sources:
+#      - ubuntu-toolchain-r-test
     packages:
-      - gfortran-6
-      - gcc-6
+#      - gfortran-6
+#      - gcc-6
       - liblapack-dev
       - libatlas-base-dev
+      
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -q
+  - sudo apt-get install -yq gfortran-6 gcc-6 g++-6
 
 install: pip install -e .[tests]
 
