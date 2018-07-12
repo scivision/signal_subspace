@@ -9,7 +9,7 @@ fcomp=(gfortran gfortran-5 gfortran-6 gfortran-7 gfortran-8 ifort pgf95 flang   
 ccomp=(gcc      gcc-5      gcc-6      gcc-7      gcc-8      icc   pgcc  clang   gcc)
 pcomp=(g++      g++-5      g++-6      g++-7      g++-8      icpc  pgc++ clang++ g++)
 # --- loops
-for i in 1 2 3 4 6
+for i in {1..5}
 do
 
 (
@@ -32,7 +32,8 @@ then
   echo "testing with"
   echo $FC  $CC  $CXX
   echo "press Enter to proceed."
-  read
+  read skip
+  [[ $skip == "s" ]] && continue
 else
   echo
   echo "${red}*** skipping $FC $CC $CXX *** ${reset}"

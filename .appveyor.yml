@@ -1,5 +1,5 @@
 image:
-- Visual Studio 2017
+#  - Visual Studio 2017  # no Lapack in Windows AppVeyor
 # - Ubuntu   too old CMake 3.5
 
 stack: python 3

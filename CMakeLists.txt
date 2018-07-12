@@ -20,19 +20,17 @@ if(MKL_FOUND)
 #    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
     # TBB
     list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
-    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
+#    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
     # OpenMP
 #    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
 #    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
 else()
     find_package(ATLAS)
     if(ATLAS_FOUND)
-        list(APPEND FLIBS ${Atlas_LAPACK_LIBRARY}) 
-        list(APPEND FLIBS8 ${Atlas_LAPACK_LIBRARY}) 
+        list(APPEND FLIBS ${Atlas_LAPACK_LIBRARY})
     else()
         find_package(LAPACK REQUIRED) 
-        list(APPEND FLIBS lapack) 
-        list(APPEND FLIBS8 lapack)
+        list(APPEND FLIBS ${LAPACK_LIBRARIES})
     endif()
 endif()
 
@@ -58,7 +56,6 @@ elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL Flang)
   list(APPEND CXXLIBS)  # Not needed:  stdc++ c++abi   Don't use: -stdlib=libc++
   list(APPEND FFLAGS -Mallocatable=03)
   list(APPEND FLIBS -static-flang-libs)
-  list(APPEND FLIBS8 -static-flang-libs)
 endif()
 
 
@@ -78,7 +75,7 @@ target_compile_options(comm PRIVATE ${FFLAGS})
 set_target_properties(comm PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(subspace filters.f90 covariance.f90 subspace.f90 signals.f90)
-target_link_libraries(subspace PRIVATE comm ${FLIBS8})
+target_link_libraries(subspace PRIVATE comm ${FLIBS})
 set_target_properties(subspace PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(subspace PRIVATE ${FFLAGS} ${FFLAGS8})
 
