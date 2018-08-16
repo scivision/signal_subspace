@@ -20,8 +20,10 @@ init:
 - sh: sudo apt-get install -yq --no-install-suggests --no-install-recommends liblapack-dev > /dev/null
 
 install:
-#- pip install -e .[tests]   # FIXME: need to figure out f2py on AppVeyor
-
+- pip install -e .[tests]
+- cmd: del *.pyd
+- cmd: python setup.py build_ext --inplace --compiler=mingw32
+ 
 - cd bin
 - cmd: cmake -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND" ..
 - sh: cmake ..
@@ -30,5 +32,6 @@ install:
 test_script:
 - ctest -V
 - cd ..
-#- pytest -rsv
+
+- pytest -rsv
 
