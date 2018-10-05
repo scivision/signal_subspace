@@ -21,8 +21,6 @@ init:
 
 install:
 - pip install -e .[tests]
-- cmd: del *.pyd
-- cmd: python setup.py build_ext --inplace --compiler=mingw32
  
 - cd bin
 - cmd: cmake -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND" ..
