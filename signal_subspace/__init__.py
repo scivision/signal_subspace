@@ -34,9 +34,9 @@ def compute_autocovariance(x: np.ndarray, M: int) -> np.ndarray:
     This function compute the auto-covariance matrix of a numpy signal.
     The auto-covariance is computed as follows
 
-    .. math:: \textbf{R}=\frac{1}{N}\sum_{M-1}^{N-1}\textbf{x}_{m}\textbf{x}_{m}^{H}
+    .. math:: R= frac{1}{N} sum_{M-1}^{N-1} textbf{x}_{m} textbf{x}_{m}^{H}
 
-    where :math:`\textbf{x}_{m}^{T}=[x[m],x[m-1],x[m-M+1]]`.
+    where :math:`textbf{x}_{m}^{T}=[x[m],x[m-1],x[m-M+1]]`.
 
     :param x: 1-D vector of size N
     :param M:  int, optional. Size of signal block.
@@ -66,12 +66,12 @@ def compute_autocovariance(x: np.ndarray, M: int) -> np.ndarray:
     return R / N
 
 
-def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
-                         fs: int=1, f: np.ndarray=None) -> Tuple[np.ndarray, np.ndarray]:
+def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int = None,
+                         fs: int = 1, f: np.ndarray = None) -> Tuple[np.ndarray, np.ndarray]:
     """
     This function compute the MUSIC pseudospectrum. The pseudo spectrum is defined as
 
-    .. math:: S(f)=\frac{1}{\|\textbf{G}^{H}\textbf{a}(f) \|}
+    .. math:: S(f)=\frac{1}{ |\textbf{G}^{H}\textbf{a}(f)  |}
 
     where :math:`\textbf{G}` corresponds to the noise subspace and :math:`\textbf{a}(f)` is the steering vector.
     The peak locations give the frequencies of the signal.
@@ -117,7 +117,7 @@ def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int=None,
     return f, cost
 
 
-def rootmusic(x: np.ndarray, L: int, M: int=None, fs: int=1) -> Tuple[np.ndarray, np.ndarray]:
+def rootmusic(x: np.ndarray, L: int, M: int = None, fs: int = 1) -> Tuple[np.ndarray, np.ndarray]:
     """
     This function estimate the frequency components based on the root-MUSIC algorithm [BAR83]_ .
     The root-Music algorithm find the roots of the following polynomial
@@ -126,7 +126,7 @@ def rootmusic(x: np.ndarray, L: int, M: int=None, fs: int=1) -> Tuple[np.ndarray
 
     The frequencies are related to the roots as
 
-    .. math:: z=e^{-2j\pi f/Fe}
+    .. math:: z=e^{-2j pi f/Fe}
 
     :param x: ndarray, vector: Nsamples
     :param L: int. Number of components to be extracted.
@@ -179,12 +179,12 @@ def rootmusic(x: np.ndarray, L: int, M: int=None, fs: int=1) -> Tuple[np.ndarray
     return f, S[:L]
 
 
-def esprit(x: np.ndarray, L: int, M: int=None, fs: int=1,
-           verbose: bool=False) -> Tuple[np.ndarray, np.ndarray]:
+def esprit(x: np.ndarray, L: int, M: int = None, fs: int = 1,
+           verbose: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """
     This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
 
-    The frequencies are related to the roots as :math:`z=e^{-2j\pi f/Fe}`.
+    The frequencies are related to the roots as :math:`z=e^{-2j pi f/Fe}`.
     See [STO97]_ section 4.7 for more information about the implementation.
 
     :param x: ndarray, Nsamples

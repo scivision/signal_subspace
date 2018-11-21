@@ -24,7 +24,7 @@ complex(dp),intent(in) :: x(N)
 real(dp),intent(in) :: fs
 real(dp),intent(out) :: tones(L),sigma(L)
 
-integer :: LWORK,i
+integer :: LWORK
 complex(dp) :: R(M,M), U(M,M), VT(M,M), S1(M-1,L), S2(M-1,L)
 real(dp) :: S(M,M), RWORK(8*M), ang(L)
 integer :: getrfinfo,getriinfo, evinfo, svdinfo
@@ -84,10 +84,9 @@ endif
 ang = atan2(aimag(eig),real(eig))
 
 tones = abs(fs*ang/(2*pi))
-!eigenvalues
-do i = 1, L/2
-  sigma(i) = S(i,i)
-enddo
+
+!eigenvalues  - NOT diag!!
+sigma(:) = S(:L/2,1)
 
 end subroutine esprit_c
 
@@ -100,7 +99,7 @@ real(sp),intent(in) :: fs
 real(sp),intent(out) :: tout(L/2),sigma(L)
 
 real(sp) :: tones(L)
-integer :: i,lwork
+integer :: lwork
 
 real, parameter :: pi = 4._sp * atan(1._sp)
 
@@ -176,10 +175,8 @@ tones = abs(fs*ang/(2*pi))
 
 tout = tones(1:L:2)
 
-!eigenvalues
-do i = 1, L/2
-  sigma(i) = S(i,i)
-enddo
+!eigenvalues  - NOT diag!!
+sigma(:) = S(:L/2,1)
 
 end subroutine esprit_r
 

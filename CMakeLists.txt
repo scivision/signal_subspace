@@ -2,15 +2,10 @@ cmake_minimum_required (VERSION 3.7)
 project(spectrum C CXX Fortran)
 enable_testing()
 
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  add_compile_options(-g -O0)
-else()
-  add_compile_options(-O3)
-endif()
-
 #------------ subspace library ---------------
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
+
 #find_package(MKL)
 if(MKL_FOUND)
     set(MKLROOT $ENV{MKLROOT})
@@ -25,51 +20,23 @@ if(MKL_FOUND)
 #    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
 #    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
 else()
-    find_package(ATLAS)
-    if(ATLAS_FOUND)
-        list(APPEND FLIBS ${Atlas_LAPACK_LIBRARY})
-    else()
-        find_package(LAPACK REQUIRED) 
-        list(APPEND FLIBS ${LAPACK_LIBRARIES})
-    endif()
-endif()
-
-if(${CMAKE_Fortran_COMPILER_ID} STREQUAL Intel)
-    list(APPEND CLIBS ifcoremt imf svml intlc)
-   # list(APPEND FFLAGS -check all -fpe0 -warn -traceback -debug extended)
-    if (MKL_FOUND)
-        list(APPEND FFLAGS8 -i8)
-    endif()
-elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
-  if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 8)
-    list(APPEND FFLAGS -std=f2018)
-  endif()
-# NOTE: -fdefault-integer-8 -m64  are crucial for MKL using gfortran to avoid SIGSEGV at runtime!
-    list(APPEND FLAGS -mtune=native -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
-    list(APPEND FFLAGS -fall-intrinsics -fbacktrace)# -ffpe-trap=zero,overflow,underflow)
-    if (MKL_FOUND)
-        list(APPEND FFLAGS8-fdefault-integer-8 -m64)
-    endif()
-elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL PGI)
-  list(APPEND FFLAGS -Mallocatable=03)
-elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL Flang)
-  list(APPEND CXXLIBS)  # Not needed:  stdc++ c++abi   Don't use: -stdlib=libc++
-  list(APPEND FFLAGS -Mallocatable=03)
-  list(APPEND FLIBS -static-flang-libs)
+    set(BLA_VENDOR ATLAS)
+    find_package(LAPACK REQUIRED) 
+    list(APPEND FLIBS ${LAPACK_LIBRARIES})
 endif()
 
 
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
-
+include(cmake/compilers.cmake)
 
 add_compile_options(${FLAGS})
 
 #------------------------------------------------------------------------------------------------
-set(okcomp GNU Intel)
-if(CMAKE_Fortran_COMPILER_ID IN_LIST okcomp)
-  add_library(comm comm.f90 perf.f90)
+add_library(comm perf.f90)
+if(f2008)
+  target_sources(comm PRIVATE comm.f90)
 else()
-  add_library(comm comm_legacy.f90 perf.f90)
+  target_sources(comm PRIVATE comm_legacy.f90)
 endif()
 target_compile_options(comm PRIVATE ${FFLAGS})
 set_target_properties(comm PROPERTIES POSITION_INDEPENDENT_CODE ON)
