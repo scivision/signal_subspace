@@ -2,64 +2,39 @@ cmake_minimum_required (VERSION 3.7)
 project(spectrum C CXX Fortran)
 enable_testing()
 
-#------------ subspace library ---------------
+option(USE_MKL "use Intel MKL")
 # we build separate libraries for real and complex to avoid polymorphic performance hits and complexities.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
 
-#find_package(MKL)
-if(MKL_FOUND)
-    set(MKLROOT $ENV{MKLROOT})
-    include_directories(${MKL_INCLUDE_DIRS})
-    # Sequential
-#    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_sequential mkl_core pthread dl m)
-#    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_sequential mkl_core pthread dl m)
-    # TBB
-    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
-#    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_tbb_thread mkl_core tbb stdc++ pthread dl m)
-    # OpenMP
-#    list(APPEND FLIBS mkl_blas95_lp64 mkl_lapack95_lp64 mkl_gf_lp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
-#    list(APPEND FLIBS8 mkl_blas95_ilp64 mkl_lapack95_ilp64 mkl_gf_ilp64 mkl_intel_thread mkl_core iomp5 pthread dl m)
-else()
-    set(BLA_VENDOR ATLAS)
-    find_package(LAPACK REQUIRED) 
-    list(APPEND FLIBS ${LAPACK_LIBRARIES})
-endif()
-
-
+include(cmake/math.cmake)
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
 include(cmake/compilers.cmake)
 
 add_compile_options(${FLAGS})
 
-#------------------------------------------------------------------------------------------------
-add_library(comm perf.f90)
+add_library(subspace SHARED filters.f90 covariance.f90 subspace.f90 signals.f90 perf.f90)
 if(f2008)
-  target_sources(comm PRIVATE comm.f90)
+  target_sources(subspace PRIVATE comm.f90)
 else()
-  target_sources(comm PRIVATE comm_legacy.f90)
+  target_sources(subspace PRIVATE comm_legacy.f90)
 endif()
-target_compile_options(comm PRIVATE ${FFLAGS})
-set_target_properties(comm PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_library(subspace filters.f90 covariance.f90 subspace.f90 signals.f90)
-target_link_libraries(subspace PRIVATE comm ${FLIBS})
-set_target_properties(subspace PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_compile_options(subspace PRIVATE ${FFLAGS} ${FFLAGS8})
+target_link_libraries(subspace PRIVATE ${FLIBS})
+target_compile_options(subspace PRIVATE ${FFLAGS})
 
 #------ test program: Fortran Complex Double Precision ----------
 add_executable(fespritcmpl RunSubspace.f90)
-target_link_libraries(fespritcmpl subspace)
+target_link_libraries(fespritcmpl subspace ${FLIBS})
 target_compile_options(fespritcmpl PRIVATE ${FFLAGS})
 add_test(NAME FortranComplexEsprit COMMAND fespritcmpl)
 #------ test program: Fortran Real Single Precision -------------
 add_executable(fespritreal RunSubspace_realsp.f90)
-target_link_libraries(fespritreal subspace)
+target_link_libraries(fespritreal subspace ${FLIBS})
 target_compile_options(fespritreal PRIVATE ${FFLAGS})
 add_test(NAME FortranRealEsprit COMMAND fespritreal)
 #------ test program: C++ Real Single ---------------------------
 add_executable(cppesprit cppSubspace.cpp)
 target_link_libraries(cppesprit subspace ${CLIBS} ${CXXLIBS})
-set_target_properties(cppesprit PROPERTIES CXX_STANDARD 14)
+set_target_properties(cppesprit PROPERTIES CXX_STANDARD 11)
 add_test(NAME C++Esprit COMMAND cppesprit)
 #------ test program: C Real Single -----------------------------
 add_executable(cesprit cSubspace.c)

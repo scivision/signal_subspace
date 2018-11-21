@@ -47,12 +47,12 @@ print *, "Fortran Esprit: Complex Double Precision"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), tones(Ntone), sigma(Ntone))
 !--- checking system numerics --------------
-if (sizeof(fs) /= 8) then
-  write(stderr,*) 'expected 8-byte real but you have real bytes: ', sizeof(fs)
+if (storage_size(fs) /= 64) then
+  write(stderr,*) 'expected 64-bit real but you have: ', storage_size(fs)
   call err('')
 endif
-if (sizeof(x(1)) /= 16) then
-  write(stderr,*) 'expected 16-byte complex but you have complex bytes: ', sizeof(x(1))
+if (storage_size(x(1)) /= 128) then
+  write(stderr,*) 'expected 128-bit complex but you have: ', storage_size(x(1))
   call err('')
 endif
 

@@ -36,22 +36,29 @@ In particular, this program (Fortran, called by C or C++ optionally) works from 
 ```sh
 cd bin
 cmake ..
+
 cmake --build .
+```
+By default, ATLAS is searched for, then any other LAPACK library.
+The no-cost 
+[Intel MKL](https://software.intel.com/en-us/articles/free_mkl) 
+can be 2-3 times faster than LAPACK.sh, and is requested by:
+```cmake
+cmake -DUSE_MKL=on ..
 ```
 
 Test the compiled libraries:
-
-    ctest -V  
+```sh
+ctest -V  
+```
 
 Then you can test Python calling the Fortran libraries by:
+```sh
+pip install -e .
 
-    pip install -e .
+pytest -v
+```
 
-    pytest -v
-
-If you have a need for speed, the no-cost 
-[Intel MKL](https://software.intel.com/en-us/articles/free_mkl) 
-can be 2-3 times faster than LAPACK.
 
 In the examples below, you will observe the frequency estimates printed
 along with their corresponding eigenvalues, where a larger eigenvalue
@@ -62,39 +69,43 @@ estimate.
 
 ### ESPRIT example with noisy sinusoid
 
-There are two versions of this program, one a full accuracy using
-`double complex` numbers, and the other using `single real` numbers as
-input. The single real (4 bytes/number) runs about 4 times faster than
-the double complex (16 bytes/number) program.:
+There are two versions of this program, one a full accuracy using `double complex` numbers, and the other using `single real` numbers as input. 
+The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.:
+```sh
+./fespritcmpl
 
-    ./fespritcmpl
-
-    ./fespritreal
+./fespritreal
+```
 
 ### C ESPRIT example with noisy sinusoid
 
 Here is an example of calling Fortran Esprit from C, which uses real
 single precision float:
-
-    ./cesprit
+```sh
+./cesprit
+```
 
 ### C++ ESPRIT example with noisy sinusoid
 
 Here is an example of calling Fortran Esprit from C++, which uses real
 single precision float:
-
-    ./cppesprit
+```sh
+./cppesprit
+```
 
 ## Python
 
 ### Compile Fortran ESPRIT to use from Python via f2py
 
-    pip install -e .
+```sh
+pip install -e .
+```
 
-### Selftest Fortran/C/C++/Python Esprit from Python
+Selftest Fortran/C/C++/Python Esprit from Python:
+```sh
+pytest
+```
 
-    ./test.py
-    
 ## Notes
 
 > /liblapack.so: undefined reference to `ATL_zgeru'
@@ -111,12 +122,7 @@ You may need
 apt install libc++abi-dev
 ```
 
-Note: for those using the Flang/Clang/LLVM compilers, you may need to tell the executable where to find `libflang.so` by something like:
-
-```sh
-LD_LIBRARY_PATH=$HOME/miniconda3/lib ./cppesprit
-```
-
 ### Plots comparing Fortran to Python
-
-    ./BasicEspritExample.py
+```sh
+./BasicEspritExample.py
+```

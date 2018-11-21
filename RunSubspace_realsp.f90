@@ -53,8 +53,8 @@ print *, "Fortran Esprit: Real Single Precision"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
 !--- checking system numerics --------------
-if (sizeof(fs) /= 4) then
-  write(stderr,*) 'expected 4-byte real but you have real bytes: ', sizeof(fs)
+if (storage_size(fs) /= 32) then
+  write(stderr,*) 'expected 32-bit real but you have : ', storage_size(fs)
   call err('')
 endif
 !------ simulate noisy signal ------------ 
