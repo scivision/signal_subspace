@@ -81,7 +81,7 @@ def test_esprit():
         toc = time()-tic
         py.loc[m, :] = [fest-f0, sigma, toc]
 
-        assert fest == approx(f0, rel=1e-6)
+        assert fest == approx(f0, rel=1e-3)
         assert sigma[0] > 50, f'too small sigma {sigma[0]}'
         #  print(f'PYTHON time signal N= {xc.size} M={m} freq {fest} Hz, sigma {sigma}, time {toc:.4f} sec')
 # %% fortran
