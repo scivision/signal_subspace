@@ -21,7 +21,6 @@ addons:
     - gfortran-6
     - gcc-6
     - liblapack-dev
-    - libatlas-base-dev
 
 matrix:
   include:
@@ -30,15 +29,16 @@ matrix:
     install: pip install -e .[tests,cov]
     script:
     - flake8
-    - mypy . --ignore-missing-imports
+    - mypy .
     after_success:
     - pytest --cov
     - coveralls
-  - os: osx
-    language: sh
-    before_install: brew install gcc
-    install: pip3 install -e .[tests]
-    script: pytest -rsv
+#  - os: osx
+#    language: sh
+#    before_install: brew install gcc
+#    install: pip3 install -e .[tests]
+#    script: pytest -rsv
+
 
 install:
 - pip install -e .[tests]
