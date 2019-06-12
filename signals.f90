@@ -1,23 +1,23 @@
 module signals
-  use, intrinsic:: iso_c_binding, only: c_int
-  use comm, only: sp, dp, J
-  
-  implicit none
-  
-  interface randn
-    procedure randn_r, randn_c
-  end interface randn
-  
-  interface signoise
-    procedure signoise_r, signoise_c
-  end interface signoise
-  
-  private
-  
-  real(dp) :: pi = 4._dp * atan(1._dp)
-  real(sp) :: pi_sp = 4._sp * atan(1._sp)
-  
-  public :: signoise
+use, intrinsic:: iso_c_binding, only: c_int
+use comm, only: sp, dp, J
+
+implicit none
+
+interface randn
+  procedure randn_r, randn_c
+end interface randn
+
+interface signoise
+  procedure signoise_r, signoise_c
+end interface signoise
+
+private
+
+real(dp) :: pi = 4._dp * atan(1._dp)
+real(sp) :: pi_sp = 4._sp * atan(1._sp)
+
+public :: signoise
 contains
 
 subroutine signoise_c(fs,f0,snr,Ns,x) bind(c)

@@ -50,7 +50,7 @@ if (Bok){
 
 if (verbose) std::cout << "Bok: " << Bok << " filtok: " << filtok << std::endl;
 
-if (!Bok or !filtok){
+if (!Bok || !filtok){
     std::cerr << "C++ Esprit: skipping filter." << std::endl;
     y=x;
 }
@@ -60,7 +60,7 @@ std::vector<float> tones((size_t(Ntone)));
 std::vector<float> sigma((size_t(Ntone)));
 
 // if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
-esprit_r(&y.front(), &Ns, &Ntone, &M, &fs, 
+esprit_r(&y.front(), &Ns, &Ntone, &M, &fs,
                       &tones.front(), &sigma.front());
 
 
@@ -98,7 +98,7 @@ if (!Bfile.is_open()){
 char val[20];
 Bfile.getline(val,20); // how many coeff in file (first line)
 int Nb = atoi(val); // NOTE: Fortran has signed integers only.
-if (Nb<1 or Nb>10000){
+if (Nb<1 || Nb>10000){
     std::cerr << "E: Failed to obtain number of coefficients from " << Bfn << std::endl;
     return Bfilt;
 }
@@ -113,7 +113,7 @@ while(iss>>val){
     Bfilt[i] = float(atof(val));
     if (verbose) std::cout << "B[" << i <<"]= " << Bfilt[i] << std::endl;
     ++i;
-} 
+}
 
 if (i != size_t(Nb)){
     std::cerr << "E: read " << i << " coeff from " << Bfn << " but expected " << Nb << std::endl;

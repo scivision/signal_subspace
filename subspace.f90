@@ -1,19 +1,19 @@
 module subspace
-  use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
-  use, intrinsic:: iso_c_binding, only: c_int
-  use comm,only: sp, dp,pi,err, debug
-  use covariance,only: autocov
-  !use perf, only : sysclock2ms
+use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
+use, intrinsic:: iso_c_binding, only: c_int
+use comm, only: sp, dp,pi, debug
+use covariance,only: autocov
+!use perf, only : sysclock2ms
 
-  Implicit none
-  
-  interface esprit
-    procedure esprit_c, esprit_r
-  end interface esprit
+Implicit none
 
-  private
-  
-  public :: esprit, esprit_c, esprit_r  ! latter two for f2py
+interface esprit
+  procedure esprit_c, esprit_r
+end interface esprit
+
+private
+
+public :: esprit, esprit_c, esprit_r  ! latter two for f2py
 
 contains
 
@@ -45,7 +45,7 @@ call autocov(x, size(x,kind=c_int), M, R)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
 if (svdinfo /= 0) then
   write(stderr,*) 'ZGESVD return code',svdinfo
-  call err('GESVD')
+  error stop 'GESVD'
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
@@ -58,13 +58,13 @@ W1=matmul(conjg(transpose(S1)),S1)
 call zgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
   write(stderr,*) 'ZGETRF inverse output code',getrfinfo
-  call err('GETRF')
+  error stop 'GETRF'
 endif
 
 call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then
   write(stderr,*) 'ZGETRI output code',getriinfo
-  call err('GETRI')
+  error stop 'GETRI'
 endif
 
 Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
@@ -75,7 +75,7 @@ Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
   write(stderr,*) 'ZGEEVS output code',evinfo
-  call err('GEEV')
+  error stop 'GEEV'
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)
@@ -129,7 +129,7 @@ call sgesvd('A','N',M,M,R,M,S,U,M,VT,M, SWORK, LWORK,svdinfo)
 !if (debug) print *,'work(1):',swork(1)
 if (svdinfo /= 0) then
   write(stderr,*) 'SGESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
-  if (M /= LWORK/LRATIO) call err('possible LWORK overflow')
+  if (M /= LWORK/LRATIO) error stop 'possible LWORK overflow'
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute SVD:',sysclock2ms(toc-tic)
@@ -143,16 +143,16 @@ W1=matmul((transpose(S1)),S1)
 call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
   write(stderr,*) 'SGETRF inverse output code',getrfinfo
-  call err('GETRF')
+  error stop 'GETRF'
 endif
 
 call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
-if (getriinfo /= 0) then 
+if (getriinfo /= 0) then
   write(stderr,*) 'SGETRI output code',getriinfo
-  call err('GETRI')
+  error stop 'GETRI'
 endif
 
-!call sgemm('N','T',L,L,max(L,N-1),1.0,W1,L,S1,L,1.0,Phi,L) 
+!call sgemm('N','T',L,L,max(L,N-1),1.0,W1,L,S1,L,1.0,Phi,L)
 !call sgemm('N','N',L,L,L,1.0,Phi,L,S2,L,1.,Phi,L)
 Phi = matmul(matmul(W1, transpose(S1)), S2)
 
@@ -163,7 +163,7 @@ Phi = matmul(matmul(W1, transpose(S1)), S2)
 call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
   write(stderr,*) 'CGEEV output code',evinfo
-  call err('GEEV')
+  error stop 'GEEV'
 endif
 !call system_clock(toc)
 !if (sysclock2ms(toc-tic).gt.1.) write(stdout,*) 'ms to compute eigenvalues:',sysclock2ms(toc-tic)

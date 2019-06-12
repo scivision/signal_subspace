@@ -1,7 +1,7 @@
-program test_subspace
+
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int,c_bool
-use comm, only: sp, random_init, err
+use comm, only: sp, rand_init
 use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals, only: signoise
@@ -19,7 +19,7 @@ character(*),parameter :: bfn='../bfilt.txt'
 integer(c_int) :: M,Nb
 integer:: fstat
 logical(c_bool) :: filtok
- 
+
 
 real(sp),allocatable :: x(:), b(:), y(:)
 real(sp),allocatable :: tones(:),sigma(:)
@@ -28,7 +28,7 @@ integer(int64) :: tic,toc
 integer :: narg,u
 character(16) :: arg
 
-call random_init()
+call rand_init(.false., .false.)
 !----------- parse command line ------------------
 M = Ns / 2_c_int
 narg = command_argument_count()
@@ -55,9 +55,9 @@ allocate(x(Ns), y(Ns), tones(Ntone/2), sigma(Ntone/2))
 !--- checking system numerics --------------
 if (storage_size(fs) /= 32) then
   write(stderr,*) 'expected 32-bit real but you have : ', storage_size(fs)
-  call err('')
+  error stop
 endif
-!------ simulate noisy signal ------------ 
+!------ simulate noisy signal ------------
 call signoise(fs, f0, snr, Ns, x)   ! output "X"
 !------ filter noisy signal --------------
 ! read coefficients 'b'
@@ -89,7 +89,7 @@ call esprit(y, size(y,kind=c_int), Ntone, M, fs, &
 call system_clock(toc)
 
 ! -- assert <0.1% error ---------
-if (abs(tones(1)-f0) > 0.001*f0) call err('excessive frequency estimation error')
+if (abs(tones(1)-f0) > 0.001*f0) error stop 'excessive frequency estimation error'
 
 print '(A,100F10.2)', 'estimated tone freq [Hz]: ',tones
 print '(A,100F5.1)', 'with sigma: ',sigma
@@ -98,5 +98,5 @@ print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic) / 10
 print *,'OK'
 
 ! deallocate(x,y,tones,sigma)  ! this is automatic going out of scope
-end program test_subspace
+end program
 
