@@ -5,16 +5,17 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL Intel)
     endif()
 
     if(WIN32)
-      list(APPEND FFLAGS /heap-arrays)
+      list(APPEND FFLAGS /warn:declarations /heap-arrays)
     else()
-      list(APPEND FFLAGS -heap-arrays)
+      list(APPEND FFLAGS -warn declarations -heap-arrays)
     endif()
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL GNU)
   if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 8)
     list(APPEND FFLAGS -std=f2018)
   endif()
 
-    list(APPEND FLAGS -mtune=native -Wall -Werror=array-bounds -Wextra -Wpedantic -fexceptions)
+    list(APPEND FLAGS -mtune=native -Wall -Werror=array-bounds
+            -Wextra -Wpedantic -fexceptions -fimplicit-none)
     #list(APPEND FFLAGS  -ffpe-trap=zero,overflow,underflow)
 
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL PGI)
