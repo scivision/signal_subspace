@@ -1,9 +1,9 @@
+subprojects/
 .mypy_cache/
 .pytest_cache/
 *.asc
 *.png
 *.txt
-bin/
 
 *.mod
 

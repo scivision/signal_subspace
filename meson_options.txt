@@ -1,0 +1,2 @@
+option('arith', type : 'string', value: 'sdcz',
+  description: 'real kind: s=real32, d=real64, c=complex64, z=complex128')
