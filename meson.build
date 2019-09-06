@@ -9,7 +9,15 @@ if not lapack.found()
   lapack = lapack_proj.get_variable('lapack')
 endif
 
-subspace = library('subspace', 'filters.f90', 'covariance.f90', 'subspace.f90', 'signals.f90', 'perf.f90', 'comm.f90', dependencies : lapack)
+if fc.links('call random_init(.false., .false.); end', name: 'F2018 random_init')
+  comm_src = 'comm.f90'
+else
+  comm_src = 'comm_legacy.f90'
+endif
+
+subspace = library('subspace',
+  sources: ['filters.f90', 'covariance.f90', 'subspace.f90', 'signals.f90', 'perf.f90', comm_src],
+  dependencies : lapack)
 
 fespritcmpl = executable('fespritcmpl', 'RunSubspace.f90', link_with : subspace)
 test('Complex Esprit', fespritcmpl, timeout: 30)
