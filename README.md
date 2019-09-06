@@ -1,7 +1,4 @@
-[![image](https://travis-ci.org/scivision/signal_subspace.svg?branch=master)](https://travis-ci.org/scivision/signal_subspace)
-[![Coverage Status](https://coveralls.io/repos/github/scivision/signal_subspace/badge.svg?branch=master)](https://coveralls.io/github/scivision/signal_subspace?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/5f2cff37394a699b5e7d/maintainability)](https://codeclimate.com/github/scivision/signal_subspace/maintainability)
-[![Build status](https://ci.appveyor.com/api/projects/status/v69y9qo536kxh9ae?svg=true)](https://ci.appveyor.com/project/scivision/signal-subspace)
+[![Actions Status](https://github.com/scivision/signal_subspace/workflows/ci/badge.svg)](https://github.com/scivision/signal_subspace/actions)
 
 
 # Signal Subspace
@@ -9,7 +6,7 @@
 1-D and ensemble signal subspace analysis with methods such as Esprit
 and RootMusic in Fortran, C, and Python
 
-based in part upon the 
+based in part upon the
 [Spectral Analysis Lib public domain code](https://github.com/vincentchoqueuse/spectral_analysis_project)
 
 The core subspace code is written in Fortran 2008 and is called from other languages (Python, C).
@@ -40,8 +37,8 @@ cmake ..
 cmake --build .
 ```
 By default, ATLAS is searched for, then any other LAPACK library.
-The no-cost 
-[Intel MKL](https://software.intel.com/en-us/articles/free_mkl) 
+The no-cost
+[Intel MKL](https://software.intel.com/en-us/articles/free_mkl)
 can be 2-3 times faster than LAPACK.sh, and is requested by:
 ```cmake
 cmake -DUSE_MKL=on ..
@@ -49,7 +46,7 @@ cmake -DUSE_MKL=on ..
 
 Test the compiled libraries:
 ```sh
-ctest -V  
+ctest -V
 ```
 
 Then you can test Python calling the Fortran libraries by:
@@ -69,7 +66,7 @@ estimate.
 
 ### ESPRIT example with noisy sinusoid
 
-There are two versions of this program, one a full accuracy using `double complex` numbers, and the other using `single real` numbers as input. 
+There are two versions of this program, one a full accuracy using `double complex` numbers, and the other using `single real` numbers as input.
 The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.:
 ```sh
 ./fespritcmpl

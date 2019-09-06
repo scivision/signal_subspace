@@ -44,4 +44,3 @@ script:
 - meson test -C build
 
 - pytest -r a -v
-

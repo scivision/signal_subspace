@@ -31,4 +31,3 @@ test_script:
 - cd ..
 
 - pytest -r a -v
-
