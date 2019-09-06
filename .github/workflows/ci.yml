@@ -47,7 +47,9 @@ jobs:
     - name: meson configure
       run: meson setup build
       env:
-        FC: gfortran
+        CC: gcc-9
+        CXX: g++-9
+        FC: gfortran-9
     - name: meson tests
       run: meson test -C build
     - name: run Pytest
@@ -66,13 +68,9 @@ jobs:
       run: |
         cinst -y ninja
         pip install meson
-    - name: Install dependencies
-      run: pip install -e .[tests]
     - name: meson configure
       run: meson setup build
       env:
         FC: gfortran
     - name: meson tests
       run: meson test -C build
-    - name: run Pytest
-      run: pytest -r a -v
