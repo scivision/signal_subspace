@@ -12,19 +12,19 @@ def corrmtx(x: np.ndarray, m: int) -> np.ndarray:
     like Matlab corrmtx(x, M, 'modified'), with a different normalization factor.
     """
     x = np.asarray(x, dtype=float)
-    assert x.ndim == 1, '1-D only'
+    assert x.ndim == 1, "1-D only"
 
     N = x.size
 
     Tp = toeplitz(x[m:N], x[m::-1])
 
-    C = np.zeros((2*(N-m), m+1), dtype=x.dtype)
+    C = np.zeros((2 * (N - m), m + 1), dtype=x.dtype)
 
-    C[:N-m, :] = Tp[:N-m, :]
+    C[: N - m, :] = Tp[: N - m, :]
 
     Tp = np.fliplr(Tp.conj())
 
-    C[N-m:, :] = Tp[-N+m:, :]
+    C[N - m:, :] = Tp[-N + m:, :]
 
     return C
 
@@ -46,28 +46,27 @@ def compute_autocovariance(x: np.ndarray, M: int) -> np.ndarray:
     # Create covariance matrix for psd estimation
     # length of the vector x
     x = np.asarray(x).squeeze()
-    assert x.ndim == 1, '1-D only'
+    assert x.ndim == 1, "1-D only"
     N = x.size
 
     # Create column vector (Nx1) from row array
     x_vect = x[None, :].T
 
     # init covariance matrix
-    yn = x_vect[M-1::-1]  # reverse order from M-1 to 0
+    yn = x_vect[M - 1:: -1]  # reverse order from M-1 to 0
 
     R = yn @ yn.conj().T  # zeroth lag
     # about 5-8% of computation time
-    for i in range(1, N-M):  # no zero because we just computed it
+    for i in range(1, N - M):  # no zero because we just computed it
         # extract the column vector
-        yn = x_vect[M-1+i:i-1:-1]
+        yn = x_vect[M - 1 + i: i - 1: -1]
 
         R = R + yn @ yn.conj().T
 
     return R / N
 
 
-def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int = None,
-                         fs: int = 1, f: np.ndarray = None) -> Tuple[np.ndarray, np.ndarray]:
+def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int = None, fs: int = 1, f: np.ndarray = None) -> Tuple[np.ndarray, np.ndarray]:
     """
     This function compute the MUSIC pseudospectrum. The pseudo spectrum is defined as
 
@@ -85,22 +84,22 @@ def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int = None,
     """
 
     # length of the vector x
-    assert x.ndim == 1, '1-D only'
+    assert x.ndim == 1, "1-D only"
     N = x.size
 
     if f is None:
-        f = np.linspace(0., fs//2, 512)
+        f = np.linspace(0.0, fs // 2, 512)
 
     if M is None:
         M = N // 2
 
-# %% extract noise subspace
+    # %% extract noise subspace
     assert isinstance(M, int)
     R = compute_autocovariance(x, M)
     U, S, V = lg.svd(R)
     G = U[:, L:]
 
-# %% compute MUSIC pseudo spectrum
+    # %% compute MUSIC pseudo spectrum
     N_f = f.shape
     cost = np.zeros(N_f)
 
@@ -110,9 +109,9 @@ def pseudospectrum_MUSIC(x: np.ndarray, L: int, M: int = None,
         vect_exp = -2j * np.pi * f_temp * np.arange(M) / fs
         a = np.exp(vect_exp)
         # Cost function
-        cost[indice] = 1. / lg.norm(G.conj().T @ a.T)
+        cost[indice] = 1.0 / lg.norm(G.conj().T @ a.T)
 
-    print('pmusic: sec. to compute:', time()-tic)
+    print("pmusic: sec. to compute:", time() - tic)
 
     return f, cost
 
@@ -135,13 +134,13 @@ def rootmusic(x: np.ndarray, L: int, M: int = None, fs: int = 1) -> Tuple[np.nda
     :returns: ndarray containing the L frequencies
     """
     # length of the vector x
-    assert x.ndim == 1, '1-D only'
+    assert x.ndim == 1, "1-D only"
     N = x.size
 
     if M is None:
         M = N // 2
 
-# %% extract noise subspace
+    # %% extract noise subspace
     assert isinstance(M, int)
     R = compute_autocovariance(x, M)
     U, S, V = lg.svd(R)
@@ -150,23 +149,23 @@ def rootmusic(x: np.ndarray, L: int, M: int = None, fs: int = 1) -> Tuple[np.nda
     # construct matrix P
     P = G @ G.conj().T
 
-# %% construct polynomial Q
-    Q = np.zeros(2*M-1, dtype='complex128')
+    # %% construct polynomial Q
+    Q = np.zeros(2 * M - 1, dtype="complex128")
     # Extract the sum in each diagonal  0.1% of computation time
-    for (idx, val) in enumerate(range(M-1, -M, -1)):
+    for (idx, val) in enumerate(range(M - 1, -M, -1)):
         Q[idx] = P.diagonal(val).sum()
 
     # Compute the roots 92% of computation time here
     tic = time()
     rts = np.roots(Q)
-    print(time()-tic)
+    print(time() - tic)
 
     # Keep the roots with radii <1 and with non zero imaginary part
     rts = rts[abs(rts) < 1]
     rts = rts[rts.imag != 0]
 
     # Find the L roots closest to the unit circle
-    distance_from_circle = abs(abs(rts)-1)
+    distance_from_circle = abs(abs(rts) - 1)
     index_sort = distance_from_circle.argsort()
     component_roots = rts[index_sort[:L]]
 
@@ -174,13 +173,12 @@ def rootmusic(x: np.ndarray, L: int, M: int = None, fs: int = 1) -> Tuple[np.nda
     ang = -np.angle(component_roots)
 
     # frequency normalisation
-    f = fs*ang / (2.*np.pi)
+    f = fs * ang / (2.0 * np.pi)
 
     return f, S[:L]
 
 
-def esprit(x: np.ndarray, L: int, M: int = None, fs: int = 1,
-           verbose: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+def esprit(x: np.ndarray, L: int, M: int = None, fs: int = 1, verbose: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """
     This function estimate the frequency components based on the ESPRIT algorithm [ROY89]_
 
@@ -212,7 +210,7 @@ def esprit(x: np.ndarray, L: int, M: int = None, fs: int = 1,
 
     if M is None:
         M = N // 2
-# %% extract signal subspace  99.9 % of computation time
+    # %% extract signal subspace  99.9 % of computation time
     tic = time()
     if x.ndim == 1 and isinstance(M, int):
         R = compute_autocovariance(x, M)  # 75% of computation time
@@ -220,14 +218,14 @@ def esprit(x: np.ndarray, L: int, M: int = None, fs: int = 1,
         # the random phase of transmit/receive/target actually helps--need at least 5-6 observations to make useful
         R = np.cov(x, rowvar=False)
     if verbose:
-        print('autocov sec.', time()-tic)
+        print("autocov sec.", time() - tic)
     # R = subspace.corrmtx(x.astype(complex128),M).astype(float) #f2py fortran
 
     tic = time()
     U, S, V = lg.svd(R)  # 25% of computation time
     if verbose:
-        print('svd sec.', time()-tic)
-# %% take eigenvalues and determine sinusoid frequencies
+        print("svd sec.", time() - tic)
+    # %% take eigenvalues and determine sinusoid frequencies
     # Remove last row
     S1 = U[:-1, :L]
     # Remove first row
@@ -243,6 +241,6 @@ def esprit(x: np.ndarray, L: int, M: int = None, fs: int = 1,
     ang = -np.angle(V)
 
     # frequency normalisation
-    f = fs*ang / (2.*np.pi)
+    f = fs * ang / (2.0 * np.pi)
 
     return f, S[:L]

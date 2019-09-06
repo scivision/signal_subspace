@@ -30,27 +30,18 @@ matrix:
     script:
     - flake8
     - mypy .
-    after_success:
-    - pytest --cov
-    - coveralls
-#  - os: osx
-#    language: sh
-#    before_install: brew install gcc
-#    install: pip3 install -e .[tests]
-#    script: pytest -rsv
 
+before_install:
+- pip install meson
+- curl -Ls https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip -o ninja-linux.zip
+- sudo unzip ninja-linux.zip -d /usr/local/bin/
 
 install:
 - pip install -e .[tests]
-
-- cd build
-- cmake ..
-- cmake --build .
+- meson build
 
 script:
-- cd $TRAVIS_BUILD_DIR/build
-- ctest --output-on-failure
-- cd ..
+- meson test -C build
 
-- pytest -rsv
+- pytest -r a -v
 

@@ -10,9 +10,9 @@ def fircoef(L: int, fc: float, fs: int) -> np.ndarray:
 
     """
 
-    fcn = fc / (0.5*fs)
+    fcn = fc / (0.5 * fs)
 
-    return signal.remez(L, [0, 0.6*fcn, fcn, 0.5], [0, 1])
+    return signal.remez(L, [0, 0.6 * fcn, fcn, 0.5], [0, 1])
 
 
 def fircirc(b: np.ndarray, x: np.ndarray) -> np.ndarray:
@@ -29,13 +29,13 @@ def fircirc(b: np.ndarray, x: np.ndarray) -> np.ndarray:
         if p >= nb:
             p = 0
         z[p] = x[n]
-        acc = 0.
+        acc = 0.0
         k = p
         for j in range(nb):
-            acc += b[j]*z[k]
+            acc += b[j] * z[k]
             k -= 1
             if k < 0:
-                k = nb-1
+                k = nb - 1
 
         y[n] = acc
         p += 1

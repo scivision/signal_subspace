@@ -7,51 +7,22 @@ from pandas import DataFrame
 import signal_subspace as subs
 import subspace
 
-x = np.random.randn(4096).astype(np.complex128)
 
 f0 = 12345.6
 fs = 48e3
-snr = 50.  # dB
+snr = 50.0  # dB
 Ntone = 2
 
-t = np.arange(0, 0.01, 1/fs)
+t = np.arange(0, 0.01, 1 / fs)
 
-nvar = 10**(-snr/10.)
+nvar = 10 ** (-snr / 10.0)
 
-xr = (np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size))).real
-xc = np.exp(1j*2*np.pi*f0*t) + np.sqrt(nvar)*(np.random.randn(t.size) + 1j*np.random.randn(t.size))
-
-
-def test_corrmtx():
-    M = 5
-    subs.corrmtx(x.real, M)
+xr = (np.exp(1j * 2 * np.pi * f0 * t) + np.sqrt(nvar) * (np.random.randn(t.size))).real
+xc = np.exp(1j * 2 * np.pi * f0 * t) + np.sqrt(nvar) * (np.random.randn(t.size) + 1j * np.random.randn(t.size))
 
 
-def test_autocov():
-    """2x extra speedup from casting correct type"""
-    M = 5
-    tic = time()
-    C = subs.compute_autocovariance(x, M)
-    tocpy = time()-tic
-    print(C)
-# %%
-    tic = time()
-    Cc = subspace.covariance.autocov_c(x, M)
-    tocfortcmpl = time()-tic
-
-    tic = time()
-    Cr = subspace.covariance.autocov_r(x.real, M)
-    tocfortreal = time() - tic
-
-    print('autocovariance: Complex: Fortran faster than Python by factor:', tocpy/tocfortcmpl)
-    print('autocovariance: Real: Fortran faster than Python by factor:', tocpy/tocfortreal)
-
-    assert C == approx(Cc, rel=1)
-    assert C.real == approx(Cr, rel=1)
-
-
-def test_music():
-    fest, sigma = subs.rootmusic(x, L=2, M=200, fs=fs)
+def test_music(fake_sig):
+    fest, sigma = subs.rootmusic(fake_sig, L=2, M=200, fs=fs)
 
 
 def test_esprit():
@@ -67,48 +38,48 @@ def test_esprit():
 
     later found literature stating ESPRIT is O(M^3) (or was it N^3?)
     """
-# %% measure signal
+    # %% measure signal
     M = [100]  # iterating over block length
 
-    py = DataFrame(index=M, columns=['err', 'sigma', 'time'])
-    fortreal = DataFrame(index=M, columns=['err', 'sigma', 'time'])
-    fortcmpl = DataFrame(index=M, columns=['err', 'sigma', 'time'])
+    py = DataFrame(index=M, columns=["err", "sigma", "time"])
+    fortreal = DataFrame(index=M, columns=["err", "sigma", "time"])
+    fortcmpl = DataFrame(index=M, columns=["err", "sigma", "time"])
 
     for m in M:
         # %% python
         tic = time()
-        fest, sigma = subs.esprit(xc, Ntone//2, M=m, fs=fs, verbose=False)
-        toc = time()-tic
-        py.loc[m, :] = [fest-f0, sigma, toc]
+        fest, sigma = subs.esprit(xc, Ntone // 2, M=m, fs=fs, verbose=False)
+        toc = time() - tic
+        py.loc[m, :] = [fest - f0, sigma, toc]
 
         assert fest == approx(f0, rel=1e-3)
-        assert sigma[0] > 50, f'too small sigma {sigma[0]}'
+        assert sigma[0] > 50, f"too small sigma {sigma[0]}"
         #  print(f'PYTHON time signal N= {xc.size} M={m} freq {fest} Hz, sigma {sigma}, time {toc:.4f} sec')
-# %% fortran
+        # %% fortran
 
         tic = time()
         fest, sigma = subspace.subspace.esprit_c(xc, Ntone, m, fs)
 
         assert fest[0] == approx(f0, rel=1e-3)
-        assert sigma[0] > 50, f'too small sigma {sigma[0]}'
-        fortcmpl.loc[m, :] = [fest-f0, sigma, time()-tic]
+        assert sigma[0] > 50, f"too small sigma {sigma[0]}"
+        fortcmpl.loc[m, :] = [fest - f0, sigma, time() - tic]
 
         fest, sigma = subspace.subspace.esprit_r(xr, Ntone, m, fs)
 
         assert fest[0] == approx(f0, rel=1e-3)
-        assert sigma[0] > 20, f'too small sigma {sigma[0]}'
-        fortreal.loc[m, :] = [fest-f0, sigma, time()-tic]
+        assert sigma[0] > 20, f"too small sigma {sigma[0]}"
+        fortreal.loc[m, :] = [fest - f0, sigma, time() - tic]
 
         # print('FORTRAN time signal N= {} M={} freq {} Hz, sigma {}, time {:.4f} sec'.format(x.size,m,fest,sigma,toc))
 
-    print('python complex: sec.', py["time"].values[0])
+    print("python complex: sec.", py["time"].values[0])
 
-    print('Fortran complex: sec.', fortcmpl["time"].values[0])
+    print("Fortran complex: sec.", fortcmpl["time"].values[0])
 
-    print('Fortran real: sec.', fortreal["time"].values[0])
+    print("Fortran real: sec.", fortreal["time"].values[0])
 
-    print('fESPRIT: Fortran faster than Python by factor:', py["time"].values[0] / fortcmpl["time"].values[0])
+    print("fESPRIT: Fortran faster than Python by factor:", py["time"].values[0] / fortcmpl["time"].values[0])
 
 
-if __name__ == '__main__':
-    pytest.main(['-x', __file__])
+if __name__ == "__main__":
+    pytest.main(["-v", __file__])
