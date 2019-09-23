@@ -10,25 +10,18 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v1
       with:
-        python-version: 3.7
-    - name: Install packages
-      run: sudo apt install -yq --no-install-recommends ninja-build gfortran g++ liblapack-dev
-    - name: Install dependencies
-      run: |
+        python-version: '3.x'
+    - run: sudo apt install -yq --no-install-recommends ninja-build gfortran g++ liblapack-dev
+    - run: |
         pip install -e .[tests,lint]
         pip install meson
-    - name: Lint
-      run: flake8
-    - name: Type check
-      run: mypy .
-    - name: meson configure
-      run: meson setup build
+    - run: flake8
+    - run: mypy .
+    - run: meson setup build
       env:
         FC: gfortran
-    - name: meson tests
-      run: meson test -C build
-    - name: run Pytest
-      run: pytest -r a -v
+    - run: meson test -C build
+    - run: pytest -r a -v
 
   macosMeson:
     needs: [linuxMeson]
@@ -37,40 +30,31 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v1
       with:
-        python-version: 3.7
-    - name: Install packages
-      run: brew install gcc ninja
-    - name: Install dependencies
-      run: |
+        python-version: '3.x'
+    - run: brew install gcc ninja
+    - run: |
         pip install -e .[tests]
         pip install meson
-    - name: meson configure
-      run: meson setup build
+    - run: meson setup build
       env:
         CC: gcc-9
         CXX: g++-9
         FC: gfortran-9
-    - name: meson tests
-      run: meson test -C build
-    - name: run Pytest
-      run: pytest -r a -v
+    - run: meson test -C build
+    - run: pytest -r a -v
 
   windowsMeson:
     needs: [linuxMeson]
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python
-      uses: actions/setup-python@v1
+    - uses: actions/setup-python@v1
       with:
-        python-version: 3.7
-    - name: Install packages
-      run: |
+        python-version: '3.x'
+    - run: |
         cinst -y ninja
         pip install meson
-    - name: meson configure
-      run: meson setup build
+    - run: meson setup build
       env:
         FC: gfortran
-    - name: meson tests
-      run: meson test -C build
+    - run: meson test -C build

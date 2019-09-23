@@ -8,7 +8,7 @@ use covariance,only: autocov
 Implicit none
 
 interface esprit
-  procedure esprit_c, esprit_r
+  module procedure esprit_c, esprit_r
 end interface esprit
 
 private
