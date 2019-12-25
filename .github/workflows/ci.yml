@@ -11,17 +11,19 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.x'
-    - run: sudo apt install -yq --no-install-recommends ninja-build gfortran g++ liblapack-dev
+    - run: |
+        sudo apt -yq update
+        sudo apt install -yq --no-install-recommends gfortran g++ liblapack-dev
     - run: |
         pip install -e .[tests,lint]
-        pip install meson
+        pip install meson ninja
     - run: flake8
     - run: mypy .
     - run: meson setup build
       env:
         FC: gfortran
     - run: meson test -C build
-    - run: pytest -r a -v
+    - run: pytest
 
   macosMeson:
     needs: [linuxMeson]
@@ -41,7 +43,7 @@ jobs:
         CXX: g++-9
         FC: gfortran-9
     - run: meson test -C build
-    - run: pytest -r a -v
+    - run: pytest
 
   windowsMeson:
     needs: [linuxMeson]
@@ -51,9 +53,7 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.x'
-    - run: |
-        cinst -y ninja
-        pip install meson
+    - run: pip install meson ninja
     - run: meson setup build
       env:
         FC: gfortran
