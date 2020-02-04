@@ -1,32 +1,35 @@
-name: ci
+name: ci_meson
 
 on: [push, pull_request]
 
 jobs:
 
-  linuxMeson:
+  linux:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v1
       with:
         python-version: '3.x'
+
     - run: |
         sudo apt -yq update
-        sudo apt install -yq --no-install-recommends gfortran g++ liblapack-dev
+        sudo apt install -yq --no-install-recommends ninja-build gfortran g++ liblapack-dev
     - run: |
         pip install -e .[tests,lint]
-        pip install meson ninja
+
     - run: flake8
     - run: mypy .
+
     - run: meson setup build
       env:
         FC: gfortran
+    - run: ninja -C build
+
     - run: meson test -C build
     - run: pytest
 
-  macosMeson:
-    needs: [linuxMeson]
+  macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
@@ -36,18 +39,19 @@ jobs:
     - run: brew install gcc ninja
     - run: |
         pip install -e .[tests]
-        pip install meson
+
     - run: meson setup build
       env:
         CC: gcc-9
         CXX: g++-9
         FC: gfortran-9
+    - run: ninja -C build
+
     - run: meson test -C build
     - run: pytest
 
-  windowsMeson:
+  windows:
     if: false
-    needs: [linuxMeson]
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
@@ -61,4 +65,6 @@ jobs:
     - run: meson setup build
       env:
         FC: gfortran
+    - run: ninja -C build
+
     - run: meson test -C build
