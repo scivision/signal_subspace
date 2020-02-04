@@ -16,7 +16,7 @@ std::vector<float> loadfiltercoeff(std::string);
 
 const bool verbose=false;
 
-int main () {
+int main(void) {
 std::cout << "C++ Esprit" << std::endl;
 
 std::string Bfn="../bfilt.txt"; //FIXME binary file

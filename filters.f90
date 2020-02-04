@@ -1,13 +1,11 @@
 module filters
 use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
 use, intrinsic:: iso_c_binding, only: c_int, c_bool
-!    use, intrinsic:: ieee_arithmetic, only: ieee_is_nan
+use, intrinsic:: ieee_arithmetic, only: ieee_value, ieee_quiet_nan
 use comm, only: sp
 
 implicit none
 private
-! https://www.doc.ic.ac.uk/~eedwards/compsys/float/nan.html
-real(sp),parameter :: nan = transfer(Z'7FF80000', 1.0)  ! Not just real() due to standard vis nan
 
 public:: fircircfilter
 
@@ -21,9 +19,10 @@ real(sp),intent(out) :: y(N)
 logical(c_bool),intent(out) :: filtok
 
 integer :: k,p, i,j
-real(sp) :: z(L), acc
+real(sp) :: z(L), acc, nan
 logical,parameter :: verbose=.false.
 
+nan = ieee_value(1._sp, ieee_quiet_nan)
 
 filtok=.false.
 

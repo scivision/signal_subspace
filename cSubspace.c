@@ -7,7 +7,7 @@ extern void signoise_r(const float*, const float*, const float*, int*, float [])
 extern void esprit_r(float [], int*, int*, int*, const float*, float [], float []);
 
 
-int main () {
+int main(void) {
 printf("ANSI C Esprit\n");
 
 int Ns=1024;
