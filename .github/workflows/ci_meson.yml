@@ -1,6 +1,18 @@
 name: ci_meson
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "**.f90"
+      - "**.F90"
+      - "**.build"
+      - ".github/workflows/ci_meson.yml"
+  pull_request:
+    paths:
+      - "**.f90"
+      - "**.F90"
+      - "**.build"
+      - ".github/workflows/ci_meson.yml"
 
 jobs:
 
@@ -15,11 +27,7 @@ jobs:
     - run: |
         sudo apt -yq update
         sudo apt install -yq --no-install-recommends ninja-build gfortran g++ liblapack-dev
-    - run: |
-        pip install -e .[tests,lint]
-
-    - run: flake8
-    - run: mypy .
+    - run: pip install meson
 
     - run: meson setup build
       env:
@@ -27,7 +35,6 @@ jobs:
     - run: ninja -C build
 
     - run: meson test -C build
-    - run: pytest
 
   macos:
     runs-on: macos-latest
@@ -36,9 +43,9 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.x'
-    - run: brew install gcc ninja
     - run: |
-        pip install -e .[tests]
+        brew install gcc ninja
+        pip install meson
 
     - run: meson setup build
       env:
@@ -48,7 +55,6 @@ jobs:
     - run: ninja -C build
 
     - run: meson test -C build
-    - run: pytest
 
   windows:
     if: false

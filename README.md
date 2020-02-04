@@ -1,5 +1,6 @@
 # Signal Subspace
 
+![ci_python](https://github.com/scivision/signal_subspace/workflows/ci_python/badge.svg)
 ![ci_meson](https://github.com/scivision/signal_subspace/workflows/ci_meson/badge.svg)
 ![ci_cmake](https://github.com/scivision/signal_subspace/workflows/ci_cmake/badge.svg)
 

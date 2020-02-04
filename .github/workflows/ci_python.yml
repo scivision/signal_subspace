@@ -1,0 +1,37 @@
+name: ci_python
+
+on:
+  push:
+    paths:
+      - "**.f90"
+      - "**.F90"
+      - "**.py"
+      - ".github/workflows/ci_python.yml"
+  pull_request:
+    paths:
+      - "**.f90"
+      - "**.F90"
+      - "**.py"
+      - ".github/workflows/ci_python.yml"
+
+jobs:
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+
+    - run: |
+        sudo apt -yq update
+        sudo apt install -yq --no-install-recommends gfortran liblapack-dev
+    - run: |
+        pip install .[tests,lint]
+
+    - run: flake8
+    - run: mypy .
+
+    - run: pytest
+      working-directory: tests
