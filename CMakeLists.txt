@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.12)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
 endif()
@@ -11,7 +11,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules/)
 # *** DO NOT use -ffast-math *** it screws up the signaling between modules!!
 include(cmake/compilers.cmake)
 
-add_compile_options(${FLAGS})
+find_package(LAPACK REQUIRED)
 
 add_library(subspace filters.f90 covariance.f90 subspace.f90 signals.f90 perf.f90)
 if(f2018)
@@ -19,19 +19,16 @@ if(f2018)
 else()
   target_sources(subspace PRIVATE comm_legacy.f90)
 endif()
-target_compile_options(subspace PRIVATE ${FFLAGS})
 target_link_libraries(subspace PRIVATE ${LAPACK_LIBRARIES})
 
 #------ test program: Fortran Complex Double Precision ----------
 add_executable(fespritcmpl RunSubspace.f90)
 target_link_libraries(fespritcmpl subspace)
-target_compile_options(fespritcmpl PRIVATE ${FFLAGS})
 add_test(NAME FortranComplexEsprit COMMAND fespritcmpl)
 set_tests_properties(FortranComplexEsprit PROPERTIES TIMEOUT 15)
 #------ test program: Fortran Real Single Precision -------------
 add_executable(fespritreal RunSubspace_realsp.f90)
 target_link_libraries(fespritreal subspace)
-target_compile_options(fespritreal PRIVATE ${FFLAGS})
 add_test(NAME FortranRealEsprit COMMAND fespritreal)
 set_tests_properties(FortranRealEsprit PROPERTIES TIMEOUT 15)
 #------ test program: C++ Real Single ---------------------------
