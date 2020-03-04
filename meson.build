@@ -29,6 +29,13 @@ cesprit = executable('cesprit', 'cSubspace.c', link_with : subspace)
 test('C Esprit', cesprit, timeout: 30)
 
 if add_languages('cpp', required: false)
-  cppesprit = executable('cppesprit', 'cppSubspace.cpp', link_with : subspace)
-  test('C++ Esprit', cppesprit, timeout: 30)
+  cxx = meson.get_compiler('cpp')
+  if cxx.compiles('''
+#include <iostream>
+int main(void) {)
+''', name: 'C++ environment OK')
+    cppesprit = executable('cppesprit', 'cppSubspace.cpp', link_with : subspace)
+
+    test('C++ Esprit', cppesprit, timeout: 30)
+  endif
 endif

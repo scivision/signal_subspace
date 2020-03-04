@@ -74,6 +74,4 @@ print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic) / 10
 
 print *,'OK'
 
-! deallocate(x,tones,sigma) ! this is automatic going out of scope
 end program
-

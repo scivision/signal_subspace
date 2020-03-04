@@ -17,11 +17,12 @@ The core subspace code is written in Fortran 2008 and is called from other langu
 Since the programs are Fortran/Python based, they should compile and run
 in virtually any environment/OS from embedded to supercomputer.
 
-In particular, this program (Fortran, called by C or C++ optionally) works from at least
+In particular, this program (Fortran, called by C or C++ optionally) works from compilers including:
 
 * Gfortran (GCC)
 * Intel Fortran (ifort, icc, icpc)
 * Flang (flang, clang, clang++)
+* PGI (pgfortran, pgcc, pgc++)
 
 ### Prereqs
 
