@@ -1,4 +1,5 @@
 project('spectrum', 'c', 'fortran',
+  version: '1.0.3',
   default_options : ['default_library=static', 'buildtype=release', 'warning_level=3'])
 
 fc = meson.get_compiler('fortran')
@@ -9,32 +10,24 @@ if not lapack.found()
   lapack = lapack_proj.get_variable('lapack')
 endif
 
-if fc.links('call random_init(.false., .false.); end', name: 'F2018 random_init')
-  comm_src = 'comm.f90'
-else
-  comm_src = 'comm_legacy.f90'
-endif
+subdir('src')
 
-subspace = library('subspace',
-  sources: ['filters.f90', 'covariance.f90', 'subspace.f90', 'signals.f90', 'perf.f90', comm_src],
-  dependencies : lapack)
-
-fespritcmpl = executable('fespritcmpl', 'RunSubspace.f90', link_with : subspace)
+fespritcmpl = executable('fespritcmpl', 'src/RunSubspace.f90', link_with : subspace)
 test('Complex Esprit', fespritcmpl, timeout: 30)
 
-fespritreal = executable('fespritreal', 'RunSubspace_realsp.f90', link_with : subspace)
+fespritreal = executable('fespritreal', 'src/RunSubspace_realsp.f90', link_with : subspace)
 test('Real Esprit', fespritreal, timeout: 30)
 
-cesprit = executable('cesprit', 'cSubspace.c', link_with : subspace)
+cesprit = executable('cesprit', 'src/cSubspace.c', link_with : subspace)
 test('C Esprit', cesprit, timeout: 30)
 
 if add_languages('cpp', required: false)
   cxx = meson.get_compiler('cpp')
   if cxx.compiles('''
 #include <iostream>
-int main(void) {)
+int main(void) {}
 ''', name: 'C++ environment OK')
-    cppesprit = executable('cppesprit', 'cppSubspace.cpp', link_with : subspace)
+    cppesprit = executable('cppesprit', 'src/cppSubspace.cpp', link_with : subspace)
 
     test('C++ Esprit', cppesprit, timeout: 30)
   endif

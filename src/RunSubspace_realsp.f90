@@ -1,4 +1,3 @@
-
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int,c_bool
 use comm, only: sp, rand_init
@@ -99,4 +98,3 @@ print *,'OK'
 
 ! deallocate(x,y,tones,sigma)  ! this is automatic going out of scope
 end program
-

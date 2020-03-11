@@ -14,8 +14,8 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
 
   string(APPEND CMAKE_Fortran_FLAGS " -fimplicit-none -Werror=array-bounds")
   string(APPEND CMAKE_Fortran_FLAGS_DEBUG " -ffpe-trap=zero,overflow,underflow")
-
-  add_compile_options(-march=native -Wall -Wextra)
+  # mtune=native for better cross-platform
+  add_compile_options(-mtune=native -Wall -Wextra)
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL PGI)
   string(APPEND CMAKE_Fortran_FLAGS " -Mdclchk")
 endif()

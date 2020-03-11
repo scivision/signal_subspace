@@ -8,11 +8,7 @@ on:
       - "**.build"
       - ".github/workflows/ci_meson.yml"
   pull_request:
-    paths:
-      - "**.f90"
-      - "**.F90"
-      - "**.build"
-      - ".github/workflows/ci_meson.yml"
+  release:
 
 jobs:
 

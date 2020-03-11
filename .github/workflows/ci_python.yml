@@ -8,11 +8,7 @@ on:
       - "**.py"
       - ".github/workflows/ci_python.yml"
   pull_request:
-    paths:
-      - "**.f90"
-      - "**.F90"
-      - "**.py"
-      - ".github/workflows/ci_python.yml"
+  release:
 
 jobs:
 

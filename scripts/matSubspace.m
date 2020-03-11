@@ -4,7 +4,7 @@ fs=48e3;
 snr=60;
 Ntone=1;
 Ns=1024;
-m = Ns/2; % Ns/2 >= m > 1 
+m = Ns/2; % Ns/2 >= m > 1
 %% generate noisy sinusoid
 x = signoise(fs,f0,snr,Ns);
 %% Subspace

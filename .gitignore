@@ -1,9 +1,9 @@
 subprojects/
+!subprojects/*.wrap
+
 .mypy_cache/
 .pytest_cache/
-*.asc
 *.png
-*.txt
 
 *.mod
 
@@ -18,7 +18,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-build/
+build*/
 develop-eggs/
 dist/
 downloads/
