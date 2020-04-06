@@ -20,6 +20,12 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL PGI)
   string(APPEND CMAKE_Fortran_FLAGS " -Mdclchk")
 endif()
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT lto_supported)
+if(lto_supported)
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 
 include(CheckFortranSourceCompiles)
 check_fortran_source_compiles("call random_init(.false., .false.); end" f2018random_init
