@@ -50,7 +50,7 @@ C = R / real(N,dp)
 end subroutine autocov_c
 
 
-subroutine autocov_r(x,N,M,C) bind(c)
+pure subroutine autocov_r(x,N,M,C) bind(c)
 !! autocovariance estimate of 1-D vector (e.g. noisy sinusoid)
 !!
 !! input:

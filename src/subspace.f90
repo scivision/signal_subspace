@@ -8,11 +8,10 @@ use covariance,only: autocov
 Implicit none
 
 interface esprit
-  module procedure esprit_c, esprit_r
+module procedure esprit_c, esprit_r
 end interface esprit
 
 private
-
 public :: esprit, esprit_c, esprit_r  ! latter two for f2py
 
 contains
@@ -138,7 +137,7 @@ S1 = U(1:M-1, :L)
 S2 = U(2:M, :L)
 
 !call system_clock(tic)
-W1=matmul((transpose(S1)),S1)
+W1=matmul(transpose(S1),S1)
 
 call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then

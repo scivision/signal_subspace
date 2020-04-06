@@ -5,11 +5,11 @@ use comm, only: sp, dp, J
 implicit none
 
 interface randn
-  procedure randn_r, randn_c
+procedure randn_r, randn_c
 end interface randn
 
 interface signoise
-  procedure signoise_r, signoise_c
+procedure signoise_r, signoise_c
 end interface signoise
 
 private
