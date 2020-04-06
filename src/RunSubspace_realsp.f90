@@ -1,5 +1,7 @@
+program Subspace_Real32
 use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int,c_bool
+
 use comm, only: sp, rand_init
 use perf, only: sysclock2ms
 use subspace, only: esprit
@@ -96,5 +98,4 @@ print '(A,F10.3)', 'seconds to estimate frequencies: ',sysclock2ms(toc-tic) / 10
 
 print *,'OK'
 
-! deallocate(x,y,tones,sigma)  ! this is automatic going out of scope
 end program

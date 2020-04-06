@@ -3,7 +3,7 @@ import pytest
 from pytest import approx
 from time import time
 import numpy as np
-from pandas import DataFrame
+
 import signal_subspace as subs
 import subspace
 
@@ -38,12 +38,14 @@ def test_esprit():
 
     later found literature stating ESPRIT is O(M^3) (or was it N^3?)
     """
+
+    pandas = pytest.importorskip('pandas')
     # %% measure signal
     M = [100]  # iterating over block length
 
-    py = DataFrame(index=M, columns=["err", "sigma", "time"])
-    fortreal = DataFrame(index=M, columns=["err", "sigma", "time"])
-    fortcmpl = DataFrame(index=M, columns=["err", "sigma", "time"])
+    py = pandas.DataFrame(index=M, columns=["err", "sigma", "time"])
+    fortreal = pandas.DataFrame(index=M, columns=["err", "sigma", "time"])
+    fortcmpl = pandas.DataFrame(index=M, columns=["err", "sigma", "time"])
 
     for m in M:
         # %% python
@@ -82,4 +84,4 @@ def test_esprit():
 
 
 if __name__ == "__main__":
-    pytest.main(["-v", __file__])
+    pytest.main([__file__])

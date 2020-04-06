@@ -1,9 +1,13 @@
 ! https://github.com/JuliaLang/julia/blob/master/test/perf/micro/perf.f90
 module perf
+
 use, intrinsic:: iso_fortran_env, only: int64
 use, intrinsic:: iso_c_binding, only: c_bool
+
 use comm,only : dp
+
 implicit none
+
 contains
 
 real(dp) function sysclock2ms(t)
@@ -24,4 +28,4 @@ end function sysclock2ms
 !        if (.not. cond) error stop 'assertion failed, halting test'
 !    end subroutine assert
 
-End Module perf
+end Module perf

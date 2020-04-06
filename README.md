@@ -26,9 +26,9 @@ In particular, this program (Fortran, called by C or C++ optionally) works from 
 
 ### Prereqs
 
-* Linux: `apt install libatlas-base-dev libatlas-dev liblapack-dev libblas-dev g++ gcc gfortran make cmake`
-* Mac: `brew install lapack openblas gcc make cmake`
-* Windows: recommend using Windows Subsystem for Linux.
+* Linux: `apt install liblapack-dev g++ gcc gfortran cmake`
+* Mac: `brew install lapack gcc cmake`
+* Windows: use [MSYS2](https://www.scivision.dev/install-msys2-windows/) or Windows Subsystem for Linux
 
 ### Install
 

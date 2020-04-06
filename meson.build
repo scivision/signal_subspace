@@ -12,13 +12,13 @@ endif
 
 subdir('src')
 
-fespritcmpl = executable('fespritcmpl', 'src/RunSubspace.f90', link_with : subspace)
-test('Complex Esprit', fespritcmpl, timeout: 30)
+fespritcmpl = executable('f_esprit_cmpl', 'src/RunSubspace.f90', link_with : subspace)
+test('ComplexEsprit', fespritcmpl, timeout: 30)
 
-fespritreal = executable('fespritreal', 'src/RunSubspace_realsp.f90', link_with : subspace)
+fespritreal = executable('f_esprit_real', 'src/RunSubspace_realsp.f90', link_with : subspace)
 test('Real Esprit', fespritreal, timeout: 30)
 
-cesprit = executable('cesprit', 'src/cSubspace.c', link_with : subspace)
+cesprit = executable('c_esprit', 'src/cSubspace.c', link_with : subspace)
 test('C Esprit', cesprit, timeout: 30)
 
 if add_languages('cpp', required: false)
@@ -27,8 +27,8 @@ if add_languages('cpp', required: false)
 #include <iostream>
 int main(void) {}
 ''', name: 'C++ environment OK')
-    cppesprit = executable('cppesprit', 'src/cppSubspace.cpp', link_with : subspace)
+    cppesprit = executable('cpp_esprit', 'src/cppSubspace.cpp', link_with : subspace)
 
-    test('C++ Esprit', cppesprit, timeout: 30)
+    test('C++Esprit', cppesprit, timeout: 30)
   endif
 endif
