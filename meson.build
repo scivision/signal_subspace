@@ -1,5 +1,5 @@
 project('spectrum', 'c', 'fortran',
-  version: '1.0.3',
+  version: '1.0.4',
   default_options : ['default_library=static', 'buildtype=release', 'warning_level=3'])
 
 fc = meson.get_compiler('fortran')
@@ -12,13 +12,13 @@ endif
 
 subdir('src')
 
-fespritcmpl = executable('f_esprit_cmpl', 'src/RunSubspace.f90', link_with : subspace)
+fespritcmpl = executable('f_esprit_cmpl', 'src/tests/RunSubspace.f90', link_with : subspace)
 test('ComplexEsprit', fespritcmpl, timeout: 30)
 
-fespritreal = executable('f_esprit_real', 'src/RunSubspace_realsp.f90', link_with : subspace)
+fespritreal = executable('f_esprit_real', 'src/tests/RunSubspace_realsp.f90', link_with : subspace)
 test('Real Esprit', fespritreal, timeout: 30)
 
-cesprit = executable('c_esprit', 'src/cSubspace.c', link_with : subspace)
+cesprit = executable('c_esprit', 'src/tests/cSubspace.c', link_with : subspace)
 test('C Esprit', cesprit, timeout: 30)
 
 if add_languages('cpp', required: false)
@@ -27,7 +27,7 @@ if add_languages('cpp', required: false)
 #include <iostream>
 int main(void) {}
 ''', name: 'C++ environment OK')
-    cppesprit = executable('cpp_esprit', 'src/cppSubspace.cpp', link_with : subspace)
+    cppesprit = executable('cpp_esprit', 'src/tests/cppSubspace.cpp', link_with : subspace)
 
     test('C++Esprit', cppesprit, timeout: 30)
   endif

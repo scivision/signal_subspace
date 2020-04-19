@@ -1,10 +1,13 @@
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.14)
+
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "default release type")
 endif()
+
 project(spectrum
 LANGUAGES C Fortran
-VERSION 1.03)
+VERSION 1.0.4)
+
 enable_testing()
 include(CTest)
 
@@ -19,3 +22,11 @@ include(cmake/compilers.cmake)
 find_package(LAPACK REQUIRED)
 
 add_subdirectory(src)
+
+if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  add_subdirectory(src/tests)
+
+  include(FeatureSummary)
+  add_feature_info(LTO lto_supported "Link time optimization")
+  feature_summary(WHAT ALL)
+endif()
