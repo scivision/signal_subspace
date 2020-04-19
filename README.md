@@ -11,38 +11,24 @@ based in part upon the
 [Spectral Analysis Lib public domain code](https://github.com/vincentchoqueuse/spectral_analysis_project)
 
 The core subspace code is written in Fortran 2008 and is called from other languages (Python, C).
-
-## Building
-
-Since the programs are Fortran/Python based, they should compile and run
-in virtually any environment/OS from embedded to supercomputer.
+Since the programs are Fortran/Python based, they should compile and run in virtually any environment/OS from embedded to supercomputer.
 
 In particular, this program (Fortran, called by C or C++ optionally) works from compilers including:
 
 * Gfortran (GCC)
 * Intel Fortran (ifort, icc, icpc)
-* Flang (flang, clang, clang++)
-* PGI (pgfortran, pgcc, pgc++)
 
-### Prereqs
+## Build
+
+Prereqs:
 
 * Linux: `apt install liblapack-dev g++ gcc gfortran cmake`
 * Mac: `brew install lapack gcc cmake`
 * Windows: use [MSYS2](https://www.scivision.dev/install-msys2-windows/) or Windows Subsystem for Linux
 
-### Install
 
 ```sh
-cmake -B build
-
-cmake --build build
-```
-
-Test the compiled libraries:
-
-```sh
-cd build
-ctest -V
+ctest -S setup.cmake -VV
 ```
 
 Then you can test Python calling the Fortran libraries by:
@@ -64,9 +50,9 @@ There are two versions of this program, one a full accuracy using `double comple
 The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.
 
 ```sh
-./fespritcmpl
+./f_esprit_cmpl
 
-./fespritreal
+./f_esprit_real
 ```
 
 ### C ESPRIT example with noisy sinusoid
@@ -75,7 +61,7 @@ Here is an example of calling Fortran Esprit from C, which uses real
 single precision float:
 
 ```sh
-./cesprit
+./c_esprit
 ```
 
 ### C++ ESPRIT example with noisy sinusoid
@@ -83,7 +69,7 @@ single precision float:
 Example of calling Fortran Esprit from C++, which uses real single precision float:
 
 ```sh
-./cppesprit
+./cpp_esprit
 ```
 
 ## Python

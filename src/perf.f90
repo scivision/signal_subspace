@@ -4,9 +4,11 @@ module perf
 use, intrinsic:: iso_fortran_env, only: int64
 use, intrinsic:: iso_c_binding, only: c_bool
 
-use comm,only : dp
+use comm, only : dp
 
-implicit none
+implicit none (type, external)
+private
+public :: sysclock2ms
 
 contains
 

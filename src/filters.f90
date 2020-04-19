@@ -4,9 +4,8 @@ use, intrinsic:: iso_c_binding, only: c_int, c_bool
 use, intrinsic:: ieee_arithmetic, only: ieee_value, ieee_quiet_nan
 use comm, only: sp
 
-implicit none
+implicit none (type, external)
 private
-
 public:: fircircfilter
 
 contains

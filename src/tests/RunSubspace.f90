@@ -8,7 +8,7 @@ use perf, only: sysclock2ms
 use subspace, only: esprit
 use signals,only: signoise
 
-implicit none
+implicit none (type, external)
 
 integer(c_int) :: Ns = 1024, &
                   Ntone=2

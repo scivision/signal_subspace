@@ -5,7 +5,7 @@ use comm, only: sp, dp,pi, debug
 use covariance,only: autocov
 !use perf, only : sysclock2ms
 
-Implicit none
+implicit none (type, external)
 
 interface esprit
 module procedure esprit_c, esprit_r
@@ -29,6 +29,8 @@ real(dp) :: S(M,M), RWORK(8*M), ang(L)
 integer :: getrfinfo,getriinfo, evinfo, svdinfo
 complex(dp) :: W1(L,L), IPIV(M-1), SWORK(8*M) !yes, this swork is complex
 complex(dp) :: Phi(L,L), CWORK(8*M), junk(L,L), eig(L)
+
+external :: zgesvd, zgetrf, zgetri, zgeev
 
 ! integer(i64) :: tic,toc
 
@@ -110,6 +112,8 @@ real(sp) :: S(M,M),RWORK(LRATIO*M),ang(L),SWORK(LRATIO*M) !this Swork is real
 integer(c_int) :: getrfinfo,getriinfo, evinfo, svdinfo
 real(sp) :: W1(L,L), IPIV(M-1)
 complex(sp) :: Phi(L,L), CWORK(LRATIO*M), junk(L,L), eig(L)
+
+external :: sgesvd, sgetrf, sgetri, cgeev
 
 LWORK = LRATIO*M  !at least 5M for sgesvd
    ! integer(i64) :: tic,toc
