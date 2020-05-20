@@ -1,5 +1,6 @@
 # Signal Subspace
 
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/scivision/signal_subspace.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/scivision/signal_subspace/context:python)
 ![ci_python](https://github.com/scivision/signal_subspace/workflows/ci_python/badge.svg)
 ![ci_meson](https://github.com/scivision/signal_subspace/workflows/ci_meson/badge.svg)
 ![ci_cmake](https://github.com/scivision/signal_subspace/workflows/ci_cmake/badge.svg)
