@@ -7,7 +7,6 @@ on:
       - "**.F90"
       - "**.build"
       - ".github/workflows/ci_meson.yml"
-  pull_request:
 
 jobs:
 
@@ -15,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
@@ -25,9 +24,8 @@ jobs:
     - run: pip install meson
 
     - run: meson setup build
-      env:
-        FC: gfortran
-    - run: ninja -C build
+
+    - run: meson compile -C build
 
     - run: meson test -C build
 
@@ -35,7 +33,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
     - run: |
@@ -47,7 +45,8 @@ jobs:
         CC: gcc-9
         CXX: g++-9
         FC: gfortran-9
-    - run: ninja -C build
+
+    - run: meson compile -C build
 
     - run: meson test -C build
 
@@ -56,7 +55,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
     - run: |
@@ -64,8 +63,7 @@ jobs:
         cinst -y ninja
 
     - run: meson setup build
-      env:
-        FC: gfortran
-    - run: ninja -C build
+
+    - run: meson compile -C build
 
     - run: meson test -C build

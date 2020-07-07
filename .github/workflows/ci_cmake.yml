@@ -8,6 +8,8 @@ on:
       - "**.txt"
       - "**.cmake"
       - ".github/workflows/ci_cmake.yml"
+
+
 jobs:
 
   macos:
@@ -37,6 +39,3 @@ jobs:
         sudo apt install -yq --no-install-recommends gfortran g++ liblapack-dev
 
     - run: ctest -S setup.cmake -VV
-      env:
-        FC: gfortran
-        CC: gcc

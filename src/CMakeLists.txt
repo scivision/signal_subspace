@@ -4,7 +4,7 @@ if(f2018random_init)
 else()
   target_sources(subspace PRIVATE comm_legacy.f90)
 endif()
-target_link_libraries(subspace PRIVATE ${LAPACK_LIBRARIES})
+target_link_libraries(subspace PRIVATE LAPACK::LAPACK)
 set_target_properties(subspace PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_include_directories(subspace INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include)
 
