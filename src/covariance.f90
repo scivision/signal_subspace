@@ -6,11 +6,12 @@ use comm,only: sp, dp
 
 implicit none (type, external)
 private
-public :: autocov, autocov_r, autocov_c  ! latter two for f2py
+public :: autocov_r, autocov_c
 
-interface autocov
-procedure autocov_r, autocov_c
-end interface autocov
+! interface autocov
+! procedure autocov_r, autocov_c
+! end interface autocov
+!! disabled due to f2py incompatibility
 
 contains
 

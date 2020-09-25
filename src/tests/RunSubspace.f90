@@ -5,7 +5,7 @@ use,intrinsic:: iso_c_binding, only: c_int
 
 use comm, only: dp, rand_init
 use perf, only: sysclock2ms
-use subspace, only: esprit
+use subspace, only: esprit_c
 use signals,only: signoise
 
 implicit none (type, external)
@@ -63,7 +63,7 @@ call signoise(fs,f0,snr,Ns,&
               x)
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(x, size(x,kind=c_int), Ntone, M, fs, &
+call esprit_c(x, size(x,kind=c_int), Ntone, M, fs, &
             tones,sigma)
 call system_clock(toc)
 

@@ -4,7 +4,7 @@ use,intrinsic:: iso_c_binding, only: c_int,c_bool
 
 use comm, only: sp, rand_init
 use perf, only: sysclock2ms
-use subspace, only: esprit
+use subspace, only: esprit_r
 use signals, only: signoise
 use filters, only: fircircfilter
 
@@ -85,7 +85,7 @@ if (fstat /= 0 .or. .not. filtok) then
 endif
 !------ estimate frequency of sinusoid in noise --------
 call system_clock(tic)
-call esprit(y, size(y,kind=c_int), Ntone, M, fs, &
+call esprit_r(y, size(y,kind=c_int), Ntone, M, fs, &
             tones,sigma)
 call system_clock(toc)
 
