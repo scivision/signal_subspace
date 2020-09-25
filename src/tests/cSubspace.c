@@ -2,13 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-extern void signoise_r(const float*, const float*, const float*, int*, float []);
-
-extern void esprit_r(float [], int*, int*, int*, const float*, float [], float []);
-
+#include "cSubspace.h"
 
 int main(void) {
-printf("ANSI C Esprit\n");
+printf("C Esprit\n");
 
 int Ns=1024;
 int Ntone=2;

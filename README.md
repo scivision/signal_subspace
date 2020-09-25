@@ -12,12 +12,12 @@ based in part upon the
 [Spectral Analysis Lib public domain code](https://github.com/vincentchoqueuse/spectral_analysis_project)
 
 The core subspace code is written in Fortran 2008 and is called from other languages (Python, C).
-Since the programs are Fortran/Python based, they should compile and run in virtually any environment/OS from embedded to supercomputer.
+Since the programs are Fortran / Python based, they should compile and run in virtually any platform from embedded to supercomputer.
 
 In particular, this program (Fortran, called by C or C++ optionally) works from compilers including:
 
 * Gfortran (GCC)
-* Intel Fortran (ifort, icc, icpc)
+* Intel oneAPI (ifort, icc, icpc)
 
 ## Build
 

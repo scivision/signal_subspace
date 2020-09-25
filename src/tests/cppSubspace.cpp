@@ -6,11 +6,7 @@
 #include <cmath>
 #include <vector>
 
-extern "C" void signoise_r(const float*, const float*, const float*, int*, float []);
-
-extern "C" void fircircfilter(float [], int*,float [],int*,float [],bool*);
-
-extern "C" void esprit_r(float [], int*, int*, int*, const float*, float [], float []);
+#include "cppSubspace.h"
 
 std::vector<float> loadfiltercoeff(std::string);
 
@@ -19,7 +15,7 @@ const bool verbose=false;
 int main(void) {
 std::cout << "C++ Esprit" << std::endl;
 
-std::string Bfn="../bfilt.txt"; //FIXME binary file
+std::string Bfn="../bfilt.txt";
 int Ns=1024;
 int Ntone=2;
 int M=Ns/2;

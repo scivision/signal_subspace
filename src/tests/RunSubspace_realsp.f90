@@ -15,7 +15,7 @@ integer(c_int) :: Ns = 1024, &
 real(sp) :: fs=48000, &
             f0=12345.6, &
             snr=60  !dB
-character(*),parameter :: bfn='../bfilt.txt'
+character(*), parameter :: bfn='../bfilt.txt'
 
 integer(c_int) :: M,Nb
 integer:: fstat

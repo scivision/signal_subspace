@@ -29,7 +29,7 @@ ep=$(command -v $CXX)
 
 if [[ $es && $ec && $ep ]]
 then
-  echo  
+  echo
   echo "testing with"
   echo $FC  $CC  $CXX
   echo "press Enter to proceed or 's' Enter to skip"
@@ -52,7 +52,7 @@ ret=$?
 [[ $ret == 0 ]] && ctest --output-on-failure || exit $ret
 
 )
-  
+
 done
 
 cd "${0%/*}"  # change to directory of this script

@@ -16,6 +16,7 @@ subroutine rand_init(repeatable, image_distinct)
 logical, intent(in) :: repeatable, image_distinct
 
 call random_init(repeatable, image_distinct)
+
 end subroutine rand_init
 
 

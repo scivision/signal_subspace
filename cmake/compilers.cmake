@@ -16,8 +16,6 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
   string(APPEND CMAKE_Fortran_FLAGS_DEBUG " -ffpe-trap=zero,overflow,underflow")
   # mtune=native for better cross-platform
   add_compile_options(-mtune=native -Wall -Wextra)
-elseif(CMAKE_Fortran_COMPILER_ID STREQUAL PGI)
-  string(APPEND CMAKE_Fortran_FLAGS " -Mdclchk")
 endif()
 
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -29,5 +27,4 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 include(CheckFortranSourceCompiles)
-check_fortran_source_compiles("call random_init(.false., .false.); end" f2018random_init
-                              SRC_EXT f90)
+check_fortran_source_compiles("call random_init(.false., .false.); end" f18random SRC_EXT f90)

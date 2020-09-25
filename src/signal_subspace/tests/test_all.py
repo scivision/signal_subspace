@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import pytest
 from pytest import approx
 from time import time
@@ -81,7 +80,3 @@ def test_esprit():
     print("Fortran real: sec.", fortreal["time"].values[0])
 
     print("fESPRIT: Fortran faster than Python by factor:", py["time"].values[0] / fortcmpl["time"].values[0])
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

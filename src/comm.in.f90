@@ -13,15 +13,10 @@ logical :: debug = .false.
 contains
 
 subroutine rand_init(repeatable, image_distinct)
-logical, intent(in), optional :: repeatable, image_distinct
-integer :: i, n, clock
-integer, allocatable :: seed(:)
+logical, intent(in) :: repeatable, image_distinct
 
-call random_seed(size=n)
-allocate(seed(n))
-call system_clock(count=clock)
-seed = clock + 37 * [ (i - 1, i = 1, n) ]
-call random_seed(put=seed)
+@_random_init@
+
 end subroutine rand_init
 
 
