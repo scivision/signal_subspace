@@ -13,17 +13,18 @@ on:
 jobs:
 
   macos:
+    needs: linux
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
 
-    - run: brew install pkg-config lapack
+    - run: brew install lapack
 
     - run: ctest -S setup.cmake -VV
       env:
-        FC: gfortran-9
-        CC: gcc-9
-        CXX: g++-9
+        FC: gfortran-10
+        CC: gcc-10
+        CXX: g++-10
 
   linux:
     runs-on: ubuntu-latest
@@ -38,4 +39,8 @@ jobs:
         sudo apt update -yq
         sudo apt install -yq --no-install-recommends gfortran g++ liblapack-dev
 
-    - run: ctest -S setup.cmake -VV
+    - run: cmake -B build
+    - run: cmake --build build
+
+    - run: ctest --output-on-failure
+      working-directory: build

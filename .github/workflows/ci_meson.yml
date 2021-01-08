@@ -30,6 +30,7 @@ jobs:
     - run: meson test -C build
 
   macos:
+    needs: linux
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -42,9 +43,9 @@ jobs:
 
     - run: meson setup build
       env:
-        CC: gcc-9
-        CXX: g++-9
-        FC: gfortran-9
+        CC: gcc-10
+        CXX: g++-10
+        FC: gfortran-10
 
     - run: meson compile -C build
 
