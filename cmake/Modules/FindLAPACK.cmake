@@ -75,6 +75,8 @@ References
 * MKL LAPACKE (C, C++): https://software.intel.com/en-us/mkl-linux-developer-guide-calling-lapack-blas-and-cblas-routines-from-c-c-language-environments
 #]=======================================================================]
 
+include(CheckSourceCompiles)
+
 # clear to avoid endless appending on subsequent calls
 set(LAPACK_LIBRARY)
 set(LAPACK_INCLUDE_DIR)
@@ -88,7 +90,7 @@ find_library(ATLAS_LIB
   NAMES_PER_DIR
   PATH_SUFFIXES atlas)
 
-pkg_check_modules(pc_atlas_lapack lapack-atlas QUIET)
+pkg_check_modules(pc_atlas_lapack lapack-atlas)
 
 find_library(LAPACK_ATLAS
   NAMES ptlapack lapack_atlas lapack
@@ -96,7 +98,7 @@ find_library(LAPACK_ATLAS
   PATH_SUFFIXES atlas
   HINTS ${pc_atlas_lapack_LIBRARY_DIRS} ${pc_atlas_lapack_LIBDIR})
 
-pkg_check_modules(pc_atlas_blas blas-atlas QUIET)
+pkg_check_modules(pc_atlas_blas blas-atlas)
 
 find_library(BLAS_LIBRARY
   NAMES ptf77blas f77blas blas
@@ -159,10 +161,8 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL PGI)
   set(_lapack_hints ${_pgi_path}/../)
 endif()
 
-pkg_check_modules(pc_lapack lapack-netlib QUIET)
-if(NOT pc_lapack_FOUND)
-  pkg_check_modules(pc_lapack lapack QUIET)  # Netlib on Cygwin, Homebrew and others
-endif()
+pkg_search_module(pc_lapack lapack-netlib lapack)
+
 find_library(LAPACK_LIB
   NAMES lapack
   NAMES_PER_DIR
@@ -176,7 +176,7 @@ else()
 endif()
 
 if(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
-  pkg_check_modules(pc_lapacke lapacke QUIET)
+  pkg_check_modules(pc_lapacke lapacke)
   find_library(LAPACKE_LIBRARY
     NAMES lapacke
     NAMES_PER_DIR
@@ -196,19 +196,15 @@ if(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
     list(APPEND LAPACK_INCLUDE_DIR ${LAPACKE_INCLUDE_DIR})
     list(APPEND LAPACK_LIBRARY ${LAPACKE_LIBRARY})
   else()
-    message(WARNING "Trouble finding LAPACKE:
-      include: ${LAPACKE_INCLUDE_DIR}
-      libs: ${LAPACKE_LIBRARY}")
     return()
   endif()
 
   mark_as_advanced(LAPACKE_LIBRARY LAPACKE_INCLUDE_DIR)
 endif(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
 
-pkg_check_modules(pc_blas blas-netlib QUIET)
-if(NOT pc_blas_FOUND)
-  pkg_check_modules(pc_blas blas QUIET)  # Netlib on Cygwin and others
-endif()
+pkg_search_module(pc_blas blas-netlib blas)
+# Netlib on Cygwin and others
+
 find_library(BLAS_LIBRARY
   NAMES refblas blas
   NAMES_PER_DIR
@@ -239,7 +235,7 @@ endfunction(netlib_libs)
 #===============================
 function(openblas_libs)
 
-pkg_check_modules(pc_lapack lapack-openblas QUIET)
+pkg_check_modules(pc_lapack lapack-openblas)
 find_library(LAPACK_LIBRARY
   NAMES lapack
   NAMES_PER_DIR
@@ -247,7 +243,7 @@ find_library(LAPACK_LIBRARY
   PATH_SUFFIXES openblas)
 
 
-pkg_check_modules(pc_blas blas-openblas QUIET)
+pkg_check_modules(pc_blas blas-openblas)
 find_library(BLAS_LIBRARY
   NAMES openblas blas
   NAMES_PER_DIR
@@ -262,9 +258,6 @@ if(LAPACK_LIBRARY AND BLAS_LIBRARY)
   list(APPEND LAPACK_LIBRARY ${BLAS_LIBRARY})
   set(LAPACK_OpenBLAS_FOUND true PARENT_SCOPE)
 else()
-  message(WARNING "Trouble finding OpenBLAS:
-      include: ${LAPACK_INCLUDE_DIR}
-      libs: ${LAPACK_LIBRARY} ${BLAS_LIBRARY}")
   return()
 endif()
 
@@ -307,7 +300,6 @@ foreach(s ${_mkl_libs})
            NO_DEFAULT_PATH)
 
   if(NOT LAPACK_${s}_LIBRARY)
-    message(STATUS "MKL component not found: " ${s})
     return()
   endif()
 
@@ -341,7 +333,7 @@ if(NOT (OpenBLAS IN_LIST LAPACK_FIND_COMPONENTS
   endif()
 endif()
 
-find_package(PkgConfig QUIET)
+find_package(PkgConfig)
 
 # ==== generic MKL variables ====
 
@@ -350,7 +342,7 @@ if(MKL IN_LIST LAPACK_FIND_COMPONENTS)
   # double-quotes are necessary per CMake to_cmake_path docs.
   file(TO_CMAKE_PATH "$ENV{MKLROOT}" MKLROOT)
 
-  list(APPEND CMAKE_PREFIX_PATH ${MKLROOT}/bin/pkgconfig)
+  list(APPEND CMAKE_PREFIX_PATH ${MKLROOT}/tools/pkgconfig)
 
   if(NOT WIN32)
     find_package(Threads)
@@ -370,7 +362,7 @@ if(MKL IN_LIST LAPACK_FIND_COMPONENTS)
 
   unset(_mkl_libs)
   if(LAPACK95 IN_LIST LAPACK_FIND_COMPONENTS)
-    list(APPEND _mkl_libs mkl_blas95_${_mkl_bitflag}lp64 mkl_lapack95_${_mkl_bitflag}lp64)
+    set(_mkl_libs mkl_blas95_${_mkl_bitflag}lp64 mkl_lapack95_${_mkl_bitflag}lp64)
   endif()
 
   unset(_tbb)
@@ -381,7 +373,7 @@ if(MKL IN_LIST LAPACK_FIND_COMPONENTS)
       list(APPEND _mkl_libs tbb.lib)
     endif()
   elseif(OpenMP IN_LIST LAPACK_FIND_COMPONENTS)
-    pkg_check_modules(pc_mkl mkl-${_mkltype}-${_mkl_bitflag}lp64-iomp QUIET)
+    pkg_check_modules(pc_mkl mkl-${_mkltype}-${_mkl_bitflag}lp64-iomp)
 
     set(_mp iomp5)
     if(WIN32)
@@ -389,7 +381,10 @@ if(MKL IN_LIST LAPACK_FIND_COMPONENTS)
     endif()
     list(APPEND _mkl_libs mkl_intel_thread mkl_core ${_mp})
   else()
-    pkg_check_modules(pc_mkl mkl-${_mkltype}-${_mkl_bitflag}lp64-seq QUIET)
+    if(NOT WIN32)
+      # Windows oneAPI crashes here due to bad *.pc
+      pkg_check_modules(pc_mkl mkl-${_mkltype}-${_mkl_bitflag}lp64-seq)
+    endif()
     list(APPEND _mkl_libs mkl_sequential mkl_core)
   endif()
 
@@ -434,9 +429,43 @@ elseif(OpenBLAS IN_LIST LAPACK_FIND_COMPONENTS)
 
 endif()
 
+# -- verify library works
+
+set(CMAKE_REQUIRED_FLAGS)
+set(CMAKE_REQUIRED_LINK_OPTIONS)
+set(CMAKE_REQUIRED_INCLUDES)
+set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARY})
+
+get_property(enabled_langs GLOBAL PROPERTY ENABLED_LANGUAGES)
+set(LAPACK_links true)  # complex to check across distinct LapackE APIs
+
+if(LAPACK_LIBRARY AND Fortran IN_LIST enabled_langs)
+
+  check_source_compiles(Fortran
+  "program check_lapack
+  implicit none
+  double precision, external :: disnan
+  print *, disnan(0.)
+  end" LAPACK_real64_links)
+
+  check_source_compiles(Fortran
+  "program check_lapack
+  implicit none
+  real, external :: sisnan
+  print *, sisnan(0.)
+  end" LAPACK_real32_links)
+
+  if(NOT (LAPACK_real64_links AND LAPACK_real32_links))
+    set(LAPACK_links false)
+  endif()
+
+endif()
+
+set(CMAKE_REQUIRED_LIBRARIES)
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LAPACK
-  REQUIRED_VARS LAPACK_LIBRARY
+  REQUIRED_VARS LAPACK_LIBRARY LAPACK_links
   HANDLE_COMPONENTS)
 
 set(BLAS_LIBRARIES ${BLAS_LIBRARY})
