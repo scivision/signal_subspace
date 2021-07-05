@@ -1,6 +1,6 @@
 project('spectrum', 'c', 'fortran',
   version: '1.1.1',
-  default_options : ['default_library=static', 'buildtype=release', 'warning_level=3'])
+  default_options : ['default_library=static', 'buildtype=release', 'warning_level=3', 'cpp_std=c++11'])
 
 fc = meson.get_compiler('fortran')
 
