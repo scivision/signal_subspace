@@ -43,9 +43,7 @@ jobs:
 
     - run: meson setup build
       env:
-        CC: gcc-10
-        CXX: g++-10
-        FC: gfortran-10
+        FC: gfortran-11
 
     - run: meson compile -C build
 
