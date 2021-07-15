@@ -1,0 +1,50 @@
+{
+  "version": 3,
+
+"configurePresets": [
+{
+  "name": "default",
+  "binaryDir": "${sourceDir}/build",
+  "cacheVariables": {
+    "CMAKE_BUILD_TYPE": "Release"
+  }
+},
+{
+  "name": "intel", "inherits": "default",
+  "displayName": "Intel LLVM",
+  "binaryDir": "${sourceDir}/build-intel",
+  "environment": {
+    "CC": "icx",
+    "FC": "ifx"
+  }
+}
+],
+"buildPresets": [
+  {
+    "name": "default",
+    "configurePreset": "default"
+  },
+  {
+    "name": "intel",
+    "configurePreset": "intel"
+  }
+],
+"testPresets": [
+{
+  "name": "default",
+  "configurePreset": "default",
+  "output": {
+    "outputOnFailure": true,
+    "verbosity": "default"
+  },
+  "execution": {
+    "noTestsAction": "error",
+    "stopOnFailure": false
+  }
+},
+{
+  "name": "intel", "inherits": "default",
+  "configurePreset": "intel"
+}
+]
+}
