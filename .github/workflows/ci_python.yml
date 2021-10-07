@@ -1,5 +1,8 @@
 name: ci_python
 
+env:
+  CMAKE_BUILD_TYPE: Release
+
 on:
   push:
     paths:
@@ -21,7 +24,7 @@ jobs:
 
     - run: |
         sudo apt -yq update
-        sudo apt install -yq --no-install-recommends gfortran liblapack-dev
+        sudo apt install -yq --no-install-recommends liblapack-dev ninja-build
     - run: pip install .[tests,lint]
 
     - run: flake8

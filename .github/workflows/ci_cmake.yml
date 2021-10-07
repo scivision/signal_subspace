@@ -1,8 +1,8 @@
 name: ci_cmake
 
 env:
-  CMAKE_BUILD_PARALLEL_LEVEL: 3
   CTEST_PARALLEL_LEVEL: 3
+  CMAKE_BUILD_TYPE: Release
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - run: brew install lapack
+    - run: brew install lapack ninja
 
     - run: cmake --preset default
     - run: cmake --build --preset default
@@ -44,7 +44,7 @@ jobs:
     - name: Install packages
       run: |
         sudo apt update -yq
-        sudo apt install -yq --no-install-recommends gfortran g++ liblapack-dev
+        sudo apt install -yq --no-install-recommends liblapack-dev ninja-build
 
     - run: cmake --preset default
     - run: cmake --build --preset default
