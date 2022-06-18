@@ -2,11 +2,12 @@ name: ci_cmake
 
 env:
   CTEST_PARALLEL_LEVEL: 3
-  CMAKE_BUILD_TYPE: Release
 
 on:
   push:
     paths:
+      - "**.c"
+      - "**.cpp"
       - "**.f90"
       - "**.F90"
       - "**/CMakeLists.txt"
@@ -16,37 +17,32 @@ on:
 
 jobs:
 
-  macos:
-    needs: linux
-    runs-on: macos-latest
-    env:
-        FC: gfortran-11
+  core:
 
+    strategy:
+      matrix:
+        cfg: [{os: ubuntu-latest, fc: gfortran},
+              {os: macos-latest, fc: gfortran-11}
+              ]
+
+    runs-on: ${{ matrix.cfg.os }}
     steps:
     - uses: actions/checkout@v2
-
-    - run: brew install lapack ninja
-
-    - run: cmake -B build
-    - run: cmake --build build
-
-    - run: ctest --test-dir build --preset default
-
-
-  linux:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
 
     - name: Install packages
+      if: runner.os == 'linux'
       run: |
         sudo apt update -yq
         sudo apt install -yq --no-install-recommends liblapack-dev ninja-build
 
+    - name: Install packages
+      if: runner.os == 'macos'
+      run: brew install lapack ninja
+
     - run: cmake -B build
+      env:
+        FC: ${{ matrix.cfg.fc }}
+
     - run: cmake --build build
 
     - run: ctest --test-dir build --preset default
