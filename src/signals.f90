@@ -1,7 +1,8 @@
 module signals
 
+use, intrinsic:: iso_fortran_env, only  : sp=>real32, dp=>real64
 use, intrinsic:: iso_c_binding, only: c_int
-use comm, only: sp, dp, J
+use comm, only: J
 
 implicit none (type, external)
 private
@@ -15,8 +16,8 @@ interface signoise
 procedure signoise_r, signoise_c
 end interface signoise
 
-real(dp) :: pi = 4._dp * atan(1._dp)
-real(sp) :: pi_sp = 4._sp * atan(1._sp)
+real(dp) :: pi = 4 * atan(1._dp)
+real(sp) :: pi_sp = 4 * atan(1._sp)
 
 contains
 

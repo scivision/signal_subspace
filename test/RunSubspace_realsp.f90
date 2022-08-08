@@ -1,8 +1,7 @@
 program Subspace_Real32
-use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
+use,intrinsic:: iso_fortran_env, only: int64, sp=>real32, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int,c_bool
 
-use comm, only: sp, rand_init
 use perf, only: sysclock2ms
 use subspace, only: esprit_r
 use signals, only: signoise
@@ -29,7 +28,7 @@ integer(int64) :: tic,toc
 integer :: narg,u
 character(16) :: arg
 
-call rand_init(.false., .false.)
+call random_init(.false., .false.)
 !----------- parse command line ------------------
 M = Ns / 2_c_int
 narg = command_argument_count()

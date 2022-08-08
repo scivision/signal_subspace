@@ -2,10 +2,8 @@
 
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/scivision/signal_subspace.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/scivision/signal_subspace/context:python)
 ![ci_python](https://github.com/scivision/signal_subspace/workflows/ci_python/badge.svg)
-![ci_meson](https://github.com/scivision/signal_subspace/workflows/ci_meson/badge.svg)
 ![ci_cmake](https://github.com/scivision/signal_subspace/workflows/ci_cmake/badge.svg)
 
-[![pypi versions](https://img.shields.io/pypi/pyversions/signal_subspace.svg)](https://pypi.python.org/pypi/signal_subspace)
 [![PyPi Download stats](http://pepy.tech/badge/signal_subspace)](http://pepy.tech/project/signal_subspace)
 
 1-D and ensemble signal subspace analysis with methods such as Esprit

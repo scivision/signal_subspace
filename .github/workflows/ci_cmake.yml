@@ -1,7 +1,7 @@
 name: ci_cmake
 
 env:
-  CTEST_PARALLEL_LEVEL: 3
+  HOMEBREW_NO_INSTALL_CLEANUP: 1
 
 on:
   push:
@@ -21,28 +21,24 @@ jobs:
 
     strategy:
       matrix:
-        cfg: [{os: ubuntu-latest, fc: gfortran},
-              {os: macos-latest, fc: gfortran-11}
-              ]
+        os: [ubuntu-latest, macos-latest]
 
-    runs-on: ${{ matrix.cfg.os }}
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-
     - name: Install packages
       if: runner.os == 'linux'
       run: |
         sudo apt update -yq
-        sudo apt install -yq --no-install-recommends liblapack-dev ninja-build
+        sudo apt install -yq --no-install-recommends liblapack-dev
 
     - name: Install packages
       if: runner.os == 'macos'
-      run: brew install lapack ninja
+      run: brew install lapack && brew reinstall gcc
+
+    - uses: actions/checkout@v3
 
     - run: cmake -B build
-      env:
-        FC: ${{ matrix.cfg.fc }}
 
     - run: cmake --build build
 
-    - run: ctest --test-dir build --preset default
+    - run: ctest --test-dir build --preset default -V

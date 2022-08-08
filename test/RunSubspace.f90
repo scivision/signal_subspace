@@ -1,9 +1,8 @@
 program Subspace_complex
 
-use,intrinsic:: iso_fortran_env, only: int64, stderr=>error_unit
+use,intrinsic:: iso_fortran_env, only: int64, dp=>real64, stderr=>error_unit
 use,intrinsic:: iso_c_binding, only: c_int
 
-use comm, only: dp, rand_init
 use perf, only: sysclock2ms
 use subspace, only: esprit_c
 use signals,only: signoise
@@ -24,7 +23,7 @@ integer(int64) :: tic,toc
 integer :: narg
 character(16) :: arg
 
-call rand_init(.false., .false.)
+call random_init(.false., .false.)
 !----------- parse command line ------------------
 M = Ns / 4_c_int
 narg = command_argument_count()

@@ -1,8 +1,5 @@
 name: ci_python
 
-env:
-  CMAKE_BUILD_TYPE: Release
-
 on:
   push:
     paths:
@@ -17,14 +14,16 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
     - run: |
         sudo apt -yq update
         sudo apt install -yq --no-install-recommends liblapack-dev ninja-build
+
+    - uses: actions/checkout@v3
+
     - run: pip install .[tests,lint]
 
     - run: flake8
