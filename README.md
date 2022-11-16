@@ -28,9 +28,9 @@ Prereqs:
 * Mac: `brew install lapack gcc cmake`
 * Windows: use [MSYS2](https://www.scivision.dev/install-msys2-windows/) or Windows Subsystem for Linux
 
-
 ```sh
-ctest -S setup.cmake -VV
+cmake -Bbuild
+cmake --build build
 ```
 
 Then you can test Python calling the Fortran libraries by:
