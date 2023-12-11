@@ -79,7 +79,7 @@ def main():
     show()
 
 
-def plotperiodogram(t: np.ndarray, x: np.ndarray, fs: int, ax, ttxt):
+def plotperiodogram(t, x, fs: int, ax, ttxt):
     fax, Pxx = periodogram(x, fs, "hanning")
     ax[0].plot(fax, 10 * np.log10(abs(Pxx)))
     ax[0].set_title(ttxt)

@@ -14,94 +14,56 @@ based in part upon the
 The core subspace code is written in Fortran 2008 and is called from other languages (Python, C).
 Since the programs are Fortran / Python based, they should compile and run in virtually any platform from embedded to supercomputer.
 
-In particular, this program (Fortran, called by C or C++ optionally) works from compilers including:
-
-* Gfortran (GCC)
-* Intel oneAPI (ifort, icc, icpc)
-
-## Build
-
-Prereqs:
-
-* Linux: `apt install liblapack-dev g++ gcc gfortran cmake`
-* Mac: `brew install lapack gcc cmake`
-* Windows: use [MSYS2](https://www.scivision.dev/install-msys2-windows/) or Windows Subsystem for Linux
-
 ```sh
-cmake -Bbuild
-cmake --build build
+cmake -B build
+
+cmake --build build --parallel
 ```
+
+If Lapack is not available, it is built automatically.
 
 In 2023-2024, F2PY and Numpy are going through a transition of build systems.
 [CMake script build the f2py bindings](https://numpy.org/doc/stable/f2py/buildtools/cmake.html)
 are used to build the f2py targets that allow Python use of this library.
 
+```sh
+cmake -B build -Dpython=yes
+
+cmake --build build --parallel
+```
+
 In the examples below, observe the frequency estimates printed along with their corresponding eigenvalues.
 A larger eigenvalue is increased confidence in that particular frequency estimate.
 
-## Fortran
+## ESPRIT examples
 
-### ESPRIT example with noisy sinusoid
+All example use a noisy sinusoid.
+Some are "complex" using complex numbers, while others use real numbers.
 
-There are two versions of this program, one a full accuracy using `double complex` numbers, and the other using `single real` numbers as input.
+There are two versions of the complex program, one a full accuracy using `double complex` numbers, and the other using `single real` numbers as input.
 The single real (4 bytes/number) runs about 4 times faster than the double complex (16 bytes/number) program.
 
 ```sh
-./f_esprit_cmpl
+build/f_esprit_cmpl
 
-./f_esprit_real
+build/f_esprit_real
 ```
 
-### C ESPRIT example with noisy sinusoid
-
-Here is an example of calling Fortran Esprit from C, which uses real
-single precision float:
+Call Fortran Esprit from C using real single precision float:
 
 ```sh
-./c_esprit
+build/c_esprit
 ```
 
-### C++ ESPRIT example with noisy sinusoid
-
-Example of calling Fortran Esprit from C++, which uses real single precision float:
+Call Fortran Esprit from C++ using real single precision float:
 
 ```sh
-./cpp_esprit
+build/cpp_esprit
 ```
 
-## Python
+---
 
-### Compile Fortran ESPRIT to use from Python via f2py
-
-```sh
-pip install -e .
-```
-
-Selftest Fortran/C/C++/Python Esprit from Python:
-
-```sh
-pytest
-```
-
-## Notes
-
-> /liblapack.so: undefined reference to `ATL_zgeru'
-
-Try removing Atlas:
-
-```sh
-apt remove libatlas-base-dev
-```
-
-### Flang / Clang / Clang++
-
-You may need
-
-```sh
-apt install libc++abi-dev
-```
-
-### Plots comparing Fortran to Python
+Plots comparing real vs. complex ESPRIT:
 
 ```sh
 python BasicEspritExample.py
