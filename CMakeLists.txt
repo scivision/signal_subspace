@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.19...3.28)
+cmake_minimum_required (VERSION 3.20...3.28)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "Please use out-of-source build like
@@ -18,13 +18,14 @@ VERSION 1.1.2
 
 enable_testing()
 
+option(BUILD_TESTING "Build tests" ON)
+option(CMAKE_TLS_VERIFY "Verify TLS certificates when downloading external projects" ON)
+option(python "build python interface")
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-option(CMAKE_TLS_VERIFY "Verify TLS certificates when downloading external projects" ON)
-
 set_property(DIRECTORY PROPERTY EP_UPDATE_DISCONNECTED ON)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -45,6 +46,12 @@ target_include_directories(subspace INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/includ
 
 add_subdirectory(src)
 
+if(python)
+include(cmake/f2py.cmake)
+endif()
+
+if(BUILD_TESTING)
 add_subdirectory(test)
+endif()
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")

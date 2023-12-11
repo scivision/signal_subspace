@@ -25,4 +25,7 @@ jobs:
     - run: flake8
     - run: mypy
 
+    - run: cmake -Bbuild -Dpython=yes
+    - run: cmake --build build --parallel
+
     - run: pytest
