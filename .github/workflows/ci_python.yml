@@ -18,11 +18,7 @@ jobs:
       with:
         python-version: '3.x'
 
-    - run: |
-        sudo apt -yq update
-        sudo apt install -yq --no-install-recommends liblapack-dev ninja-build
-
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - run: pip install .[tests,lint]
 

@@ -1,5 +1,37 @@
 [build-system]
-requires = ["setuptools", "wheel", "numpy"]
+requires = ["setuptools>=61.0.0", "wheel", "numpy"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "signal_subspace"
+description = "1-D & 2-D signal subspace estimation methods"
+keywords = ["ESPRIT", "MUSIC", "RootMUSIC"]
+classifiers = ["Development Status :: 5 - Production/Stable",
+ "Environment :: Console",
+ "Intended Audience :: Science/Research",
+ "Operating System :: OS Independent",
+ "Programming Language :: Python :: 3",
+ "Topic :: Scientific/Engineering"
+]
+dependencies = ["numpy", "scipy"]
+requires-python = ">=3.7"
+dynamic = ["version", "readme"]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
+version = {attr = "signal_subspace.__version__"}
+
+[project.optional-dependencies]
+tests = ["pytest"]
+lint = ["flake8", "flake8-bugbear", "flake8-builtins", "flake8-blind-except", "mypy"]
 
 [tool.black]
 line-length = 132
+
+[tool.mypy]
+files = "src/"
+ignore_missing_imports = true
+strict_optional = false
+allow_redefinition = true
+show_error_context = false
+show_column_numbers = true

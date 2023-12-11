@@ -38,7 +38,7 @@ def test_esprit():
     later found literature stating ESPRIT is O(M^3) (or was it N^3?)
     """
 
-    pandas = pytest.importorskip('pandas')
+    pandas = pytest.importorskip("pandas")
     # %% measure signal
     M = [100]  # iterating over block length
 

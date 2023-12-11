@@ -4,6 +4,8 @@ from numpy import linalg as lg
 from time import time
 from typing import Tuple
 
+__version__ = "1.1.2"
+
 
 def corrmtx(x: np.ndarray, m: int) -> np.ndarray:
     """
@@ -24,7 +26,7 @@ def corrmtx(x: np.ndarray, m: int) -> np.ndarray:
 
     Tp = np.fliplr(Tp.conj())
 
-    C[N - m:, :] = Tp[-N + m:, :]
+    C[N - m :, :] = Tp[-N + m :, :]
 
     return C
 
@@ -53,13 +55,13 @@ def compute_autocovariance(x: np.ndarray, M: int) -> np.ndarray:
     x_vect = x[None, :].T
 
     # init covariance matrix
-    yn = x_vect[M - 1:: -1]  # reverse order from M-1 to 0
+    yn = x_vect[M - 1 :: -1]  # reverse order from M-1 to 0
 
     R = yn @ yn.conj().T  # zeroth lag
     # about 5-8% of computation time
     for i in range(1, N - M):  # no zero because we just computed it
         # extract the column vector
-        yn = x_vect[M - 1 + i: i - 1: -1]
+        yn = x_vect[M - 1 + i : i - 1 : -1]
 
         R = R + yn @ yn.conj().T
 
@@ -152,7 +154,7 @@ def rootmusic(x: np.ndarray, L: int, M: int = None, fs: int = 1) -> Tuple[np.nda
     # %% construct polynomial Q
     Q = np.zeros(2 * M - 1, dtype="complex128")
     # Extract the sum in each diagonal  0.1% of computation time
-    for (idx, val) in enumerate(range(M - 1, -M, -1)):
+    for idx, val in enumerate(range(M - 1, -M, -1)):
         Q[idx] = P.diagonal(val).sum()
 
     # Compute the roots 92% of computation time here

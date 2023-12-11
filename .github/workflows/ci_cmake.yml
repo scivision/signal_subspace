@@ -19,23 +19,18 @@ jobs:
 
   core:
 
+    env:
+      FC: gfortran-13
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
+
     steps:
-    - name: Install packages
-      if: runner.os == 'linux'
-      run: |
-        sudo apt update -yq
-        sudo apt install -yq --no-install-recommends liblapack-dev
 
-    - name: Install packages
-      if: runner.os == 'macos'
-      run: brew install lapack && brew reinstall gcc
-
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - run: cmake -B build
 
