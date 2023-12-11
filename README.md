@@ -32,13 +32,9 @@ cmake -Bbuild
 cmake --build build
 ```
 
-Then you can test Python calling the Fortran libraries by:
-
-```sh
-pip install -e .
-
-pytest -v
-```
+In 2023-2024, F2PY and Numpy are going through a transition of build systems.
+[CMake script build the f2py bindings](https://numpy.org/doc/stable/f2py/buildtools/cmake.html)
+are used to build the f2py targets that allow Python use of this library.
 
 In the examples below, observe the frequency estimates printed along with their corresponding eigenvalues.
 A larger eigenvalue is increased confidence in that particular frequency estimate.

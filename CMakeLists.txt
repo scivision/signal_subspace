@@ -13,7 +13,7 @@ endif()
 
 project(subspace
 LANGUAGES C CXX Fortran
-VERSION 1.1.1
+VERSION 1.1.2
 )
 
 enable_testing()
@@ -36,6 +36,12 @@ message(STATUS "${PROJECT_NAME} install prefix: ${CMAKE_INSTALL_PREFIX}")
 include(cmake/compilers.cmake)
 
 include(cmake/lapack.cmake)
+
+add_library(subspace OBJECT)
+target_compile_options(subspace PRIVATE ${fopts})
+target_link_libraries(subspace PRIVATE LAPACK::LAPACK)
+set_property(TARGET subspace PROPERTY Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_include_directories(subspace INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 add_subdirectory(src)
 
