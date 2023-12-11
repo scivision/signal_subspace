@@ -1,56 +1,44 @@
-cmake_minimum_required (VERSION 3.19)
+cmake_minimum_required (VERSION 3.19...3.28)
 
-project(spectrum
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "Please use out-of-source build like
+  cmake -B build")
+endif()
+
+get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(NOT is_multi_config AND NOT (CMAKE_BUILD_TYPE OR DEFINED ENV{CMAKE_BUILD_TYPE}))
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Release default")
+endif()
+
+
+project(subspace
 LANGUAGES C CXX Fortran
 VERSION 1.1.1
 )
 
 enable_testing()
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+option(CMAKE_TLS_VERIFY "Verify TLS certificates when downloading external projects" ON)
+
+set_property(DIRECTORY PROPERTY EP_UPDATE_DISCONNECTED ON)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/local" CACHE PATH "install prefix")
+endif()
+
+message(STATUS "${PROJECT_NAME} install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 include(cmake/compilers.cmake)
 
-find_package(LAPACK REQUIRED)
-
-if(NOT LAPACK_d_FOUND)
-  message(FATAL_ERROR "need LAPACK real64 'd' but not found")
-endif()
-
-if(NOT LAPACK_s_FOUND)
-  message(FATAL_ERROR "need LAPACK real32 's' but not found")
-endif()
-
-check_fortran_source_compiles(
-"program check
-use, intrinsic :: iso_fortran_env, only : real32
-implicit none (type, external)
-complex(real32), external :: cnrm2
-print *, cnrm2(1, [0._real32], 1)
-end program"
-LAPACK_c_FOUND
-SRC_EXT f90
-)
-
-if(NOT LAPACK_c_FOUND)
-  message(FATAL_ERROR "need LAPACK complex64 'c' but not found")
-endif()
-
-check_fortran_source_compiles(
-"program check
-use, intrinsic :: iso_fortran_env, only : real64
-implicit none (type, external)
-complex(real64), external :: znrm2
-print *, znrm2(1, [0._real64], 1)
-end program"
-LAPACK_z_FOUND
-SRC_EXT f90
-)
-
-if(LAPACK_z_FOUND)
-  set(HAVE_COMPLEX true)
-endif()
+include(cmake/lapack.cmake)
 
 add_subdirectory(src)
 
 add_subdirectory(test)
+
+file(GENERATE OUTPUT .gitignore CONTENT "*")

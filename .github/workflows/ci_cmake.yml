@@ -32,8 +32,4 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - run: cmake -B build
-
-    - run: cmake --build build
-
-    - run: ctest --test-dir build --preset default -V
+    - run: cmake --workflow --preset default
