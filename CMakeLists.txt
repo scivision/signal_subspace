@@ -28,7 +28,7 @@ option(CMAKE_TLS_VERIFY "Verify TLS certificates when downloading external proje
 set_property(DIRECTORY PROPERTY EP_UPDATE_DISCONNECTED ON)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/local" CACHE PATH "install prefix")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/local" CACHE PATH "install prefix" FORCE)
 endif()
 
 message(STATUS "${PROJECT_NAME} install prefix: ${CMAKE_INSTALL_PREFIX}")

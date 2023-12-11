@@ -29,14 +29,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: install full Lapack (linux)
-      if: runner.os == 'Linux'
-      run: sudo apt install liblapack-dev
-
-    - name: install full Lapack (macos)
-      if: runner.os == 'macOS'
-      run: brew install lapack
-
     - uses: actions/checkout@v4
 
     - run: cmake --workflow --preset default
