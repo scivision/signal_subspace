@@ -3,7 +3,7 @@ include(ExternalProject)
 
 find_package(LAPACK)
 
-if(LAPACK_d_FOUND AND LAPACK_s_FOUND AND LAPACK_c_FOUND AND LAPACK_z_FOUND)
+if(LAPACK_FOUND)
   return()
 endif()
 
@@ -50,10 +50,7 @@ endif()
 
 
 ExternalProject_Add(lapack
-GIT_REPOSITORY https://github.com/Reference-LAPACK/lapack.git
-GIT_TAG v3.12.0
-GIT_SHALLOW TRUE
-GIT_PROGRESS TRUE
+URL https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz
 CMAKE_ARGS ${lapack_cmake_args}
 TEST_COMMAND ""
 BUILD_BYPRODUCTS ${LAPACK_LIBRARIES}
@@ -70,7 +67,7 @@ USES_TERMINAL_TEST true
 if(NOT TARGET LAPACK::LAPACK)
   add_library(LAPACK::LAPACK INTERFACE IMPORTED GLOBAL)
 endif()
-set_property(TARGET LAPACK::LAPACK PROPERTY INCLUDE_DIRECTORIES "${LAPACK_INCLUDE_DIRS}")
-set_property(TARGET LAPACK::LAPACK PROPERTY IMPORTED_LOCATION "${LAPACK_LIBRARIES}")
+target_include_directories(LAPACK::LAPACK INTERFACE "${LAPACK_INCLUDE_DIRS}")
+target_link_libraries(LAPACK::LAPACK INTERFACE "${LAPACK_LIBRARIES}")
 
 add_dependencies(LAPACK::LAPACK lapack)

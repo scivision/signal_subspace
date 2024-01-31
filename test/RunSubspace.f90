@@ -44,7 +44,7 @@ if (narg > 4) then
   call get_command_argument(5,arg); read(arg,*) snr !dB
 endif
 
-print *, "Fortran Esprit: Complex Double Precision"
+print *, "Fortran Esprit"
 !---------- assign variable size arrays ---------------
 allocate(x(Ns), tones(Ntone), sigma(Ntone))
 !--- checking system numerics --------------

@@ -2,6 +2,7 @@
 add_executable(f_esprit_cmpl RunSubspace.f90)
 target_link_libraries(f_esprit_cmpl PRIVATE subspace)
 add_test(NAME fortran:complex:esprit COMMAND f_esprit_cmpl)
+set_property(TEST fortran:complex:esprit PROPERTY DISABLED $<NOT:$<BOOL:${LAPACK_z_FOUND}>>)
 #------ test program: Fortran Real Single Precision -------------
 add_executable(f_esprit_real RunSubspace_realsp.f90)
 target_link_libraries(f_esprit_real PRIVATE subspace)
