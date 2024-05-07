@@ -6,11 +6,11 @@ extern "C" {
 #include <stdbool.h>
 #endif
 
-extern void fircircfilter(float [], int*,float [],int*,float [], bool*);
+bool fircircfilter(float [], const int, float [], const int, float []);
 
-extern void signoise_r(const float*, const float*, const float*, int*, float []);
+void signoise_r(const float*, const float*, const float, const int, float []);
 
-extern void esprit_r(float [], int*, int*, int*, const float*, float [], float []);
+void esprit_r(float [], const int, const int, const int, const float, float [], float []);
 
 #ifdef __cplusplus
 }

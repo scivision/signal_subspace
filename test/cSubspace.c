@@ -7,9 +7,9 @@
 int main(void) {
 printf("C Esprit\n");
 
-int Ns=1024;
-int Ntone=2;
-int M=Ns/2;
+const int Ns=1024;
+const int Ntone=2;
+const int M=Ns/2;
 const float fs=48000.;
 //------- noisy signal generation ----------------
 const float snr = 60.; // dB, arbitrary
@@ -17,13 +17,13 @@ const float f0 = (float)12345.6; //arbitrary
 
 float * x;
 x = malloc((size_t)Ns*sizeof(float));
-signoise_r(&fs, &f0, &snr, &Ns, &x[0]);
+signoise_r(&fs, &f0, snr, Ns, &x[0]);
 
 //---- signal estimation -----------------------------
 float * tones = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));
 float * sigma = calloc((size_t)Ntone,(size_t)Ntone*sizeof(float));
 
-esprit_r(&x[0], &Ns, &Ntone, &M, &fs, &tones[0], &sigma[0]);
+esprit_r(&x[0], Ns, Ntone, M, fs, &tones[0], &sigma[0]);
 
 free(x);
 

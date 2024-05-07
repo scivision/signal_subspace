@@ -29,9 +29,9 @@ contains
 
 subroutine esprit_r(x,N,L,M,fs,tout,sigma) bind(c)
 
-integer(c_int), intent(in) :: L,M,N
+integer(c_int), intent(in), value :: L,M,N
 real(sp),intent(in) :: x(N)
-real(sp),intent(in) :: fs
+real(sp),intent(in), value :: fs
 real(sp),intent(out) :: tout(L/2),sigma(L)
 
 real(sp) :: tones(L)

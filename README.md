@@ -17,7 +17,7 @@ Since the programs are Fortran / Python based, they should compile and run in vi
 ```sh
 cmake -B build
 
-cmake --build build --parallel
+cmake --build build
 ```
 
 If Lapack is not available, it is built automatically.
@@ -29,7 +29,7 @@ are used to build the f2py targets that allow Python use of this library.
 ```sh
 cmake -B build -Dpython=yes
 
-cmake --build build --parallel
+cmake --build build
 ```
 
 In the examples below, observe the frequency estimates printed along with their corresponding eigenvalues.

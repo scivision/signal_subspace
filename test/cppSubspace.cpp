@@ -12,22 +12,23 @@ std::vector<float> loadfiltercoeff(std::string);
 
 const bool verbose=false;
 
-int main(void) {
+int main() {
 std::cout << "C++ Esprit" << std::endl;
 
 std::string Bfn="../bfilt.txt";
-int Ns=1024;
-int Ntone=2;
-int M=Ns/2;
+
+const int Ns=1024;
+const int Ntone=2;
+const int M=Ns/2;
 const float fs=48000.;
 //------- noisy signal generation ----------------
 const float snr = 60.; // dB, arbitrary
 const float f0 = float(12345.6); //arbitrary
 
-std::vector<float> x((size_t(Ns))); // noisy signal
-std::vector<float> y((size_t(Ns))); // filtered signal
+std::vector<float> x(Ns); // noisy signal
+std::vector<float> y(Ns); // filtered signal
 
-signoise_r(&fs, &f0, &snr, &Ns, &x.front());
+signoise_r(&fs, &f0, snr, Ns, &x.front());
 
 //---- filter noisy signal ------------------------
 
@@ -40,8 +41,7 @@ if (Bok){
 
     if (verbose) std::cout << "Nb: " << Nb << std::endl;
 
-    fircircfilter(&x.front(),&Ns,&Bfilt.front(),&Nb,
-                                &y.front(),&filtok);
+    filtok = fircircfilter(&x.front(), Ns, &Bfilt.front(), Nb, &y.front());
 }
 
 if (verbose) std::cout << "Bok: " << Bok << " filtok: " << filtok << std::endl;
@@ -56,7 +56,7 @@ std::vector<float> tones((size_t(Ntone)));
 std::vector<float> sigma((size_t(Ntone)));
 
 // if we pass the reference to the first array address, the rest of the array will follow (tones,sigma)
-esprit_r(&y.front(), &Ns, &Ntone, &M, &fs,
+esprit_r(&y.front(), Ns, Ntone, M, fs,
                       &tones.front(), &sigma.front());
 
 

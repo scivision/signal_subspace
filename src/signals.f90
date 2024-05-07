@@ -44,11 +44,12 @@ x = x + sqrt(nvar)*noise
 end subroutine signoise_c
 
 
-subroutine signoise_r(fs,f0,snr,Ns,x) bind(c)
+subroutine signoise_r(fs, f0, snr, Ns, x) bind(c)
 ! generate noisy tone
 
-real(sp),intent(in) :: fs,f0,snr
-integer(c_int), intent(in) :: Ns
+real(sp),intent(in) :: fs,f0
+real(sp), intent(in), value :: snr
+integer(c_int), intent(in), value :: Ns
 real(sp),intent(out) :: x(Ns)
 
 

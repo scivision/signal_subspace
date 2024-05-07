@@ -73,7 +73,7 @@ if (fstat == 0) then
 !    print '(EN10.1)', b
 
   call system_clock(tic)
-  call fircircfilter(x, size(x,kind=c_int), b, size(b,kind=c_int), y, filtok)
+  filtok = fircircfilter(x, size(x,kind=c_int), b, size(b,kind=c_int), y)
   call system_clock(toc)
   print '(A,EN10.1)', 'seconds to FIR filter: ',sysclock2ms(toc-tic) / 1000
 endif

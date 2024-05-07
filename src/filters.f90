@@ -10,12 +10,11 @@ public:: fircircfilter
 
 contains
 
-subroutine fircircfilter(x,N,b,L, y,filtok) bind(c)
+logical(C_BOOL) function fircircfilter(x, N, b, L, y) bind(c) result(filtok)
 ! http://www.mathworks.com/help/fixedpoint/ug/convert-fir-filter-to-fixed-point-with-types-separate-from-code.html
-integer(c_int), intent(in) :: N,L
+integer(c_int), intent(in), value :: N, L
 real(sp),intent(in) :: x(N), b(L)
 real(sp),intent(out) :: y(N)
-logical(c_bool),intent(out) :: filtok
 
 integer :: k,p, i,j
 real(sp) :: z(L), acc, nan
@@ -66,6 +65,6 @@ enddo !i
 
 filtok = .true.
 
-end subroutine fircircfilter
+end function fircircfilter
 
 end module filters
