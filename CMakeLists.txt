@@ -22,9 +22,6 @@ option(BUILD_TESTING "Build tests" ON)
 option(CMAKE_TLS_VERIFY "Verify TLS certificates when downloading external projects" ON)
 option(python "build python interface")
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
-
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set_property(DIRECTORY PROPERTY EP_UPDATE_DISCONNECTED ON)
 
