@@ -28,15 +28,11 @@ set(CMAKE_CXX_STANDARD 11)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set_property(DIRECTORY PROPERTY EP_UPDATE_DISCONNECTED ON)
 
-if(PROJECT_IS_TOP_LEVEL AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "${PROJECT_BINARY_DIR}/local")
-endif()
-
 message(STATUS "${PROJECT_NAME} install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 include(cmake/compilers.cmake)
 
-include(cmake/lapack.cmake)
+find_package(LAPACK REQUIRED)
 
 add_library(subspace OBJECT)
 target_compile_options(subspace PRIVATE ${fopts})
