@@ -1,5 +1,7 @@
 submodule (subspace) subspace_complex
 
+use, intrinsic :: iso_fortran_env, only : error_unit
+
 implicit none
 
 contains
@@ -28,7 +30,7 @@ call autocov_c(x, size(x,kind=c_int), M, R)
 !call system_clock(tic)
 call zgesvd('A','N',M,M,R,M,S,U,M,VT,M,SWORK,LWORK,RWORK,svdinfo)
 if (svdinfo /= 0) then
-  write(stderr,*) 'ZGESVD return code',svdinfo
+  write(error_unit,*) 'ZGESVD return code',svdinfo
   error stop 'GESVD'
 endif
 !call system_clock(toc)
@@ -41,13 +43,13 @@ S2 = U(2:M, :L)
 W1=matmul(conjg(transpose(S1)),S1)
 call zgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
-  write(stderr,*) 'ZGETRF inverse output code',getrfinfo
+  write(error_unit,*) 'ZGETRF inverse output code',getrfinfo
   error stop 'GETRF'
 endif
 
 call zgetri(L,W1,L,ipiv,Swork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then
-  write(stderr,*) 'ZGETRI output code',getriinfo
+  write(error_unit,*) 'ZGETRI output code',getriinfo
   error stop 'GETRI'
 endif
 
@@ -58,7 +60,7 @@ Phi = matmul(matmul(W1, conjg(transpose(S1))), S2)
 !call system_clock(tic)
 call zgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
-  write(stderr,*) 'ZGEEVS output code',evinfo
+  write(error_unit,*) 'ZGEEVS output code',evinfo
   error stop 'GEEV'
 endif
 !call system_clock(toc)

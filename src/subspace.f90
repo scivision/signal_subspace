@@ -1,6 +1,6 @@
 module subspace
-use, intrinsic:: iso_fortran_env, only: stderr=>error_unit
-use, intrinsic:: iso_c_binding, only: c_int
+use, intrinsic :: iso_fortran_env, only: error_unit
+use, intrinsic :: iso_c_binding, only: c_int
 use comm, only: sp, dp,pi, debug
 use covariance,only: autocov_r, autocov_c
 !use perf, only : sysclock2ms
@@ -66,7 +66,7 @@ if (debug) print *,'LWORK: ',LWORK
 call sgesvd('A','N',M,M,R,M,S,U,M,VT,M, SWORK, LWORK,svdinfo)
 !if (debug) print *,'work(1):',swork(1)
 if (svdinfo /= 0) then
-  write(stderr,*) 'SGESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
+  write(error_unit,*) 'SGESVD return code',svdinfo,'  LWORK:',LWORK,'  M:',M
   if (M /= LWORK/LRATIO) error stop 'possible LWORK overflow'
 endif
 !call system_clock(toc)
@@ -80,13 +80,13 @@ W1=matmul(transpose(S1),S1)
 
 call sgetrf(L,L,W1,L,ipiv,getrfinfo) !LU decomp
 if (getrfinfo /= 0) then
-  write(stderr,*) 'SGETRF inverse output code',getrfinfo
+  write(error_unit,*) 'SGETRF inverse output code',getrfinfo
   error stop 'GETRF'
 endif
 
 call sgetri(L,W1,L,ipiv,Rwork,Lwork,getriinfo) !LU inversion
 if (getriinfo /= 0) then
-  write(stderr,*) 'SGETRI output code',getriinfo
+  write(error_unit,*) 'SGETRI output code',getriinfo
   error stop 'GETRI'
 endif
 
@@ -100,7 +100,7 @@ Phi = matmul(matmul(W1, transpose(S1)), S2)
 !call system_clock(tic)
 call cgeev('N','N',L,Phi,L,eig,junk,L,junk,L,cwork,lwork,rwork,evinfo)
 if (evinfo /= 0) then
-  write(stderr,*) 'CGEEV output code',evinfo
+  write(error_unit,*) 'CGEEV output code',evinfo
   error stop 'GEEV'
 endif
 !call system_clock(toc)
