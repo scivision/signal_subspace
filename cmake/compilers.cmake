@@ -11,7 +11,4 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   "$<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-ffpe-trap=zero,overflow,underflow>"
   -Wall -Wextra
   )
-  if(NOT CMAKE_CROSSCOMPILING)
-    add_compile_options(-mtune=native)
-  endif()
 endif()

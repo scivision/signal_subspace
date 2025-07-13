@@ -30,6 +30,18 @@ include(cmake/compilers.cmake)
 
 find_package(LAPACK REQUIRED)
 
+set(CMAKE_REQUIRED_LIBRARIES LAPACK::LAPACK)
+check_source_compiles(Fortran
+"program check_lapack
+use, intrinsic :: iso_fortran_env, only : real64
+implicit none
+real(real64), external :: dznrm2
+complex(real64) :: x = 0.
+print *, dznrm2(1, x, 1)
+end program"
+LAPACK_z_FOUND
+)
+
 add_library(subspace OBJECT)
 target_compile_options(subspace PRIVATE ${fopts})
 target_link_libraries(subspace PRIVATE LAPACK::LAPACK)
