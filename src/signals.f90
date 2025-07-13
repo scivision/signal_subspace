@@ -33,7 +33,7 @@ complex(dp) :: noise(Ns)
 integer :: i
 
 t = [(i, i=0,size(x)-1)] / fs
-x = sqrt(2._dp) * exp(J * 2._dp * pi * f0 * t)
+x = sqrt(2._dp) * exp(J * 2 * pi * f0 * t)
 !--- add noise
 call randn(noise)
 
@@ -58,12 +58,12 @@ real(sp) :: noise(Ns)
 integer(c_int) :: i
 
 t = [(i, i=0, size(x)-1)] / fs
-x = sqrt(2._sp) * cos(2._sp * pi_sp * f0 * t)
+x = sqrt(2._sp) * cos(2 * pi_sp * f0 * t)
 
 !--- add noise
 call randn(noise)
 
-nvar = 10._sp**(-snr / 10._sp)
+nvar = 10._sp**(-snr / 10)
 
 x = x + sqrt(nvar) * noise
 
@@ -86,8 +86,8 @@ real(dp) :: u1, u2, x_i, x_r
 call random_number(u1)
 call random_number(u2)
 
-x_r = sqrt(-2._dp * log(u1)) * cos(2._dp * pi * u2)
-x_i = sqrt(-2._dp * log(u1)) * sin(2._dp * pi * u2)
+x_r = sqrt(-2 * log(u1)) * cos(2 * pi * u2)
+x_i = sqrt(-2 * log(u1)) * sin(2 * pi * u2)
 
 noise = cmplx(x_r, x_i, dp)  !complex() can only handle scalars
 
@@ -109,7 +109,7 @@ real(sp) :: u1, u2
 call random_number(u1)
 call random_number(u2)
 
-noise = sqrt(-2._sp * log(u1)) * cos(2._sp * pi_sp * u2)
+noise = sqrt(-2 * log(u1)) * cos(2 * pi_sp * u2)
 
 end subroutine randn_r
 

@@ -7,7 +7,7 @@ private
 public :: sp, dp, J, pi, debug
 
 complex(dp),parameter :: J = (0._dp, 1._dp)
-real(dp),parameter :: pi = 4._dp*atan(1._dp)
+real(dp),parameter :: pi = 4 * atan(1._dp)
 logical :: debug = .false.
 
 
