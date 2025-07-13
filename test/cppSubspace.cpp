@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstring>
+#include <cstdlib>
 #include <string> // cstring and string for platform independence
 #include <cmath>
 #include <vector>
@@ -13,7 +14,7 @@ std::vector<float> loadfiltercoeff(std::string);
 const bool verbose=false;
 
 int main() {
-std::cout << "C++ Esprit" << std::endl;
+std::cout << "C++ Esprit\n";
 
 std::string Bfn="../bfilt.txt";
 
@@ -35,19 +36,19 @@ signoise_r(&fs, &f0, snr, Ns, &x.front());
 std::vector<float> Bfilt = loadfiltercoeff(Bfn);
 bool Bok = std::isfinite(Bfilt.at(0));
 bool filtok = false;
-if (verbose) std::cout << "len(y): " << y.size() << std::endl;
+if (verbose) std::cout << "len(y): " << y.size() << "\n";
 if (Bok){
     int Nb = int(Bfilt.size());
 
-    if (verbose) std::cout << "Nb: " << Nb << std::endl;
+    if (verbose) std::cout << "Nb: " << Nb << "\n";
 
     filtok = fircircfilter(&x.front(), Ns, &Bfilt.front(), Nb, &y.front());
 }
 
-if (verbose) std::cout << "Bok: " << Bok << " filtok: " << filtok << std::endl;
+if (verbose) std::cout << "Bok: " << Bok << " filtok: " << filtok << "\n";
 
 if (!Bok || !filtok){
-    std::cerr << "C++ Esprit: skipping filter." << std::endl;
+    std::cerr << "C++ Esprit: skipping filter.\n";
     y=x;
 }
 
@@ -63,18 +64,17 @@ esprit_r(&y.front(), Ns, Ntone, M, fs,
 std::cout << "estimated tone freq [Hz]: ";
 for (const auto i: tones) std::cout << i;
 
-std::cout << std::endl << "with sigma:               ";
+std::cout << "\nwith sigma:               ";
 for (const auto i: sigma) std::cout << i;
-std::cout << std::endl;
+std::cout << "\n";
 
 if (fabsf(tones[0]-f0)>0.0001*f0){
-    std::cerr << "E: failed to meet tolerance" << std::endl;
+    std::cerr << "E: failed to meet tolerance\n";
     return EXIT_FAILURE;
 }
-else{
-    std::cout << "OK" << std::endl;
-    return EXIT_SUCCESS;
-}
+
+std::cout << "OK\n";
+return EXIT_SUCCESS;
 
 } // main
 
@@ -87,7 +87,7 @@ Bfilt.at(0)=NAN; // signals failure
 std::ifstream Bfile;
 Bfile.open(Bfn,std::ifstream::in);
 if (!Bfile.is_open()){
-    std::cerr << "E: could not open " << Bfn << std::endl;
+    std::cerr << "E: could not open " << Bfn << "\n";
     return Bfilt;
 }
 
@@ -95,7 +95,7 @@ char val[20];
 Bfile.getline(val,20); // how many coeff in file (first line)
 int Nb = atoi(val); // NOTE: Fortran has signed integers only.
 if (Nb<1 || Nb>10000){
-    std::cerr << "E: Failed to obtain number of coefficients from " << Bfn << std::endl;
+    std::cerr << "E: Failed to obtain number of coefficients from " << Bfn << "\n";
     return Bfilt;
 }
 // Read coeff
@@ -107,17 +107,17 @@ std::istringstream iss(vals);
 size_t i=0;
 while(iss>>val){
     Bfilt[i] = float(atof(val));
-    if (verbose) std::cout << "B[" << i <<"]= " << Bfilt[i] << std::endl;
+    if (verbose) std::cout << "B[" << i <<"]= " << Bfilt[i] << "\n";
     ++i;
 }
 
 if (i != size_t(Nb)){
-    std::cerr << "E: read " << i << " coeff from " << Bfn << " but expected " << Nb << std::endl;
+    std::cerr << "E: read " << i << " coeff from " << Bfn << " but expected " << Nb << "\n";
     Bfilt.at(0)=NAN;
     return Bfilt;
 }
 
-if (verbose) std::cout << "loaded " << Bfilt.size() << " filter coefficients from " << Bfn << std::endl;
+if (verbose) std::cout << "loaded " << Bfilt.size() << " filter coefficients from " << Bfn << "\n";
 
 
 return Bfilt;
