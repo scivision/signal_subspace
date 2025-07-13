@@ -25,6 +25,12 @@ jobs:
     - run: flake8
     - run: mypy
 
+    - name: Install Lapack (linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt update
+        sudo apt install --no-install-recommends liblapack-dev
+
     - run: cmake -Bbuild -Dpython=yes
     - run: cmake --build build --parallel
 
