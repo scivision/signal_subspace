@@ -45,7 +45,6 @@ add_custom_command(
   COMMENT "${print_cmd}"
   DEPENDS ${f2py_src} # Fortran source
   VERBATIM
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Set up target
