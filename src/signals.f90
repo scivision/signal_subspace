@@ -1,7 +1,7 @@
 module signals
 
 use, intrinsic:: iso_fortran_env, only  : sp=>real32, dp=>real64
-use, intrinsic:: iso_c_binding, only: c_int
+use, intrinsic:: iso_c_binding, only: C_INT, C_DOUBLE, C_FLOAT
 use comm, only: J
 
 implicit none (type, external)
@@ -21,12 +21,12 @@ real(sp) :: pi_sp = 4 * atan(1._sp)
 
 contains
 
-subroutine signoise_c(fs,f0,snr,Ns,x) bind(c)
+subroutine signoise_c(fs, f0, snr, Ns, x) bind(c)
 ! generate noisy tone
 
-real(dp),intent(in) :: fs,f0,snr
-integer(c_int), intent(in) :: Ns
-complex(dp),intent(out) :: x(Ns)
+real(C_DOUBLE),intent(in) :: fs,f0,snr
+integer(C_INT), intent(in) :: Ns
+complex(C_DOUBLE),intent(out) :: x(Ns)
 
 real(dp) :: t(Ns),nvar
 complex(dp) :: noise(Ns)
@@ -47,10 +47,10 @@ end subroutine signoise_c
 subroutine signoise_r(fs, f0, snr, Ns, x) bind(c)
 ! generate noisy tone
 
-real(sp),intent(in) :: fs,f0
-real(sp), intent(in), value :: snr
-integer(c_int), intent(in), value :: Ns
-real(sp),intent(out) :: x(Ns)
+real(C_FLOAT), intent(in) :: fs,f0
+real(C_FLOAT), intent(in), value :: snr
+integer(C_INT), intent(in), value :: Ns
+real(C_FLOAT), intent(out) :: x(Ns)
 
 
 real(sp) :: t(Ns),nvar
