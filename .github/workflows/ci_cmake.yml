@@ -20,7 +20,7 @@ jobs:
   core:
 
     env:
-      FC: gfortran-13
+      FC: gfortran-14
 
     strategy:
       matrix:
@@ -31,4 +31,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - run: cmake --workflow --preset default
+    - name: Install Lapack (linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt update
+        sudo apt install --no-install-recommends liblapack-dev
+
+    - run: cmake --workflow default
