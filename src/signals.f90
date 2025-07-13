@@ -4,7 +4,7 @@ use, intrinsic:: iso_fortran_env, only  : sp=>real32, dp=>real64
 use, intrinsic:: iso_c_binding, only: C_INT, C_DOUBLE, C_FLOAT
 use comm, only: J
 
-implicit none (type, external)
+implicit none
 private
 public :: signoise
 

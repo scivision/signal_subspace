@@ -5,7 +5,7 @@ use comm, only: sp, dp,pi, debug
 use covariance,only: autocov_r, autocov_c
 !use perf, only : sysclock2ms
 
-implicit none (type, external)
+implicit none
 
 ! interface esprit
 ! module procedure esprit_c, esprit_r

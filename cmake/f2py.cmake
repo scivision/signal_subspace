@@ -25,32 +25,37 @@ cmake_print_variables(Python_NumPy_INCLUDE_DIRS)
 
 # Common variables
 set(f2py_module_name "pysubspace")
-set(f2py_module_c "${CMAKE_CURRENT_BINARY_DIR}/${f2py_module_name}module.c")
+set(f2py_module_c "${f2py_module_name}module.c")
 
 get_property(f2py_src TARGET subspace PROPERTY SOURCES)
 message(VERBOSE "f2py ${f2py_module_name} sources: ${f2py_src}")
 
 
 # Generate sources
-add_custom_target(
-  genpyf
-  DEPENDS "${f2py_module_c}"
+add_custom_target(genpyf
+  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${f2py_module_c}"
 )
+
+set(cmd ${Python_EXECUTABLE}  -m "numpy.f2py" "${f2py_src}" -m "${f2py_module_name}" --lower)
+string(REPLACE ";" " " print_cmd "${cmd}")
+
 add_custom_command(
-  OUTPUT "${f2py_module_c}"
-  COMMAND ${Python_EXECUTABLE}  -m "numpy.f2py"
-                   "${fortran_src_file}"
-                   -m "${f2py_module_name}"
-                   --lower # Important
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${f2py_module_c}"
+  COMMAND ${cmd}
+  COMMENT "${print_cmd}"
   DEPENDS ${f2py_src} # Fortran source
+  VERBATIM
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Set up target
 Python_add_library(${f2py_module_name} MODULE WITH_SOABI
-  "${f2py_module_c}" # Generated
+  "${CMAKE_CURRENT_BINARY_DIR}/${f2py_module_c}" # Generated
   "${F2PY_INCLUDE_DIR}/fortranobject.c" # From NumPy
   "${f2py_src}"
 )
 
 target_include_directories(${f2py_module_name} PRIVATE "${F2PY_INCLUDE_DIR}")
 target_link_libraries(${f2py_module_name} PRIVATE Python::NumPy)
+
+add_dependencies(${f2py_module_name} genpyf)

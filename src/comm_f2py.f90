@@ -2,7 +2,7 @@ module comm
 
 use, intrinsic :: iso_c_binding, only: sp=>C_FLOAT, dp=>C_DOUBLE, int64=>C_LONG_LONG, sizeof=>c_sizeof
 
-implicit none (type, external)
+implicit none
 private
 public :: sp, dp, J, pi, debug
 

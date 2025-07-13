@@ -7,7 +7,7 @@ use subspace, only: esprit_r
 use signals, only: signoise
 use filters, only: fircircfilter
 
-implicit none (type, external)
+implicit none
 
 integer(c_int) :: Ns = 1024, &
                   Ntone = 2

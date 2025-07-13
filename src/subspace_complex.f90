@@ -1,6 +1,6 @@
 submodule (subspace) subspace_complex
 
-implicit none (type, external)
+implicit none
 
 contains
 

@@ -6,7 +6,7 @@ use, intrinsic:: iso_c_binding, only: c_bool
 
 use comm, only : dp
 
-implicit none (type, external)
+implicit none
 private
 public :: sysclock2ms
 

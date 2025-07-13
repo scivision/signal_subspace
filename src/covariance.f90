@@ -4,7 +4,7 @@ use, intrinsic:: iso_c_binding, only: c_int
 use comm,only: sp, dp
 !use perf, only : sysclock2ms
 
-implicit none (type, external)
+implicit none
 private
 public :: autocov_r, autocov_c
 
