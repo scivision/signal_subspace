@@ -51,6 +51,11 @@ target_include_directories(subspace INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/includ
 add_subdirectory(src)
 
 if(python)
+set(f2py_src
+${CMAKE_CURRENT_SOURCE_DIR}/src/comm.f90
+${CMAKE_CURRENT_SOURCE_DIR}/src/covariance.f90
+${CMAKE_CURRENT_SOURCE_DIR}/src/subspace.f90
+)
 include(cmake/f2py.cmake)
 endif()
 

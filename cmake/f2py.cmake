@@ -27,8 +27,8 @@ cmake_print_variables(Python_NumPy_INCLUDE_DIRS)
 set(f2py_module_name "pysubspace")
 set(f2py_module_c "${f2py_module_name}module.c")
 
-get_property(f2py_src TARGET subspace PROPERTY SOURCES)
-message(VERBOSE "f2py ${f2py_module_name} sources: ${f2py_src}")
+# get_property(f2py_src TARGET subspace_f2py PROPERTY SOURCES)
+# message(VERBOSE "f2py ${f2py_module_name} sources: ${f2py_src}")
 
 
 # Generate sources
@@ -56,6 +56,6 @@ Python_add_library(${f2py_module_name} MODULE WITH_SOABI
 )
 
 target_include_directories(${f2py_module_name} PRIVATE "${F2PY_INCLUDE_DIR}")
-target_link_libraries(${f2py_module_name} PRIVATE Python::NumPy)
+target_link_libraries(${f2py_module_name} PRIVATE Python::NumPy LAPACK::LAPACK)
 
 add_dependencies(${f2py_module_name} genpyf)
