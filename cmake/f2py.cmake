@@ -1,4 +1,5 @@
 # CMake >= 3.18
+# https://numpy.org/doc/stable/f2py/buildtools/cmake.html
 
 find_package(Python REQUIRED
   COMPONENTS Interpreter Development.Module NumPy)
@@ -9,14 +10,10 @@ set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
 
 execute_process(
   COMMAND ${Python_EXECUTABLE} -c "import numpy.f2py; print(numpy.f2py.get_include())"
-  OUTPUT_VARIABLE F2PY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
-  RESULT_VARIABLE ret
+  OUTPUT_VARIABLE F2PY_INCLUDE_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY
 )
-
-if(NOT ret EQUAL 0)
-  message(WARNING "Failed to get f2py include dir ${ret}")
-  return()
-endif()
 
 cmake_path(CONVERT "${F2PY_INCLUDE_DIR}" TO_CMAKE_PATH_LIST F2PY_INCLUDE_DIR)
 
@@ -54,3 +51,6 @@ Python_add_library(${f2py_module_name} MODULE WITH_SOABI
   "${F2PY_INCLUDE_DIR}/fortranobject.c" # From NumPy
   "${f2py_src}"
 )
+
+target_include_directories(${f2py_module_name} PRIVATE "${F2PY_INCLUDE_DIR}")
+target_link_libraries(${f2py_module_name} PRIVATE Python::NumPy)

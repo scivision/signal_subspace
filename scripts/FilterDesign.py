@@ -17,13 +17,6 @@ from matplotlib.pyplot import show, figure
 from argparse import ArgumentParser
 from signal_subspace.plots import plotfilt
 
-try:
-    import seaborn as sns
-
-    sns.set_context("talk")
-except ImportError:
-    pass
-
 
 def computefir(fc, L: int, ofn, fs: int, method: str):
     """
